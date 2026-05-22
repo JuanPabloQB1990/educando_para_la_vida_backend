@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS tiempo_validacion (
+  id_tiempo_validacion VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
+  tiempo INT NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

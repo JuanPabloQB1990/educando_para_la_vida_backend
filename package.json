@@ -1,0 +1,37 @@
+{
+  "name": "institucion-backend",
+  "version": "1.0.0",
+  "description": "API for educational institution enrollment system",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon --exec tsx src/index.ts",
+    "build": "tsc",
+    "db:migrate": "node src/database/migrate.ts",
+    "db:init": "node src/database/init.ts",
+    "db:seed": "node src/database/seedLoader.ts",
+    "db:setup": "node src/database/init.ts && node src/database/seedLoader.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "google-auth-library": "^10.6.2",
+    "google-spreadsheet": "^5.2.0",
+    "googleapis": "^171.4.0",
+    "joi": "^17.11.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.6.5",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3",
+    "uuid": "^11.1.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.7.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2"
+  }
+}

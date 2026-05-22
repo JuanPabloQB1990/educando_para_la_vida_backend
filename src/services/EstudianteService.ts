@@ -1,0 +1,62 @@
+import EstudianteRepository from '../repositories/EstudianteRepository';
+import UsuarioRepository from '../repositories/UsuarioRepository';
+
+class EstudianteService {
+  async list() {
+    return await EstudianteRepository.findAll();
+  }
+
+  async get(id: string) {
+    return await EstudianteRepository.findById(id);
+  }
+
+  async create(data: any) {
+    // Accept nested payloads: { usuario: {...}, estudiante: {...} } or flat
+    const payload = { ...(data.usuario ?? {}), ...(data.estudiante ?? {}), ...data };
+    // repository.create already creates usuario + estudiante and returns combined entity
+    return await EstudianteRepository.create(payload);
+  }
+
+  async update(id: string, data: any) {
+    // Normalize payload: prefer nested usuario/estudiante objects
+    const usuarioPayload = data.usuario ?? {};
+    const estudiantePayload = data.estudiante ?? {};
+    const payload = { ...estudiantePayload, ...data };
+
+    // fetch existing to get id_usuario
+    const existing: any = await EstudianteRepository.findById(id);
+    if (!existing) return null;
+    const idUsuario = existing.idUsuario ?? existing.usuarioIdUsuario ?? null;
+
+    // update usuario if data provided
+    if (Object.keys(usuarioPayload).length > 0) {
+      if (idUsuario) await UsuarioRepository.update(idUsuario, usuarioPayload);
+    } else {
+      // if top-level usuario fields were provided, detect some common keys
+      const hasUsuarioFields = ['nombres', 'apellido1', 'apellido2', 'contacto1', 'contacto2', 'email', 'id_rol', 'estado', 'id_tipo_documento', 'no_documento', 'fecha_expedicion_documento'].some(k => k in data);
+      if (hasUsuarioFields && idUsuario) {
+        const uPayload: any = {};
+        for (const k of ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol','estado','id_tipo_documento','no_documento','fecha_expedicion_documento']) {
+          if (k in data) uPayload[k] = (data as any)[k];
+        }
+        if (Object.keys(uPayload).length > 0) await UsuarioRepository.update(idUsuario, uPayload);
+      }
+    }
+
+    // update estudiante table with estudiante-specific fields
+    await EstudianteRepository.update(id, payload);
+    return await EstudianteRepository.findById(id);
+  }
+
+  async delete(id: string) {
+    // remove estudiante and its usuario
+    const existing: any = await EstudianteRepository.findById(id);
+    if (!existing) return null;
+    const idUsuario = existing.idUsuario ?? existing.usuarioIdUsuario ?? null;
+    const res = await EstudianteRepository.remove(id);
+    if (idUsuario) await UsuarioRepository.remove(idUsuario);
+    return res;
+  }
+}
+
+export default new EstudianteService();

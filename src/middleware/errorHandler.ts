@@ -1,0 +1,21 @@
+import type { Request, Response, NextFunction } from 'express';
+
+export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+  const statusCode = err?.statusCode || 500;
+  const message = err?.message || 'Internal Server Error';
+
+  res.status(statusCode).json({
+    success: false,
+    data: null,
+    error: {
+      message,
+      statusCode,
+    },
+  });
+};
+
+export const asyncHandler = (fn: Function) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
+};

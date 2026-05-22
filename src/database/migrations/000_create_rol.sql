@@ -1,0 +1,5 @@
+-- Migration: 000_create_rol.sql
+CREATE TABLE IF NOT EXISTS rol (
+  id_rol VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
+  nombre_rol VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

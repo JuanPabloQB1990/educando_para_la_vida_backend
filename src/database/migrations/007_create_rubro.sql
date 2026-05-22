@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS rubro (
+  id_rubro VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
+  nombre_rubro VARCHAR(200) NOT NULL UNIQUE,
+  descripcion TEXT,
+  monto_base DECIMAL(12,2) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
