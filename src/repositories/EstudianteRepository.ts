@@ -38,41 +38,9 @@ class EstudianteRepository {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-
-      // prepare usuario data
-      const id_usuario = generatePrimaryKey();
-      const usuarioPayload = {
-        id_usuario,
-        nombres: data.nombres ?? null,
-        apellido1: data.apellido1 ?? null,
-        apellido2: data.apellido2 ?? null,
-        contacto1: data.contacto1 ?? null,
-        contacto2: data.contacto2 ?? null,
-        email: data.email ?? null,
-        id_rol: data.id_rol ?? null,
-        estado: data.estado ?? 'activo',
-        id_tipo_documento: data.id_tipo_documento ?? null,
-        no_documento: data.no_documento ?? null,
-        fecha_expedicion_documento: data.fecha_expedicion_documento ?? null,
-      };
-
-      await conn.execute(
-        'INSERT INTO usuario (id_usuario, nombres, apellido1, apellido2, contacto1, contacto2, email, id_rol, estado, id_tipo_documento, no_documento, fecha_expedicion_documento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-        [
-          usuarioPayload.id_usuario,
-          usuarioPayload.nombres,
-          usuarioPayload.apellido1,
-          usuarioPayload.apellido2,
-          usuarioPayload.contacto1,
-          usuarioPayload.contacto2,
-          usuarioPayload.email,
-          usuarioPayload.id_rol,
-          usuarioPayload.estado,
-          usuarioPayload.id_tipo_documento,
-          usuarioPayload.no_documento,
-          usuarioPayload.fecha_expedicion_documento,
-        ]
-      );
+      // The service layer is responsible for creating `usuario` and passing `id_usuario` here.
+      const id_usuario = data.id_usuario;
+      if (!id_usuario) throw new Error('id_usuario is required to create estudiante; create usuario in service first');
 
       // prepare estudiante data (remove usuario-only fields)
       const id_estudiante = generatePrimaryKey();

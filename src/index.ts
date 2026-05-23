@@ -5,8 +5,9 @@ import { errorHandler } from './middleware/errorHandler.ts';
 import { config } from './config/environment.ts';
 import setupDatabase from './database/setup.ts';
 import routerUsuario from './routes/usuarioRoutes.ts';
-import routerAcademico from './routes/academicoRoutes.ts';
-import routerGestion from './routes/gestionRoutes.ts';
+import routerAcademico from './routes/academicoRoutes';
+import routerGestion from './routes/gestionRoutes';
+import routerMatricula from './routes/matriculaRoutes';
 
 const app: Application = express();
 
@@ -23,6 +24,7 @@ async function bootstrap() {
   app.use('/api/usuario', routerUsuario);
   app.use('/api/academico', routerAcademico);
   app.use('/api/gestion', routerGestion);
+  app.use('/api/matriculas', routerMatricula);
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {

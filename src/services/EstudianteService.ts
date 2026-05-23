@@ -1,5 +1,6 @@
 import EstudianteRepository from '../repositories/EstudianteRepository';
 import UsuarioRepository from '../repositories/UsuarioRepository';
+import UsuarioService from './UsuarioService';
 
 class EstudianteService {
   async list() {
@@ -12,8 +13,25 @@ class EstudianteService {
 
   async create(data: any) {
     // Accept nested payloads: { usuario: {...}, estudiante: {...} } or flat
-    const payload = { ...(data.usuario ?? {}), ...(data.estudiante ?? {}), ...data };
-    // repository.create already creates usuario + estudiante and returns combined entity
+    let usuarioPayload = data.usuario ?? {};
+    // If usuario nested object not provided, pick top-level usuario fields from data
+    if (!usuarioPayload || Object.keys(usuarioPayload).length === 0) {
+      const possibleKeys = ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol','estado','id_tipo_documento','no_documento','fecha_expedicion_documento'];
+      usuarioPayload = {};
+      for (const k of possibleKeys) {
+        if (k in data) (usuarioPayload as any)[k] = (data as any)[k];
+      }
+    }
+    const estudiantePayload = data.estudiante ?? {};
+
+    // Create usuario via UsuarioService and obtain id_usuario
+    const createdUser: any = await UsuarioService.create(usuarioPayload);
+    if (!createdUser || !createdUser.idUsuario) throw new Error('Failed to create usuario');
+    const id_usuario = createdUser.idUsuario;
+
+    // Build payload for estudiante repository. EstudianteRepository expects `id_usuario` snake_case
+    const payload = { id_usuario, ...estudiantePayload, ...data };
+    // Ensure we don't accidentally pass usuario-only fields
     return await EstudianteRepository.create(payload);
   }
 

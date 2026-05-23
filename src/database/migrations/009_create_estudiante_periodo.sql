@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS estudiante_periodo (
   id_tipo_estudio VARCHAR(100) NOT NULL,
   id_tiempo_validacion VARCHAR(100),
   fecha_inscripcion DATE NOT NULL,
+  file_certificado_grados VARCHAR(255) NOT NULL,
   id_anio_electivo VARCHAR(100),
   CONSTRAINT fk_ep_estudiante FOREIGN KEY (id_estudiante) REFERENCES estudiante(id_estudiante) ON DELETE CASCADE,
   CONSTRAINT fk_ep_tipo_estudio FOREIGN KEY (id_tipo_estudio) REFERENCES tipo_estudio(id_tipo_estudio),

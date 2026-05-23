@@ -16,6 +16,18 @@ class UsuarioRepository {
     return row ? mapRowToEntity<Usuario>(row) : null;
   }
 
+  async findByDocumento(no_documento: string, id_rol?: string) {
+    let query = 'SELECT * FROM usuario WHERE no_documento = ?';
+    const params: any[] = [no_documento];
+    if (typeof id_rol !== 'undefined') {
+      query += ' AND id_rol = ?';
+      params.push(id_rol);
+    }
+    const [rows] = await pool.query(query, params);
+    const row = (rows as any[])[0] || null;
+    return row ? mapRowToEntity<Usuario>(row) : null;
+  }
+
   async create(data: any) {
     const {
       nombres,

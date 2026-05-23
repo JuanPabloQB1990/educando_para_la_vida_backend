@@ -7,10 +7,10 @@
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
     "build": "tsc",
-    "db:migrate": "node src/database/migrate.ts",
-    "db:init": "node src/database/init.ts",
-    "db:seed": "node src/database/seedLoader.ts",
-    "db:setup": "node src/database/init.ts && node src/database/seedLoader.ts"
+    "db:migrate": "tsx src/database/migrate.ts",
+    "db:init": "tsx src/database/init.ts",
+    "db:seed": "tsx src/database/seedLoader.ts",
+    "db:setup": "tsx src/database/init.ts && tsx src/database/seedLoader.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -20,6 +20,7 @@
     "google-spreadsheet": "^5.2.0",
     "googleapis": "^171.4.0",
     "joi": "^17.11.0",
+    "zod": "^3.22.4",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.5",
     "tsx": "^4.22.3",
