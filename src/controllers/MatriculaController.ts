@@ -14,7 +14,7 @@ class MatriculaController {
           data: null,
           error: { message: 'El alumno ya se encuentra inscrito en la institución' },
         });
-      }
+    } 
       // For now, return success that the check passed and enrollment may continue
       return res.status(200).json({
         success: true,
@@ -22,6 +22,7 @@ class MatriculaController {
         data: result.payload || null,
         error: null,
       });
+
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -32,5 +33,6 @@ class MatriculaController {
     }
   }
 }
+
 
 export default new MatriculaController();

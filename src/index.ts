@@ -2,7 +2,6 @@ import express from 'express';
 import type { Application } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler.ts';
-import { config } from './config/environment.ts';
 import setupDatabase from './database/setup.ts';
 import routerUsuario from './routes/usuarioRoutes.ts';
 import routerAcademico from './routes/academicoRoutes';
