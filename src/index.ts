@@ -7,6 +7,7 @@ import routerUsuario from './routes/usuarioRoutes.ts';
 import routerAcademico from './routes/academicoRoutes';
 import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';
+import config from './config/environment.js';
 
 const app: Application = express();
 

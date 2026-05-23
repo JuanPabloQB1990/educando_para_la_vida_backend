@@ -12,25 +12,30 @@ class EstudianteService {
   }
 
   async create(data: any) {
+    //console.log(data);
+    
     // Accept nested payloads: { usuario: {...}, estudiante: {...} } or flat
     let usuarioPayload = data.usuario ?? {};
+    
     // If usuario nested object not provided, pick top-level usuario fields from data
     if (!usuarioPayload || Object.keys(usuarioPayload).length === 0) {
-      const possibleKeys = ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol','estado','id_tipo_documento','no_documento','fecha_expedicion_documento'];
+      const possibleKeys = ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol','id_tipo_documento','no_documento','fecha_expedicion_documento'];
       usuarioPayload = {};
       for (const k of possibleKeys) {
         if (k in data) (usuarioPayload as any)[k] = (data as any)[k];
       }
     }
+  
     const estudiantePayload = data.estudiante ?? {};
 
     // Create usuario via UsuarioService and obtain id_usuario
-    const createdUser: any = await UsuarioService.create(usuarioPayload);
-    if (!createdUser || !createdUser.idUsuario) throw new Error('Failed to create usuario');
-    const id_usuario = createdUser.idUsuario;
-
+    const idCreatedUser: any = await UsuarioService.create(usuarioPayload);
+    
+    const id_usuario = idCreatedUser;
+    
     // Build payload for estudiante repository. EstudianteRepository expects `id_usuario` snake_case
     const payload = { id_usuario, ...estudiantePayload, ...data };
+    console.log(payload);
     // Ensure we don't accidentally pass usuario-only fields
     return await EstudianteRepository.create(payload);
   }
@@ -51,10 +56,10 @@ class EstudianteService {
       if (idUsuario) await UsuarioRepository.update(idUsuario, usuarioPayload);
     } else {
       // if top-level usuario fields were provided, detect some common keys
-      const hasUsuarioFields = ['nombres', 'apellido1', 'apellido2', 'contacto1', 'contacto2', 'email', 'id_rol', 'estado', 'id_tipo_documento', 'no_documento', 'fecha_expedicion_documento'].some(k => k in data);
+      const hasUsuarioFields = ['nombres', 'apellido1', 'apellido2', 'contacto1', 'contacto2', 'email', 'id_rol', 'id_tipo_documento', 'no_documento', 'fecha_expedicion_documento'].some(k => k in data);
       if (hasUsuarioFields && idUsuario) {
         const uPayload: any = {};
-        for (const k of ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol','estado','id_tipo_documento','no_documento','fecha_expedicion_documento']) {
+        for (const k of ['nombres','apellido1','apellido2','contacto1','contacto2','email','id_rol', 'id_tipo_documento','no_documento','fecha_expedicion_documento']) {
           if (k in data) uPayload[k] = (data as any)[k];
         }
         if (Object.keys(uPayload).length > 0) await UsuarioRepository.update(idUsuario, uPayload);

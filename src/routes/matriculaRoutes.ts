@@ -1,16 +1,32 @@
 import express from 'express';
-import multer from 'multer';
+const multer = require('multer');
 import { z } from 'zod';
 import { asyncHandler } from '../middleware/errorHandler';
 import MatriculaController from '../controllers/MatriculaController';
 
 const router = express.Router();
 const upload = multer();
+const expectedFileFields = [
+    { name: 'file_doc', maxCount: 1 },
+    { name: 'file_foto', maxCount: 1 },
+    { name: 'file_certificado_grados', maxCount: 1 },
+    { name: 'file_compromiso', maxCount: 1 },
+    { name: 'file_comprobante_pago', maxCount: 1 },
+    { name: 'file_diagnostico', maxCount: 1 },
+    { name: 'padre_file', maxCount: 1 },
+    { name: 'madre_file', maxCount: 1 },
+    { name: 'acudiente_file', maxCount: 1 },
+];
 
 // Middleware para exigir un número mínimo de archivos en la petición
 function requireMinFiles(min: number) {
-	return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-		const files = req.files as Express.Multer.File[] | undefined;
+    return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const reqFiles = (req as any).files;
+        const files = Array.isArray(reqFiles)
+            ? reqFiles
+            : reqFiles && typeof reqFiles === 'object'
+            ? Object.values(reqFiles).flat()
+            : [];
 		if (!files || files.length < min) {
 			return res.status(400).json({
 				success: false,
@@ -23,17 +39,17 @@ function requireMinFiles(min: number) {
 	};
 }
 
-// Recibe FormData desde el frontend y archivos (mínimo 8 archivos)
+// Recibe FormData desde el frontend y archivos (mínimo 9 archivos)
 // Validación Zod de los campos requeridos (campos que no pueden ser null en las tablas)
 const usuarioSchema = z.object({
 	nombres: z.string().min(1, 'nombres es requerido'),
-	apellido1: z.string().min(1, 'apellido1 es requerido'),
+	apellido1: z.string().min(1, 'primer apellido es requerido'),
 	apellido2: z.string().min(1, 'segundo apellido es requerido'),
 	contacto1: z.string().min(1, 'contacto 1 es requerido'),
 	contacto2: z.string().optional().nullable(),
 	email: z.string().min(1, 'email es requerido'),
-	id_tipo_documento: z.string().min(1, 'id_tipo_documento es requerido'),
-	no_documento: z.string().min(1, 'no_documento es requerido'),
+	id_tipo_documento: z.string().min(1, 'el tipo de documento es requerido'),
+	no_documento: z.string().min(1, 'numero de documento es requerido'),
     fecha_expedicion_documento: z.string().min(1, 'la fecha de expedicion del documento es requerida'),
 });
 
@@ -54,8 +70,9 @@ const estudianteSchema = z.object({
     contacto2: z.string().optional().nullable(),
     file_doc: z.string().min(1, 'documento de identidad es requerido'),
     file_foto: z.string().min(1, 'foto es requerida'),
+    file_certificado_grados: z.string().min(1, 'certificado de grados es requerido'),
     limitaciones: z.array(z.string()).optional(),
-    file_diagnostico: z.string().min(1, 'diagnóstico es requerido'),
+    file_diagnostico: z.string().optional(),
     capacidades: z.array(z.string()).optional(),
     ci_puntaje: z.string().min(1, 'puntaje del CI es requerido'),
     problemasalud: z.string().optional().nullable(),
@@ -106,11 +123,11 @@ const estudianteSchema = z.object({
     ref6_tel: z.string().min(1, 'teléfono de la referencia 6 es requerido'),
 });
 
-const estudiantePeriodoSchema = z.object({
+const estudianteNuevoPeriodoSchema = z.object({
 	id_tipo_estudio: z.string().min(1, 'id de tipo estudio es requerido'),
 	id_tiempo_validacion: z.string().optional().nullable(),
     file_certificado_grados: z.string().min(1, 'certificado de grados es requerido'),
-	// id_anio_electivo será asignado por admin, puede no llegar en el formulario
+	id_anio_electivo: z.string().optional().nullable(),
 });
 
 // id_grado_educacion se enviará como JSON (array). Validamos que sea array de strings no vacíos cuando aplica.
@@ -123,8 +140,7 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 		// multer coloca los campos de FormData en req.body (todos como strings)
 		const body = req.body || {};
 
-		// Normalizar campos que pueden venir como JSON strings
-		// id_grado_educacion puede venir como JSON string — intentamos parsearlo
+		// Normalizar campos que pueden venir como JSON strings o campos repetidos
 		if (typeof body.id_grado_educacion === 'string') {
 			try {
 				body.id_grado_educacion = JSON.parse(body.id_grado_educacion);
@@ -133,7 +149,33 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 				body.id_grado_educacion = [body.id_grado_educacion];
 			}
 		}
+		if (Array.isArray(body.id_grado_educacion)) {
+			body.id_grado_educacion = body.id_grado_educacion.map(String);
+		}
 
+        const reqFiles = (req as any).files;
+        const files = Array.isArray(reqFiles)
+            ? reqFiles
+            : reqFiles && typeof reqFiles === 'object'
+            ? Object.values(reqFiles).flat()
+            : [];
+        const receivedFileNames = files.map((file: any) => file.fieldname);
+        if (receivedFileNames.length > 0 && !receivedFileNames.includes('file_certificado_grados')) {
+            console.log('Archivos recibidos sin fieldname file_certificado_grados:', receivedFileNames);
+        }
+		for (const file of files as any[]) {
+			if (file && file.fieldname) {
+				body[file.fieldname] = file.originalname || file.filename || 'uploaded_file';
+			}
+		}
+
+		if (typeof body.limitaciones === 'string') {
+			body.limitaciones = [body.limitaciones];
+		}
+		if (typeof body.capacidades === 'string') {
+			body.capacidades = [body.capacidades];
+		}
+   
 		// Validar secciones
 		usuarioSchema.parse({
 			nombres: body.nombres,
@@ -175,13 +217,13 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
             observaciones: body.observaciones,
             file_compromiso: body.file_compromiso,
             file_comprobante_pago: body.file_comprobante_pago,
-            padre_apellido1: body.padr_apellido1,
-            padre_apellido2: body.padr_apellido2,
-            padre_nombre: body.padr_nombre,
-            padre_cedula: body.padr_cedula,
-            padre_file: body.padr_file,
-            padre_contacto1: body.padr_contacto1,
-            padre_contacto2: body.padr_contacto2,
+            padre_apellido1: body.padre_apellido1,
+            padre_apellido2: body.padre_apellido2,
+            padre_nombre: body.padre_nombre,
+            padre_cedula: body.padre_cedula,
+            padre_file: body.padre_file,
+            padre_contacto1: body.padre_contacto1,
+            padre_contacto2: body.padre_contacto2,
             madre_apellido1: body.madre_apellido1,
             madre_apellido2: body.madre_apellido2,
             madre_nombre: body.madre_nombre,
@@ -217,9 +259,11 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 
 		});
 
-		estudiantePeriodoSchema.parse({
+		estudianteNuevoPeriodoSchema.parse({
 			id_tipo_estudio: body.id_tipo_estudio,
 			id_tiempo_validacion: body.id_tiempo_validacion,
+            file_certificado_grados: body.file_certificado_grados,
+            id_anio_electivo: body.id_anio_electivo,
 		});
 
 		// Sólo validar grados array si viene en el formulario (por ejemplo para validación de grados o educación formal)
@@ -231,9 +275,14 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 		req.body = body;
 		return next();
 	} catch (err) {
+        console.error(err);
 		const zErr = err as any;
-		const message = zErr?.errors ? zErr.errors.map((e: any) => e.message).join('; ') : 'Datos inválidos';
-		return res.status(400).json({
+		const issues = Array.isArray(zErr?.issues) ? zErr.issues : [];
+		const message = issues.length ? issues.map((e: any) => e.message).join('; ') : 'Datos inválidos';
+        console.log('Validación fallida:', message);
+        console.log('Campos con error:', issues.map((e: any) => ({ path: e.path, message: e.message })));
+        
+        return res.status(400).json({
 			success: false,
 			message: 'Validación de datos fallida',
 			data: null,
@@ -242,6 +291,6 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 	}
 }
 
-router.post('/', upload.any(), requireMinFiles(8), validateMatricula, asyncHandler((req: express.Request, res: express.Response) => MatriculaController.create(req, res)));
+router.post('/', upload.fields(expectedFileFields), requireMinFiles(8), validateMatricula, asyncHandler((req: express.Request, res: express.Response) => MatriculaController.create(req, res)));
 
 export default router;

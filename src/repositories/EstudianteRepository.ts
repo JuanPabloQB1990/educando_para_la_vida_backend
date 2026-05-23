@@ -49,6 +49,9 @@ class EstudianteRepository {
       const keys = Object.keys(row);
       const values = keys.map((k) => row[k]);
       const placeholders = keys.map(() => '?').join(',');
+      console.log(keys);
+      console.log(placeholders);
+      
 
       await conn.execute(`INSERT INTO estudiante (${keys.join(',')}) VALUES (${placeholders})`, values as any[]);
 
