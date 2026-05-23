@@ -63,7 +63,6 @@ CREATE TABLE IF NOT EXISTS estudiante (
   problemasalud VARCHAR(255),
   eps VARCHAR(150) NOT NULL,
   ips VARCHAR(150) NOT NULL,
-  grupo_sanguineo VARCHAR(10) NOT NULL,
   rh VARCHAR(10) NOT NULL,
   observaciones TEXT,
   CONSTRAINT fk_estudiante_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE RESTRICT

@@ -30,7 +30,7 @@ class UsuarioRepository {
   }
 
   async create(data: any) {
-
+ 
     const {
       nombres,
       apellido1,
@@ -44,26 +44,34 @@ class UsuarioRepository {
       no_documento,
       fecha_expedicion_documento,
     } = data;
+
     const id_usuario = generatePrimaryKey();
-    const [result] = await pool.execute(
-      'INSERT INTO usuario (id_usuario, nombres, apellido1, apellido2, contacto1, contacto2, email, password, id_rol, estado, id_tipo_documento, no_documento, fecha_expedicion_documento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      [
-        id_usuario,
-        nombres,
-        apellido1,
-        apellido2,
-        contacto1,
-        contacto2,
-        email,
-        password,
-        id_rol ?? null,
-        UsuarioEstado.INACTIVO,
-        id_tipo_documento ?? null,
-        no_documento ?? null,
-        fecha_expedicion_documento ?? null,
-      ]
-    );
-    return { id: id_usuario };
+
+    try {
+      
+      const [result] = await pool.execute(
+        'INSERT INTO usuario (id_usuario, nombres, apellido1, apellido2, contacto1, contacto2, email, password, id_rol, estado, id_tipo_documento, no_documento, fecha_expedicion_documento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [
+          id_usuario,
+          nombres,
+          apellido1,
+          apellido2,
+          contacto1,
+          contacto2,
+          email,
+          password,
+          id_rol ?? null,
+          UsuarioEstado.INACTIVO,
+          id_tipo_documento ?? null,
+          no_documento ?? null,
+          fecha_expedicion_documento ?? null,
+        ]
+      );
+  
+      return { id: id_usuario };
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async update(id: string, data: any) {

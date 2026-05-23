@@ -1,9 +1,9 @@
 import express from 'express';
 import type { Application } from 'express';
 import cors from 'cors';
-import { errorHandler } from './middleware/errorHandler.ts';
-import setupDatabase from './database/setup.ts';
-import routerUsuario from './routes/usuarioRoutes.ts';
+import { errorHandler } from './middleware/errorHandler';
+import setupDatabase from './database/setup';
+import routerUsuario from './routes/usuarioRoutes';
 import routerAcademico from './routes/academicoRoutes';
 import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';

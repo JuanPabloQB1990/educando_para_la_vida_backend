@@ -35,7 +35,7 @@ class EstudianteService {
     
     // Build payload for estudiante repository. EstudianteRepository expects `id_usuario` snake_case
     const payload = { id_usuario, ...estudiantePayload, ...data };
-    console.log(payload);
+    
     // Ensure we don't accidentally pass usuario-only fields
     return await EstudianteRepository.create(payload);
   }
