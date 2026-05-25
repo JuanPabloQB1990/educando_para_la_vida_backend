@@ -1,4 +1,4 @@
-import RubroRepository from '../repositories/RubroRepository';
+import RubroRepository from "../repositories/RubroRepository";
 
 class RubroService {
   async list() {
@@ -7,6 +7,10 @@ class RubroService {
 
   async get(id: string) {
     return await RubroRepository.findById(id);
+  }
+
+  async findByName(nombre_rubro: string) {
+    return await RubroRepository.findByName(nombre_rubro);
   }
 
   async create(data: any) {

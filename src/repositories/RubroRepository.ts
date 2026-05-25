@@ -1,6 +1,6 @@
 import pool from '../config/database';
 import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
-import type { Rubro } from '../models/rubro';
+import type { Rubro, RubroRow } from '../models/rubro';
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 
 class RubroRepository {
@@ -11,6 +11,12 @@ class RubroRepository {
 
   async findById(id: string) {
     const [rows] = await pool.query('SELECT * FROM rubro WHERE id_rubro = ?', [id]);
+    const row = (rows as any[])[0] || null;
+    return row ? mapRowToEntity<Rubro>(row) : null;
+  }
+
+    async findByName(nombre_rubro: string) {
+    const [rows] = await pool.query('SELECT * FROM rubro WHERE nombre_rubro = ? LIMIT 1', [nombre_rubro]);
     const row = (rows as any[])[0] || null;
     return row ? mapRowToEntity<Rubro>(row) : null;
   }

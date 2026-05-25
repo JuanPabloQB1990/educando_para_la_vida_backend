@@ -1,5 +1,5 @@
 import express from 'express';
-const multer = require('multer');
+import multer from 'multer';
 import { z } from 'zod';
 import { asyncHandler } from '../middleware/errorHandler';
 import MatriculaController from '../controllers/MatriculaController';
@@ -209,7 +209,7 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
             capacidades: body.capacidades,
             ci_puntaje: body.ci_puntaje,
             problemasalud: body.problemasalud,
-            eps: body.ps,
+            eps: body.eps,
             ips: body.ips,
             rh: body.rh,
             observaciones: body.observaciones,

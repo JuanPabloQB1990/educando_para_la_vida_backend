@@ -1,39 +1,38 @@
-import sgMail from '@sendgrid/mail';
+import {
+  SendEmailCommand,
+} from "@aws-sdk/client-ses";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
+import { sesClient } from "../config/awsSES";
 
-interface SendPasswordEmailParams {
-    to: string;
-    nombres: string;
-    password: string;
-}
+export class EmailService {
+  static async sendMail(to: string, subject: string, html: string) {
+    try {
+      const command = new SendEmailCommand({
+        Source: process.env.SES_FROM_EMAIL!,
+        Destination: {
+          ToAddresses: [to],
+        },
+        Message: {
+          Subject: {
+            Data: subject,
+          },
+          Body: {
+            Html: {
+              Data: html,
+            },
+          },
+        },
+      });
 
-export async function sendPasswordEmail({
-    to,
-    nombres,
-    password,
-}: SendPasswordEmailParams): Promise<void> {
-    const msg = {
-        to,
-        from: process.env.SENDGRID_FROM_EMAIL as string,
-        subject: 'Credenciales de acceso',
-        html: `
-            <div style="font-family: Arial, sans-serif;">
-                <h2>Bienvenido ${nombres}</h2>
+      const response = await sesClient.send(command);
 
-                <p>Su cuenta ha sido creada correctamente.</p>
+      console.log("EMAIL ENVIADO:", response);
 
-                <p>
-                    <strong>Contraseña temporal:</strong>
-                    ${password}
-                </p>
+      return response;
 
-                <p>
-                    Por seguridad, cambie su contraseña después de iniciar sesión.
-                </p>
-            </div>
-        `,
-    };
-
-    await sgMail.send(msg);
+    } catch (error) {
+      console.error("ERROR SES:", error);
+      throw error;
+    }
+  }
 }

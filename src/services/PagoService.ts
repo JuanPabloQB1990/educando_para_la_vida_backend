@@ -12,8 +12,8 @@ class PagoService {
   async create(data: any) {
     const res: any = await PagoRepository.create(data);
     const id = res?.id;
-    if (!id) return null;
-    return await PagoRepository.findById(id);
+    if (id) return id;
+    return null
   }
 
   async update(id: string, data: any) {

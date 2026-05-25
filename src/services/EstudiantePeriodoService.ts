@@ -12,8 +12,7 @@ class EstudiantePeriodoService {
   async create(data: any) {
     const res: any = await EstudiantePeriodoRepository.create(data);
     const id = res?.id;
-    if (!id) return null;
-    return await EstudiantePeriodoRepository.findById(id);
+    return id;
   }
 
   async update(id: string, data: any) {

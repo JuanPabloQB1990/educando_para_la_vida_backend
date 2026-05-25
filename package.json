@@ -13,6 +13,9 @@
     "db:setup": "tsx src/database/init.ts && tsx src/database/seedLoader.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0",
+    "@aws-sdk/client-ses": "^3.1053.0",
+    "@aws-sdk/lib-storage": "^3.1053.0",
     "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
@@ -33,6 +36,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.1.0",
     "@types/node": "^25.7.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2"

@@ -40,15 +40,15 @@ class EstudianteRepository {
     try {
       await conn.beginTransaction();
       // The service layer is responsible for creating `usuario` and passing `id_usuario` here.
-      const id_usuario = data.id_usuario;
-      if (!id_usuario) throw new Error('id_usuario is required to create estudiante; create usuario in service first');
+      //const id_usuario = data.id_usuario;
+      if (!data.id_usuario) throw new Error('id_usuario is required to create estudiante; create usuario in service first');
 
       // prepare estudiante data (remove usuario-only fields)
       const id_estudiante : string= generatePrimaryKey();
     
       const row = {
             id_estudiante,
-            id_usuario,
+            id_usuario: data.id_usuario,
             fecha_nacimiento: data.fecha_nacimiento,
             edad: data.edad,
             sexo: data.sexo,
@@ -119,8 +119,6 @@ class EstudianteRepository {
             ref6_tel: data.ref6_tel,
       };
 
-      console.log(row);
-      
       const keys = Object.keys(row);
       const values = Object.values(row);
       const placeholders = keys.map(() => '?').join(',');

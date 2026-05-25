@@ -1,7 +1,6 @@
 import UsuarioRepository from '../repositories/UsuarioRepository';
 import bcrypt from 'bcryptjs';
 import { generateSecurePassword } from '../utils/generatePassword';
-import { sendPasswordEmail } from '../utils/sendEmail';
 
 class UsuarioService {
   async list() {
@@ -21,12 +20,6 @@ class UsuarioService {
 
     const res: any = await UsuarioRepository.create(payload);
   
-    // await sendPasswordEmail({
-    //   to: data.email,
-    //   nombres: data.nombres,
-    //   password: plainPassword,
-    // });
-    
     const id = res?.id;
     if (id) return id;
     return null

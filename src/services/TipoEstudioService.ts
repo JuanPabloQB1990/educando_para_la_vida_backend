@@ -1,4 +1,4 @@
-import TipoEstudioRepository from '../repositories/TipoEstudioRepository';
+import TipoEstudioRepository from "../repositories/TipoEstudioRepository";
 
 class TipoEstudioService {
   async list() {

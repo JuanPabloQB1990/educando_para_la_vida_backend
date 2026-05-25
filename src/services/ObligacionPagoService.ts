@@ -12,8 +12,8 @@ class ObligacionPagoService {
   async create(data: any) {
     const res: any = await ObligacionPagoRepository.create(data);
     const id = res?.id;
-    if (!id) return null;
-    return await ObligacionPagoRepository.findById(id);
+    if (id) return id;
+    return null
   }
 
   async update(id: string, data: any) {

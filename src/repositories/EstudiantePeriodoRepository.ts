@@ -17,13 +17,22 @@ class EstudiantePeriodoRepository {
   }
 
   async create(data: any) {
-    const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo } = data;
-    const id_estudiante_periodo = generatePrimaryKey();
-    const [result] = await pool.execute(
-      'INSERT INTO estudiante_periodo (id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo) VALUES (?,?,?,?,?,?,?)',
-      [id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo]
-    );
-    return { id: id_estudiante_periodo };
+    console.log(data);
+    try {
+      
+      const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo = null } = data;
+      const id_estudiante_periodo = generatePrimaryKey();
+      const [result] = await pool.execute(
+        'INSERT INTO estudiante_periodo (id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo) VALUES (?,?,?,?,?,?,?)',
+        [id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo]
+      );
+      console.log(result);
+      
+      return { id: id_estudiante_periodo };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async update(id: string, data: any) {

@@ -9,8 +9,8 @@ class GradosPorMatriculaService {
     return await GradosPorMatriculaRepository.findByPK(id_estudiante_periodo, id_grado_educacion);
   }
 
-  async create(data: any) {
-    const res: any = await GradosPorMatriculaRepository.create(data.id_estudiante_periodo, data.id_grado_educacion, data.estado);
+  async createMany(data: any) {
+    const res: any = await GradosPorMatriculaRepository.createMany(data);
     return res;
   }
 
