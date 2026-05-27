@@ -21,8 +21,7 @@ class UsuarioService {
     const res: any = await UsuarioRepository.create(payload);
   
     const id = res?.id;
-    if (id) return id;
-    return null
+    return { plainPassword, id };
   }
 
   async update(id: string, data: any) {

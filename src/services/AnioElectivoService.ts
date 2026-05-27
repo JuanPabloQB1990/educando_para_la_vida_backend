@@ -1,4 +1,5 @@
 import AnioElectivoRepository from '../repositories/AnioElectivoRepository';
+import PeriodoRepository from '../repositories/PeriodoRepository';
 
 class AnioElectivoService {
   async list() {
@@ -13,6 +14,7 @@ class AnioElectivoService {
     const res: any = await AnioElectivoRepository.create(data.anio, data.estado);
     const id = res?.id;
     if (!id) return null;
+    await PeriodoRepository.createCuatroPeriodos(id);
     return await AnioElectivoRepository.findById(id);
   }
 

@@ -1,5 +1,5 @@
 export enum ClassroomEntregaEstado {
     PENDIENTE = 'pendiente',
-    ENTREGADO = 'entregado',
+    APROVADO = 'aprovado',
     CORREGIDO = 'corregido',
 }

@@ -2,6 +2,7 @@ import { GradoMatriculaEstado } from "../enums/gradosPorMatricula.enum";
 import { ObligacionPagoEstado } from "../enums/obligacionPago.enum";
 import { PagoEstado } from "../enums/pago.enum";
 import UsuarioRepository from "../repositories/UsuarioRepository";
+import { FormularioMatriculaSchema } from "../types";
 import { generatePrimaryKey } from "../utils/generatePrimaryKey";
 import { EmailService } from "../utils/sendEmail";
 import { uploadFileToS3 } from "../utils/uploadFIleAWSS3";
@@ -14,12 +15,12 @@ import RolService from "./RolService";
 import RubroService from "./RubroService";
 import UsuarioService from "./UsuarioService";
 
+
+
 class MatriculaService {
-  /**
-   * Actualmente valida si existe un usuario con `no_documento` y `id_rol = 2`.
-   */
-  async processEnrollment(form: any) {
-    const no_documento = form.no_documento ?? form.noDocumento ?? null;
+ 
+  async create(form: FormularioMatriculaSchema) {
+    const no_documento = form.no_documento ?? form.no_documento ?? null;
     // obtener id del rol 'estudiante' desde la tabla rol
     const rol = await RolService.findByName("estudiante");
     const id_rol = rol?.idRol;
@@ -63,7 +64,7 @@ class MatriculaService {
     };
 
     // Accept nested payloads: { usuario: {...}, estudiante: {...} } or flat
-    let usuarioPayload = payload.usuario ?? {};
+    let usuarioPayload = {};
 
     // If usuario nested object not provided, pick top-level usuario fields from data
     if (!usuarioPayload || Object.keys(usuarioPayload).length === 0) {
@@ -79,23 +80,22 @@ class MatriculaService {
         "no_documento",
         "fecha_expedicion_documento",
       ];
+
       usuarioPayload = {};
+
       for (const k of possibleKeys) {
         if (k in payload) (usuarioPayload as any)[k] = (payload as any)[k];
       }
     }
 
-    const estudiantePayload = payload.estudiante ?? {};
-
     // Crear usuario via UsuarioService y obtener id_usuario creado
-    const idCreatedUser: any = await UsuarioService.create(usuarioPayload);
+    const userResult: { plainPassword: string; id: string } | null = await UsuarioService.create(usuarioPayload);
 
-    const id_usuario = idCreatedUser;
+    const id_usuario = userResult.id;
 
     // Build payload for estudiante repository. EstudianteRepository expects `id_usuario` snake_case
     const payloadToCreateStudent = {
       id_usuario,
-      ...estudiantePayload,
       ...payload,
       ...payloadFiles,
     };
@@ -114,14 +114,13 @@ class MatriculaService {
       fecha_inscripcion: new Date(),
       file_certificado_grados: payloadFiles.file_certificado_grados || null,
     };
-    console.log(EstudiantePeriodo);
-    
+  
     const idCreatedEstudiantePeriodo = await EstudiantePeriodoService.create(EstudiantePeriodo);
     console.log('id estudiante_período: ' + idCreatedEstudiantePeriodo);
     
     // crear registro en grados_por_matricula con id_estudiante_periodo recién creado
 
-    const gradosPayload = payload.id_grado_educacion.map((idGrado: number) => [
+    const gradosPayload = payload.id_grado_educacion.map((idGrado: string) => [
       idCreatedEstudiantePeriodo,
       idGrado,
       GradoMatriculaEstado.PENDIENTE,
@@ -161,13 +160,112 @@ class MatriculaService {
     await PagoService.create(pago);
 
     await EmailService.sendMail(
-      'juanpqb_19@hotmail.com',
-      "Matrícula registrada",
-      `
-        <h1>Educando para la Vida</h1>
-        <p>Tu matrícula fue registrada correctamente.</p>
-      `
-    );
+  'juanpqb_19@hotmail.com',
+  'Matrícula registrada exitosamente',
+  `
+  <div style="margin:0;padding:0;background-color:#f4f7fb;font-family:Arial,sans-serif;">
+    
+    <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 0;">
+      <tr>
+        <td align="center">
+
+          <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+            
+            <!-- HEADER -->
+            <tr>
+              <td align="center" style="background:#1e3a8a;padding:30px;">
+                <h1 style="color:#ffffff;margin:0;font-size:28px;">
+                  Educando para la Vida
+                </h1>
+                <p style="color:#dbeafe;margin-top:10px;font-size:14px;">
+                  Plataforma de Matrículas Académicas
+                </p>
+              </td>
+            </tr>
+
+            <!-- BODY -->
+            <tr>
+              <td style="padding:40px;">
+
+                <h2 style="color:#111827;margin-top:0;">
+                  ¡Matrícula registrada correctamente!
+                </h2>
+
+                <p style="color:#4b5563;font-size:16px;line-height:1.6;">
+                  Nos alegra informarte que tu proceso de matrícula fue realizado exitosamente en nuestra plataforma educativa.
+                </p>
+
+                <p style="color:#4b5563;font-size:16px;line-height:1.6;">
+                  Ya puedes ingresar al sistema utilizando las siguientes credenciales:
+                </p>
+
+                <!-- BOX -->
+                <div style="background:#f3f4f6;border-radius:10px;padding:20px;margin:30px 0;">
+                  
+                  <p style="margin:0 0 10px 0;color:#111827;font-size:15px;">
+                    <strong>Correo:</strong> juanpqb_19@hotmail.com
+                  </p>
+
+                  <p style="margin:0;color:#111827;font-size:15px;">
+                    <strong>Contraseña temporal:</strong> ${userResult.plainPassword}
+                  </p>
+
+                </div>
+
+                <!-- BUTTON -->
+                <div style="text-align:center;margin:35px 0;">
+                  <a 
+                    href="http://localhost:4173/login"
+                    style="
+                      background:#2563eb;
+                      color:#ffffff;
+                      text-decoration:none;
+                      padding:14px 28px;
+                      border-radius:8px;
+                      font-size:16px;
+                      display:inline-block;
+                      font-weight:bold;
+                    "
+                  >
+                    Ingresar a la Plataforma
+                  </a>
+                </div>
+
+                <p style="color:#6b7280;font-size:14px;line-height:1.6;">
+                  Por seguridad, te recomendamos cambiar tu contraseña después de iniciar sesión por primera vez.
+                </p>
+
+                <p style="color:#6b7280;font-size:14px;line-height:1.6;">
+                  Si no realizaste esta solicitud o tienes inconvenientes para acceder, comunícate con la institución.
+                </p>
+
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td align="center" style="background:#f9fafb;padding:20px;border-top:1px solid #e5e7eb;">
+                
+                <p style="margin:0;color:#9ca3af;font-size:13px;">
+                  © ${new Date().getFullYear()} Educando para la Vida
+                </p>
+
+                <p style="margin-top:8px;color:#9ca3af;font-size:12px;">
+                  Este es un correo automático, por favor no responder.
+                </p>
+
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+
+  </div>
+  `
+);
 
     return { exists: false };
   }

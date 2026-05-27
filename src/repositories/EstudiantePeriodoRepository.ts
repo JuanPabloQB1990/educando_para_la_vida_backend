@@ -17,7 +17,7 @@ class EstudiantePeriodoRepository {
   }
 
   async create(data: any) {
-    console.log(data);
+    
     try {
       
       const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo = null } = data;
@@ -26,7 +26,6 @@ class EstudiantePeriodoRepository {
         'INSERT INTO estudiante_periodo (id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo) VALUES (?,?,?,?,?,?,?)',
         [id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo]
       );
-      console.log(result);
       
       return { id: id_estudiante_periodo };
     } catch (error) {

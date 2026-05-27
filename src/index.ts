@@ -2,9 +2,14 @@ import express from 'express';
 import type { Application } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
+import { verifyToken } from './middleware/auth';
+import { requireRoles } from './middleware/roles';
 import setupDatabase from './database/setup';
+import routerAuth from './routes/authRoutes';
 import routerUsuario from './routes/usuarioRoutes';
 import routerAcademico from './routes/academicoRoutes';
+import routerCatalogo from './routes/catalogoRoutes';
+import routerDocente from './routes/docenteRoutes';
 import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';
 import config from './config/environment.js';
@@ -21,10 +26,18 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: true }));
 
   // Routes
-  app.use('/api/usuario', routerUsuario);
-  app.use('/api/academico', routerAcademico);
-  app.use('/api/gestion', routerGestion);
+  app.use('/api/auth', routerAuth);
   app.use('/api/matriculas', routerMatricula);
+  // Rutas públicas de catálogos (usadas por el formulario de matrícula)
+  app.use('/api/academico', routerAcademico);
+  app.use('/api/catalogo', routerCatalogo);
+  // Rutas académicas (docentes, calificaciones, asistencias, classroom)
+  app.use('/api/docente', routerDocente);
+  // Rutas protegidas — solo admin
+  app.use('/api/usuario',  routerUsuario);
+  app.use('/api/gestion', verifyToken, requireRoles('admin'), routerGestion);
+
+  //verifyToken, requireRoles('admin'),
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {

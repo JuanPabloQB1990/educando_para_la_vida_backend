@@ -17,6 +17,33 @@ class UsuarioRepository {
     return row ? mapRowToEntity<Usuario>(row) : null;
   }
 
+  async findByEmailWithRol(emailOrId: string) {
+    const [rows] = await pool.query(
+      `SELECT u.*, r.nombre_rol
+       FROM usuario u
+       LEFT JOIN rol r ON u.id_rol = r.id_rol
+       WHERE u.email = ? OR u.id_usuario = ?`,
+      [emailOrId, emailOrId]
+    );
+    const row = (rows as any[])[0] ?? null;
+    if (!row) return null;
+    return {
+      idUsuario: row.id_usuario as string,
+      nombres: row.nombres as string,
+      apellido1: row.apellido1 as string,
+      apellido2: row.apellido2 as string | null,
+      email: row.email as string,
+      password: row.password as string | null,
+      estado: row.estado as 'activo' | 'inactivo',
+      idRol: row.id_rol as string | null,
+      nombreRol: row.nombre_rol as string | null,
+    };
+  }
+
+  async updatePassword(idUsuario: string, hashedPassword: string): Promise<void> {
+    await pool.execute('UPDATE usuario SET password = ? WHERE id_usuario = ?', [hashedPassword, idUsuario]);
+  }
+
   async findByDocumento(no_documento: string, id_rol?: string) {
     let query = 'SELECT * FROM usuario WHERE no_documento = ?';
     const params: any[] = [no_documento];
@@ -61,7 +88,7 @@ class UsuarioRepository {
           email,
           password,
           id_rol ?? null,
-          UsuarioEstado.INACTIVO,
+          UsuarioEstado.ACTIVO,
           id_tipo_documento ?? null,
           no_documento ?? null,
           fecha_expedicion_documento ?? null,

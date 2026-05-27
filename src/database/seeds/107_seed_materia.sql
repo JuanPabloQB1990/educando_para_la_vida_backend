@@ -1,0 +1,20 @@
+-- Seed: 107_seed_materia.sql
+INSERT IGNORE INTO materia (nombre_materia) VALUES
+  ('Ciencias Naturales/Ed.Ambiental Y Biología'),
+  ('Ciencias Sociales'),
+  ('Ed. Artística'),
+  ('Etica Y Valores'),
+  ('Religión'),
+  ('Lengua Castellana'),
+  ('Matemáticas'),
+  ('Dimension Corporal'),
+  ('Emprendimiento'),
+  ('Convivencia'),
+  ('Tecnologia E Informatica'),
+  ('Idioma Extrajero (Inglés)'),
+  ('Ed. Física/ Recreación Y Deporte'),
+  ('Dimension Estetica'),
+  ('Dimension Etica Y Valores'),
+  ('Dimension Cognitiva'),
+  ('Dimension Comunicativa'),
+  ('Bachiller Comercial con enfasis en emprendimiento');

@@ -5,7 +5,38 @@ Backend REST API profesional y robusto para la institución educativa "Educando 
 
 Responsable de: Autenticación/Autorización (RBAC), Gestión Académica, Ciclos de Matrículas, Control Financiero (Obligaciones y Pagos), Gestión Documental, Notas, Asistencias y módulo de Classroom.
 
----
+## Especificaciones Técnicas del Backend:
+- **Sin ORM:** Solo se permiten consultas SQL nativas y parametrizadas usando placeholders (`$1` o `?`). Prohibida la interpolación de strings en SQL.
+- **Conexión:** Uso mandatorio de un Pool de conexiones (vía driver nativo).
+- **Mapeo:** Transformación obligatoria de `snake_case` (DB) a `camelCase` (TS) en la salida del Repository.
+- **Transacciones:** Control explícito de `BEGIN`, `COMMIT` y `ROLLBACK` en operaciones multi-tabla dentro de la capa de servicio o repositorios compuestos.
+
+Separación estricta de responsabilidades.
+
+## JWT y Roles
+
+# Middleware JWT
+
+Validar:
+
+- Token
+- Expiración (3 horas)
+- Firma
+
+# Middleware Roles
+
+Permitir acceso según:
+
+- admin
+- profesor
+- estudiante
+
+# Reglas
+
+- Nunca confiar en datos del frontend.
+- Validar rol en backend.
+- El frontend solo oculta UI.
+- El backend protege datos.
 
 # Stack Tecnológico
 - Node.js (LTS)
@@ -18,8 +49,6 @@ Responsable de: Autenticación/Autorización (RBAC), Gestión Académica, Ciclos
 - Multer (Carga de archivos)
 - Dotenv
 - Docker & Docker Compose
-
----
 
 # Arquitectura Backend (Estructura de Directorios)
 
@@ -111,11 +140,11 @@ usuario:
 
 grados_por_matricula:
 - finalizado
-- en curso
+- pendiente
 - retirado
 
 classroom_entrega
 - pendiente
-- entregado
+- aprovado
 - corregido
  

@@ -25,7 +25,7 @@ class MatriculaController {
         ...normalizedFiles,
       };
 
-      const result = await MatriculaService.processEnrollment(payload);
+      const result = await MatriculaService.create(payload);
 
       if (result.exists) {
         return res.status(409).json({
