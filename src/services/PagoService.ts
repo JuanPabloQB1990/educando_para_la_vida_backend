@@ -1,8 +1,21 @@
-import PagoRepository from '../repositories/PagoRepository';
+import PagoRepository, { type PagoAdminFilters } from '../repositories/PagoRepository';
 
 class PagoService {
   async list() {
     return await PagoRepository.findAll();
+  }
+
+  async listForAdmin(filters: PagoAdminFilters) {
+    return await PagoRepository.findAllForAdmin(filters);
+  }
+
+  async verificarPago(idPago: string, accion: 'aprobado' | 'rechazado', observaciones?: string) {
+    const existing = await PagoRepository.findById(idPago);
+    if (!existing) return null;
+    if (existing.estado !== 'pendiente') {
+      throw new Error(`El pago ya fue ${existing.estado}, no se puede modificar`);
+    }
+    return await PagoRepository.aprobarRechazar(idPago, accion, observaciones);
   }
 
   async get(id: string) {

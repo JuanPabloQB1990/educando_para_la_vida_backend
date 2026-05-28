@@ -7,7 +7,7 @@ class UsuarioController {
       const data = await UsuarioService.list();
       res.json({ success: true, data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing usuarios' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error listando usuarios' } });
     }
   }
 
@@ -18,7 +18,7 @@ class UsuarioController {
       if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
       res.json({ success: true, data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching usuario' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error obteniendo usuario' } });
     }
   }
 
@@ -27,7 +27,7 @@ class UsuarioController {
       const result = await UsuarioService.create(req.body);
       res.status(201).json({ success: true, data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating usuario' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error creando usuario' } });
     }
   }
 
@@ -37,7 +37,7 @@ class UsuarioController {
       await UsuarioService.update(id, req.body);
       res.json({ success: true, data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating usuario' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error actualizando usuario' } });
     }
   }
 
@@ -47,7 +47,7 @@ class UsuarioController {
       await UsuarioService.delete(id);
       res.json({ success: true, data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting usuario' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error eliminando usuario' } });
     }
   }
 }

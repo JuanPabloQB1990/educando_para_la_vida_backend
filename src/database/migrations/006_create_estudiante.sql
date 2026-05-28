@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS estudiante (
   file_foto VARCHAR(255) NOT NULL,
   file_doc VARCHAR(255) NOT NULL,
   file_diagnostico VARCHAR(255),
-  file_compromiso VARCHAR(255) NOT NULL,
   ref1_nombres VARCHAR(150) NOT NULL,
   ref1_apellidos VARCHAR(150) NOT NULL,
   ref1_tel VARCHAR(50) NOT NULL,

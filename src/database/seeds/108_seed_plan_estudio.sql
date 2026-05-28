@@ -39,7 +39,7 @@ JOIN materia m ON (
   )
   OR (
     g.nombre IN ('Décimo','Once')
-    AND m.nombre_materia = 'Bachiller Comercial con enfasis en emprendimiento'
+    AND m.nombre_materia IN ('Bachiller Comercial con enfasis en emprendimiento', 'Alfabetización')
   )
 )
 WHERE NOT EXISTS (

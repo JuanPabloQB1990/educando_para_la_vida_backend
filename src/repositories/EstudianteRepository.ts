@@ -77,7 +77,6 @@ class EstudianteRepository {
             ips: data.ips,
             rh: data.rh,
             observaciones: data.observaciones,
-            file_compromiso: data.file_compromiso,
             padre_apellido1: data.padre_apellido1,
             padre_apellido2: data.padre_apellido2,
             padre_nombre: data.padre_nombre,

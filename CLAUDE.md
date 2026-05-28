@@ -90,7 +90,7 @@ Database
 
 # Convenciones
 
-##  Controllers
+## Controllers
  - Solo request y response.
  - Nunca lógica SQL.
  - Nunca lógica de negocio compleja.

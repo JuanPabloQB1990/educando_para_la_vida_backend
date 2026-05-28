@@ -50,7 +50,42 @@ class PagoController {
       if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
       res.json({ success: true, data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting pago' } });
+      res.status(500).json({ success: false, data: null, error: { message: 'Error eliminando pago' } });
+    }
+  }
+
+  async listAdmin(req: Request, res: Response) {
+    try {
+      const { idRubro, fechaPagoReal, estado, fechaVerificacion } = req.query as Record<string, string | undefined>;
+      const data = await PagoService.listForAdmin({ idRubro, fechaPagoReal, estado, fechaVerificacion });
+
+      res.json({ success: true, data, error: null });
+    } catch (error) {
+      console.error('Error listando comprobantes para admin:', error);
+      res.status(500).json({ success: false, data: null, error: { message: 'Error listando comprobantes' } });
+    }
+  }
+
+  async verificar(req: Request, res: Response) {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
+      const { accion, observaciones } = req.body as { accion: 'aprobado' | 'rechazado'; observaciones?: string };
+
+      if (!accion || !['aprobado', 'rechazado'].includes(accion)) {
+        return res.status(400).json({ success: false, data: null, error: { message: 'accion debe ser aprobado o rechazado' } });
+      }
+
+      const result = await PagoService.verificarPago(id, accion, observaciones);
+      if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Pago no encontrado' } });
+
+      res.json({ success: true, data: result, error: null });
+    } catch (error: any) {
+      const isConflict = error?.message?.includes('ya fue');
+      res.status(isConflict ? 409 : 500).json({
+        success: false,
+        data: null,
+        error: { message: error?.message ?? 'Error verificando pago' },
+      });
     }
   }
 }

@@ -5,6 +5,7 @@ import UsuarioRepository from '../repositories/UsuarioRepository';
 import AuthRepository from '../repositories/AuthRepository';
 import { EmailService } from '../utils/sendEmail';
 import { UsuarioEstado } from '../enums/usuario.enum';
+import { AppError } from '../error/AppError';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -27,17 +28,18 @@ class AuthService {
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
   
     if (!usuario) {
-      throw { statusCode: 401, message: 'Credenciales incorrectas' };
+      throw new AppError('Usuario no registrado', 401);
     }
 
     if (usuario.estado !== UsuarioEstado.ACTIVO) {
-      throw { statusCode: 403, message: 'Usuario inactivo. Contacta al administrador.' };
+      throw new AppError('Usuario inactivo. Contacta al administrador.', 403);
     }
-
+   
     const passwordValida = await bcrypt.compare(password, usuario.password!);
+    console.log(passwordValida);
     
     if (!passwordValida) {
-      throw { statusCode: 401, message: 'Credenciales incorrectas' };
+      throw new AppError('Contraseña incorrecta', 401);
     }
 
     const payload: JwtPayload = {

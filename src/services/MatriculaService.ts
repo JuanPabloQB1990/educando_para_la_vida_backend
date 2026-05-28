@@ -26,6 +26,8 @@ class MatriculaService {
     const id_rol = rol?.idRol;
 
     const user = await UsuarioRepository.findByDocumento(no_documento, id_rol);
+      console.log(user);
+      
     if (user) return { exists: true };
 
     // No existe: proceder a crear usuario y estudiante.
@@ -90,6 +92,7 @@ class MatriculaService {
 
     // Crear usuario via UsuarioService y obtener id_usuario creado
     const userResult: { plainPassword: string; id: string } | null = await UsuarioService.create(usuarioPayload);
+    console.log('id para crear estudiante:', userResult);
 
     const id_usuario = userResult.id;
 
@@ -99,7 +102,6 @@ class MatriculaService {
       ...payload,
       ...payloadFiles,
     };
-
     // crear registro en estudiante con id_usuario recién creado, obtener id_estudiante
     const idEstudiante = await EstudianteService.create(payloadToCreateStudent);
     console.log('id estudiante: ' + idEstudiante);
@@ -113,6 +115,7 @@ class MatriculaService {
       id_tiempo_validacion: payload.id_tiempo_validacion || null,
       fecha_inscripcion: new Date(),
       file_certificado_grados: payloadFiles.file_certificado_grados || null,
+      file_compromiso: payloadFiles.file_compromiso || null,
     };
   
     const idCreatedEstudiantePeriodo = await EstudiantePeriodoService.create(EstudiantePeriodo);
@@ -149,12 +152,12 @@ class MatriculaService {
     let pago = {
       id_pago: generatePrimaryKey(),
       id_obligacion_pago: idObligacionPago,
-      monto_pagado: obligacionPago.monto_cuota,
+      monto_pagado: 0,
       fecha_pago_real: new Date(),
       file_comprobante: payloadFiles.file_comprobante_pago || null,
       observaciones: '',
       estado: PagoEstado.PENDIENTE,
-      fecha_verificacion: new Date()
+      fecha_verificacion: null
     };
 
     await PagoService.create(pago);

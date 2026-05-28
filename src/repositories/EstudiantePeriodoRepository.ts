@@ -20,11 +20,11 @@ class EstudiantePeriodoRepository {
     
     try {
       
-      const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo = null } = data;
+      const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, file_compromiso, id_anio_electivo = null } = data;
       const id_estudiante_periodo = generatePrimaryKey();
       const [result] = await pool.execute(
-        'INSERT INTO estudiante_periodo (id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo) VALUES (?,?,?,?,?,?,?)',
-        [id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo]
+        'INSERT INTO estudiante_periodo (id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, file_compromiso, id_anio_electivo) VALUES (?,?,?,?,?,?,?,?)',
+        [id_estudiante_periodo, id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, file_compromiso, id_anio_electivo]
       );
       
       return { id: id_estudiante_periodo };
@@ -35,10 +35,10 @@ class EstudiantePeriodoRepository {
   }
 
   async update(id: string, data: any) {
-    const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo } = data;
+    const { id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, file_compromiso, id_anio_electivo } = data;
     const [result] = await pool.execute(
-      'UPDATE estudiante_periodo SET id_estudiante=?, id_tipo_estudio=?, id_tiempo_validacion=?, fecha_inscripcion=?, file_certificado_grados=?, id_anio_electivo=? WHERE id_estudiante_periodo=?',
-      [id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, id_anio_electivo, id]
+      'UPDATE estudiante_periodo SET id_estudiante=?, id_tipo_estudio=?, id_tiempo_validacion=?, fecha_inscripcion=?, file_certificado_grados=?, file_compromiso=?, id_anio_electivo=? WHERE id_estudiante_periodo=?',
+      [id_estudiante, id_tipo_estudio, id_tiempo_validacion, fecha_inscripcion, file_certificado_grados, file_compromiso, id_anio_electivo, id]
     );
     return result;
   }

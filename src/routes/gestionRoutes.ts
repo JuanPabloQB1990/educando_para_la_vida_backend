@@ -1,6 +1,5 @@
 import express from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
-import UsuarioController from '../controllers/UsuarioController';
 import RubroController from '../controllers/RubroController';
 import EstudianteController from '../controllers/EstudianteController';
 import EstudiantePeriodoController from '../controllers/EstudiantePeriodoController';
@@ -54,6 +53,8 @@ router.put('/obligacion_pago/:id', asyncHandler((req: express.Request, res: expr
 router.delete('/obligacion_pago/:id', asyncHandler((req: express.Request, res: express.Response) => ObligacionPagoController.delete(req, res)));
 
 // Pago
+router.get('/pago/admin', asyncHandler((req: express.Request, res: express.Response) => PagoController.listAdmin(req, res)));
+router.patch('/pago/:id/verificar', asyncHandler((req: express.Request, res: express.Response) => PagoController.verificar(req, res)));
 router.get('/pago', asyncHandler((req: express.Request, res: express.Response) => PagoController.list(req, res)));
 router.get('/pago/:id', asyncHandler((req: express.Request, res: express.Response) => PagoController.get(req, res)));
 router.post('/pago', asyncHandler((req: express.Request, res: express.Response) => PagoController.create(req, res)));

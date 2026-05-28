@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import AuthService from '../services/AuthService';
 
@@ -23,18 +23,22 @@ const nuevaPasswordSchema = z.object({
 });
 
 class AuthController {
-  async login(req: Request, res: Response): Promise<void> {
-    const parsed = loginSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: parsed.error.errors[0].message });
-      return;
+  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = loginSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: parsed.error.errors[0].message });
+        return;
+      }
+  
+      const ip = req.ip;
+      const userAgent = req.headers['user-agent'];
+      const result = await AuthService.login(parsed.data.email, parsed.data.password, ip, userAgent);
+     
+      res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', data: result, error: null });
+    } catch (error) {
+      next(error);
     }
-
-    const ip = req.ip;
-    const userAgent = req.headers['user-agent'];
-    const result = await AuthService.login(parsed.data.email, parsed.data.password, ip, userAgent);
-
-    res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', data: result, error: null });
   }
 
   async refresh(req: Request, res: Response): Promise<void> {
