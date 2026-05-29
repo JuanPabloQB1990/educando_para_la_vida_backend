@@ -56,8 +56,8 @@ class PagoController {
 
   async listAdmin(req: Request, res: Response) {
     try {
-      const { idRubro, fechaPagoReal, estado, fechaVerificacion } = req.query as Record<string, string | undefined>;
-      const data = await PagoService.listForAdmin({ idRubro, fechaPagoReal, estado, fechaVerificacion });
+      const { idRubro, fechaPagoReal, estado, fechaVerificacion, noDocumento, padreCedula, madreCedula, acudienteCedula } = req.query as Record<string, string | undefined>;
+      const data = await PagoService.listForAdmin({ idRubro, fechaPagoReal, estado, fechaVerificacion, noDocumento, padreCedula, madreCedula, acudienteCedula });
 
       res.json({ success: true, data, error: null });
     } catch (error) {
@@ -69,19 +69,23 @@ class PagoController {
   async verificar(req: Request, res: Response) {
     try {
       const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const { accion, observaciones } = req.body as { accion: 'aprobado' | 'rechazado'; observaciones?: string };
+      const { accion, observaciones, idObligacionPago, montoPagado } = req.body as {
+        accion: 'aprobado' | 'rechazado';
+        observaciones?: string;
+        idObligacionPago?: string;
+        montoPagado?: string;
+      };
 
       if (!accion || !['aprobado', 'rechazado'].includes(accion)) {
         return res.status(400).json({ success: false, data: null, error: { message: 'accion debe ser aprobado o rechazado' } });
       }
 
-      const result = await PagoService.verificarPago(id, accion, observaciones);
+      const result = await PagoService.verificarPago(id, accion, observaciones, idObligacionPago, montoPagado);
       if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Pago no encontrado' } });
 
       res.json({ success: true, data: result, error: null });
     } catch (error: any) {
-      const isConflict = error?.message?.includes('ya fue');
-      res.status(isConflict ? 409 : 500).json({
+      res.status(500).json({
         success: false,
         data: null,
         error: { message: error?.message ?? 'Error verificando pago' },

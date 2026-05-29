@@ -28,18 +28,18 @@ class AuthService {
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
   
     if (!usuario) {
-      throw new AppError('Usuario no registrado', 401);
+      throw { statusCode: 401, message: 'Usuario no registrado' };
     }
 
     if (usuario.estado !== UsuarioEstado.ACTIVO) {
-      throw new AppError('Usuario inactivo. Contacta al administrador.', 403);
+      throw { statusCode: 403, message: 'Usuario inactivo. Contacta al administrador.' };
     }
    
     const passwordValida = await bcrypt.compare(password, usuario.password!);
-    console.log(passwordValida);
     
     if (!passwordValida) {
-      throw new AppError('Contraseña incorrecta', 401);
+      console.log(passwordValida);
+      throw { statusCode: 401, message: 'Contraseña incorrecta' };
     }
 
     const payload: JwtPayload = {
@@ -69,9 +69,8 @@ class AuthService {
       userAgent,
       fechaExpiracion: refreshExpiracion,
     });
-
     const { password: _pwd, ...usuarioSinPassword } = usuario;
-
+    
     return { accessToken, refreshToken, usuario: usuarioSinPassword };
   }
 

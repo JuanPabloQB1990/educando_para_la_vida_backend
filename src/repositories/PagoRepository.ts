@@ -8,6 +8,10 @@ export interface PagoAdminFilters {
   fechaPagoReal?: string;
   estado?: string;
   fechaVerificacion?: string;
+  noDocumento?: string;
+  padreCedula?: string;
+  madreCedula?: string;
+  acudienteCedula?: string;
 }
 
 class PagoRepository {
@@ -36,6 +40,22 @@ class PagoRepository {
       conditions.push('DATE(p.fecha_verificacion) = ?');
       params.push(filters.fechaVerificacion);
     }
+    if (filters.noDocumento) {
+      conditions.push('u.no_documento LIKE ?');
+      params.push(`%${filters.noDocumento}%`);
+    }
+    if (filters.padreCedula) {
+      conditions.push('e.padre_cedula LIKE ?');
+      params.push(`%${filters.padreCedula}%`);
+    }
+    if (filters.madreCedula) {
+      conditions.push('e.madre_cedula LIKE ?');
+      params.push(`%${filters.madreCedula}%`);
+    }
+    if (filters.acudienteCedula) {
+      conditions.push('e.acudiente_cedula LIKE ?');
+      params.push(`%${filters.acudienteCedula}%`);
+    }
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -45,7 +65,9 @@ class PagoRepository {
         p.file_comprobante, p.observaciones, p.estado, p.fecha_verificacion,
         op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado AS estado_obligacion,
         r.nombre_rubro,
-        ep.id_estudiante, ep.fecha_inscripcion, ep.file_compromiso, ep.file_certificado_grados,
+        ep.id_estudiante_periodo, ep.id_estudiante, ep.fecha_inscripcion, ep.file_compromiso, ep.file_certificado_grados,
+        te.nombre AS nombre_tipo_estudio,
+        tv.tiempo AS tiempo_validacion,
         e.fecha_nacimiento, e.edad, e.sexo,
         e.municipio_nacimiento, e.departamento_nacimiento, e.pais_nacimiento,
         e.religion, e.direccion_actual, e.barrio_vereda_actual, e.ciudad_actual,
@@ -76,6 +98,8 @@ class PagoRepository {
       INNER JOIN estudiante e ON ep.id_estudiante = e.id_estudiante
       INNER JOIN usuario u ON e.id_usuario = u.id_usuario
       LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id_tipo_documento
+      LEFT JOIN tipo_estudio te ON ep.id_tipo_estudio = te.id_tipo_estudio
+      LEFT JOIN tiempo_validacion tv ON ep.id_tiempo_validacion = tv.id_tiempo_validacion
       ${where}
       ORDER BY p.fecha_pago_real DESC
     `;
@@ -84,7 +108,13 @@ class PagoRepository {
     return mapRowsToEntities<any>(rows as any[]);
   }
 
-  async aprobarRechazar(idPago: string, accion: 'aprobado' | 'rechazado', observaciones?: string) {
+  async aprobarRechazar(
+    idPago: string,
+    accion: 'aprobado' | 'rechazado',
+    observaciones?: string,
+    idObligacionPagoNuevo?: string,
+    montoPagado?: string
+  ) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
@@ -93,23 +123,54 @@ class PagoRepository {
         'SELECT id_obligacion_pago FROM pago WHERE id_pago = ?',
         [idPago]
       );
-      const pago = (pagoRows as any[])[0];
-      if (!pago) throw new Error('Pago no encontrado');
+      const pagoActual = (pagoRows as any[])[0];
+      if (!pagoActual) throw new Error('Pago no encontrado');
 
-      const idObligacionPago: string = pago.id_obligacion_pago;
+      const idObligacionActual: string = pagoActual.id_obligacion_pago;
+      const idObligacionFinal = idObligacionPagoNuevo ?? idObligacionActual;
+      const cambiandoObligacion = idObligacionPagoNuevo && idObligacionPagoNuevo !== idObligacionActual;
 
-      await conn.execute(
-        'UPDATE pago SET estado = ?, fecha_verificacion = NOW(), observaciones = ? WHERE id_pago = ?',
-        [accion, observaciones ?? null, idPago]
-      );
+      // Construir UPDATE dinámico del pago
+      const setClauses: string[] = ['estado = ?', 'fecha_verificacion = NOW()', 'observaciones = ?'];
+      const values: unknown[] = [accion, observaciones ?? null];
 
+      if (cambiandoObligacion) {
+        setClauses.push('id_obligacion_pago = ?');
+        values.push(idObligacionFinal);
+      }
+      if (montoPagado !== undefined) {
+        setClauses.push('monto_pagado = ?');
+        values.push(montoPagado);
+      }
+      values.push(idPago);
+
+      await conn.execute(`UPDATE pago SET ${setClauses.join(', ')} WHERE id_pago = ?`, values as any);
+
+      // Si cambió la obligación y la anterior estaba pagada, revertirla
+      if (cambiandoObligacion) {
+        const [oldOpRows] = await conn.query(
+          'SELECT estado, fecha_vencimiento FROM obligacion_pago WHERE id_obligacion_pago = ?',
+          [idObligacionActual]
+        );
+        const oldOp = (oldOpRows as any[])[0];
+        if (oldOp?.estado === 'pagado') {
+          const fechaVenc = oldOp.fecha_vencimiento ? new Date(oldOp.fecha_vencimiento) : null;
+          const estadoRevertido = fechaVenc && fechaVenc < new Date() ? 'vencido' : 'pendiente';
+          await conn.execute(
+            'UPDATE obligacion_pago SET estado = ? WHERE id_obligacion_pago = ?',
+            [estadoRevertido, idObligacionActual]
+          );
+        }
+      }
+
+      // Actualizar estado de la obligación final
       let estadoObligacion: string;
       if (accion === 'aprobado') {
         estadoObligacion = 'pagado';
       } else {
         const [opRows] = await conn.query(
           'SELECT fecha_vencimiento FROM obligacion_pago WHERE id_obligacion_pago = ?',
-          [idObligacionPago]
+          [idObligacionFinal]
         );
         const op = (opRows as any[])[0];
         const fechaVenc = op?.fecha_vencimiento ? new Date(op.fecha_vencimiento) : null;
@@ -118,7 +179,7 @@ class PagoRepository {
 
       await conn.execute(
         'UPDATE obligacion_pago SET estado = ? WHERE id_obligacion_pago = ?',
-        [estadoObligacion, idObligacionPago]
+        [estadoObligacion, idObligacionFinal]
       );
 
       await conn.commit();

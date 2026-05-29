@@ -30,6 +30,9 @@ router.get('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: e
 router.post('/estudiante_periodo', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.create(req, res)));
 router.put('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.update(req, res)));
 router.delete('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.delete(req, res)));
+router.get('/estudiante_periodo/:id/grados', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.getGrados(req, res, next)));
+router.get('/estudiante_periodo/:id/obligaciones', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.getObligaciones(req, res, next)));
+router.post('/estudiante_periodo/:id/matricular-anio', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.matricularAnio(req, res, next)));
 
 // Anio Electivo
 router.get('/anio_electivo', asyncHandler((req: express.Request, res: express.Response) => AnioElectivoController.list(req, res)));

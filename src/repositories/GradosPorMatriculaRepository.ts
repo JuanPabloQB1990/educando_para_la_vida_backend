@@ -37,6 +37,24 @@ class GradosPorMatriculaRepository {
     const [result] = await pool.execute('DELETE FROM grados_por_matricula WHERE id_estudiante_periodo=? AND id_grado_educacion=?', [id_estudiante_periodo, id_grado_educacion]);
     return result;
   }
+
+  async findByEstudiantePeriodo(id_estudiante_periodo: string) {
+    try {
+      const sql = `
+        SELECT gpm.id_estudiante_periodo, gpm.id_grado_educacion, gpm.estado,
+               ge.nombre AS nombre_grado
+        FROM grados_por_matricula gpm
+        INNER JOIN grado_educacion ge ON gpm.id_grado_educacion = ge.id_grado_educacion
+        WHERE gpm.id_estudiante_periodo = ?
+        ORDER BY ge.nombre
+      `;
+      const [rows] = await pool.query(sql, [id_estudiante_periodo]);
+      return mapRowsToEntities<any>(rows as any[]);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export default new GradosPorMatriculaRepository();

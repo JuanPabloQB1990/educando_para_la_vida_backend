@@ -39,6 +39,24 @@ class ObligacionPagoRepository {
     const [result] = await pool.execute('DELETE FROM obligacion_pago WHERE id_obligacion_pago = ?', [id]);
     return result;
   }
+
+  async findByEstudiantePeriodo(idEstudiantePeriodo: string) {
+    try {
+      const sql = `
+        SELECT op.id_obligacion_pago, op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado,
+               r.nombre_rubro AS nombre_rubro
+        FROM obligacion_pago op
+        INNER JOIN rubro r ON op.id_rubro = r.id_rubro
+        WHERE op.id_estudiante_periodo = ?
+        ORDER BY op.fecha_vencimiento ASC
+      `;
+      const [rows] = await pool.query(sql, [idEstudiantePeriodo]);
+      return mapRowsToEntities<any>(rows as any[]);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
 }
 
 export default new ObligacionPagoRepository();

@@ -47,6 +47,42 @@ class EstudiantePeriodoRepository {
     const [result] = await pool.execute('DELETE FROM estudiante_periodo WHERE id_estudiante_periodo = ?', [id]);
     return result;
   }
+
+  async matricularAnio(
+    idEstudiantePeriodo: string,
+    idAnioElectivo: string,
+    anio: number,
+    idRubro: string,
+    montoBase: string,
+    meses: number[]
+  ): Promise<void> {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      await conn.execute(
+        'UPDATE estudiante_periodo SET id_anio_electivo = ? WHERE id_estudiante_periodo = ?',
+        [idAnioElectivo, idEstudiantePeriodo]
+      );
+
+      for (const mes of meses) {
+        const fechaStr = `${anio}-${String(mes + 1).padStart(2, '0')}-27 23:59:00`;
+        const idObligacion = generatePrimaryKey();
+        await conn.execute(
+          'INSERT INTO obligacion_pago (id_obligacion_pago, id_estudiante_periodo, id_rubro, monto_cuota, fecha_vencimiento, estado) VALUES (?,?,?,?,?,?)',
+          [idObligacion, idEstudiantePeriodo, idRubro, montoBase, fechaStr, 'pendiente']
+        );
+      }
+
+      await conn.commit();
+    } catch (error) {
+      await conn.rollback();
+      console.error(error);
+      throw error;
+    } finally {
+      conn.release();
+    }
+  }
 }
 
 export default new EstudiantePeriodoRepository();

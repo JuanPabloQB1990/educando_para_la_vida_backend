@@ -9,13 +9,16 @@ class PagoService {
     return await PagoRepository.findAllForAdmin(filters);
   }
 
-  async verificarPago(idPago: string, accion: 'aprobado' | 'rechazado', observaciones?: string) {
+  async verificarPago(
+    idPago: string,
+    accion: 'aprobado' | 'rechazado',
+    observaciones?: string,
+    idObligacionPago?: string,
+    montoPagado?: string
+  ) {
     const existing = await PagoRepository.findById(idPago);
     if (!existing) return null;
-    if (existing.estado !== 'pendiente') {
-      throw new Error(`El pago ya fue ${existing.estado}, no se puede modificar`);
-    }
-    return await PagoRepository.aprobarRechazar(idPago, accion, observaciones);
+    return await PagoRepository.aprobarRechazar(idPago, accion, observaciones, idObligacionPago, montoPagado);
   }
 
   async get(id: string) {
