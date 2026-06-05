@@ -5,8 +5,8 @@ class GradosPorMatriculaService {
     return await GradosPorMatriculaRepository.findAll();
   }
 
-  async get(id_estudiante_periodo: string, id_grado_educacion: string) {
-    return await GradosPorMatriculaRepository.findByPK(id_estudiante_periodo, id_grado_educacion);
+  async get(id_estudiante_matricula: string, id_grado_educacion: string) {
+    return await GradosPorMatriculaRepository.findByPK(id_estudiante_matricula, id_grado_educacion);
   }
 
   async createMany(data: any) {
@@ -14,12 +14,12 @@ class GradosPorMatriculaService {
     return res;
   }
 
-  async update(id_estudiante_periodo: string, id_grado_educacion: string, data: any) {
-    return await GradosPorMatriculaRepository.update(id_estudiante_periodo, id_grado_educacion, data.estado);
+  async update(id_estudiante_matricula: string, id_grado_educacion: string, data: any) {
+    return await GradosPorMatriculaRepository.update(id_estudiante_matricula, id_grado_educacion, data.estado);
   }
 
-  async delete(id_estudiante_periodo: string, id_grado_educacion: string) {
-    return await GradosPorMatriculaRepository.remove(id_estudiante_periodo, id_grado_educacion);
+  async delete(id_estudiante_matricula: string, id_grado_educacion: string) {
+    return await GradosPorMatriculaRepository.remove(id_estudiante_matricula, id_grado_educacion);
   }
 }
 

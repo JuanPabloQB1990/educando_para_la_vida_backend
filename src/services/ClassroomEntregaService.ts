@@ -17,13 +17,13 @@ class ClassroomEntregaService {
   async create(data: { idClassroomTarea: string; idEstudiante: string }) {
     const res = await ClassroomEntregaRepository.create({
       ...data,
-      estadoEntrega: ClassroomEntregaEstado.PENDIENTE,
+      estado: ClassroomEntregaEstado.PENDIENTE,
     });
     return ClassroomEntregaRepository.findById(res.id);
   }
 
   async updateEstado(id: string, data: { estadoEntrega: string; observacionProfesor?: string }) {
-    await ClassroomEntregaRepository.updateEstado(id, data);
+    await ClassroomEntregaRepository.updateEstado(id, { estado: data.estadoEntrega, observacionProfesor: data.observacionProfesor });
     return ClassroomEntregaRepository.findById(id);
   }
 

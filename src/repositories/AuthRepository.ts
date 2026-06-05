@@ -19,7 +19,7 @@ class AuthRepository {
   async crearSesion(data: CrearSesionData): Promise<string> {
     const id = generatePrimaryKey();
     await pool.execute(
-      `INSERT INTO sesion_usuario (id_sesion, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
+      `INSERT INTO sesion_usuario (id, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
        VALUES (?, ?, ?, ?, ?, NOW(), ?)`,
       [id, data.idUsuario, data.token, data.ip ?? null, data.userAgent ?? null, data.fechaExpiracion]
     );
@@ -48,7 +48,7 @@ class AuthRepository {
     );
     const id = generatePrimaryKey();
     await pool.execute(
-      `INSERT INTO sesion_usuario (id_sesion, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
+      `INSERT INTO sesion_usuario (id, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
        VALUES (?, ?, ?, NULL, 'RECOVERY_CODE', NOW(), ?)`,
       [id, data.idUsuario, data.codigo, data.fechaExpiracion]
     );
@@ -56,7 +56,7 @@ class AuthRepository {
 
   async verificarCodigoRecuperacion(idUsuario: string, codigo: string): Promise<boolean> {
     const [rows] = await pool.query(
-      `SELECT id_sesion FROM sesion_usuario
+      `SELECT id FROM sesion_usuario
        WHERE id_usuario = ? AND token = ? AND user_agent = 'RECOVERY_CODE' AND fecha_expiracion > NOW()`,
       [idUsuario, codigo]
     );

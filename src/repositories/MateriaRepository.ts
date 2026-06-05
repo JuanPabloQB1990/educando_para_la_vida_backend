@@ -5,29 +5,29 @@ import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 
 class MateriaRepository {
   async findAll() {
-    const [rows] = await pool.query('SELECT * FROM materia ORDER BY nombre_materia');
+    const [rows] = await pool.query('SELECT * FROM materia ORDER BY nombre');
     return mapRowsToEntities<Materia>(rows as any[]);
   }
 
   async findById(id: string) {
-    const [rows] = await pool.query('SELECT * FROM materia WHERE id_materia = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM materia WHERE id = ?', [id]);
     const row = (rows as any[])[0] ?? null;
     return row ? mapRowToEntity<Materia>(row) : null;
   }
 
-  async create(nombreMateria: string) {
+  async create(nombre: string) {
     const id = generatePrimaryKey();
-    await pool.execute('INSERT INTO materia (id_materia, nombre_materia) VALUES (?, ?)', [id, nombreMateria]);
+    await pool.execute('INSERT INTO materia (id, nombre) VALUES (?, ?)', [id, nombre]);
     return { id };
   }
 
-  async update(id: string, nombreMateria: string) {
-    const [result] = await pool.execute('UPDATE materia SET nombre_materia = ? WHERE id_materia = ?', [nombreMateria, id]);
+  async update(id: string, nombre: string) {
+    const [result] = await pool.execute('UPDATE materia SET nombre = ? WHERE id = ?', [nombre, id]);
     return result;
   }
 
   async remove(id: string) {
-    const [result] = await pool.execute('DELETE FROM materia WHERE id_materia = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM materia WHERE id = ?', [id]);
     return result;
   }
 }

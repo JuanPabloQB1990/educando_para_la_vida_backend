@@ -34,10 +34,9 @@ async function bootstrap() {
   // Rutas académicas (docentes, calificaciones, asistencias, classroom)
   app.use('/api/docente', routerDocente);
   // Rutas protegidas — solo admin
-  app.use('/api/usuario',  routerUsuario);
+  app.use('/api/usuario', routerUsuario);
   app.use('/api/gestion', verifyToken, requireRoles('admin'), routerGestion);
 
-  //verifyToken, requireRoles('admin'),
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {

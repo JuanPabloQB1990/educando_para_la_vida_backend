@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import pool from '../config/database.ts';
+import pool from '../config/database';
 
 async function runSqlFile(filePath: string) {
   const sql = await fs.readFile(filePath, 'utf8');

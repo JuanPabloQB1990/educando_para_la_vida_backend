@@ -18,7 +18,7 @@ class PeriodoRepository {
   }
 
   async findById(id: string) {
-    const [rows] = await pool.query('SELECT * FROM periodo WHERE id_periodo = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM periodo WHERE id = ?', [id]);
     const row = (rows as any[])[0] ?? null;
     return row ? mapRowToEntity<Periodo>(row) : null;
   }
@@ -27,7 +27,7 @@ class PeriodoRepository {
     for (let i = 1; i <= 4; i++) {
       const id = generatePrimaryKey();
       await pool.execute(
-        'INSERT INTO periodo (id_periodo, id_anio_electivo, numero_periodo) VALUES (?, ?, ?)',
+        'INSERT INTO periodo (id, id_anio_electivo, numero_periodo) VALUES (?, ?, ?)',
         [id, idAnioElectivo, i]
       );
     }

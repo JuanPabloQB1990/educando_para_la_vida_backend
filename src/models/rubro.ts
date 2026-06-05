@@ -1,13 +1,13 @@
 export interface RubroRow {
-  id_rubro: string;
-  nombre_rubro: string;
+  id: string;
+  nombre: string;
   descripcion?: string | null;
   monto_base?: string | null;
 }
 
 export interface Rubro {
-  idRubro: string;
-  nombreRubro: string;
+  id: string;
+  nombre: string;
   descripcion?: string | null;
   montoBase?: string | null;
 }

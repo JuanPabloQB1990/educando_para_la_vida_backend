@@ -1,5 +1,5 @@
 export interface EstudianteRow {
-  id_estudiante: string;
+  id: string;
   id_usuario: string;
   fecha_nacimiento_estudiante?: string | null;
   edad_estudiante?: number | null;
@@ -8,7 +8,7 @@ export interface EstudianteRow {
 }
 
 export interface Estudiante {
-  idEstudiante: string;
+  id: string;
   idUsuario: string;
   fechaNacimientoEstudiante?: string | null;
   edadEstudiante?: number | null;

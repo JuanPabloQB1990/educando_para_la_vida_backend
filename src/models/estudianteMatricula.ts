@@ -1,5 +1,5 @@
-export interface EstudiantePeriodoRow {
-  id_estudiante_periodo: string;
+export interface EstudianteMatriculaRow {
+  id: string;
   id_estudiante: string;
   id_tipo_estudio?: string | null;
   id_tiempo_validacion?: string | null;
@@ -9,8 +9,8 @@ export interface EstudiantePeriodoRow {
   id_anio_electivo?: string | null;
 }
 
-export interface EstudiantePeriodo {
-  idEstudiantePeriodo: string;
+export interface EstudianteMatricula {
+  id: string;
   idEstudiante: string;
   idTipoEstudio?: string | null;
   idTiempoValidacion?: string | null;
@@ -22,6 +22,6 @@ export interface EstudiantePeriodo {
 
 import { mapRowToEntity } from './dbMappers';
 
-export function mapEstudiantePeriodo(row: EstudiantePeriodoRow): EstudiantePeriodo {
-  return mapRowToEntity<EstudiantePeriodo>(row);
+export function mapEstudianteMatricula(row: EstudianteMatriculaRow): EstudianteMatricula {
+  return mapRowToEntity<EstudianteMatricula>(row);
 }

@@ -1,9 +1,9 @@
 export interface MateriaRow {
-  id_materia: string;
-  nombre_materia: string;
+  id: string;
+  nombre: string;
 }
 
 export interface Materia {
-  idMateria: string;
-  nombreMateria: string;
+  id: string;
+  nombre: string;
 }

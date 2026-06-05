@@ -10,12 +10,12 @@ class ActividadMateriaService {
   }
 
   async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string; nombreActividad: string }) {
-    const res = await ActividadMateriaRepository.create(data);
+    const res = await ActividadMateriaRepository.create({ idActividad: data.idActividad, idMateria: data.idMateria, idCargaAcademica: data.idCargaAcademica, nombre: data.nombreActividad });
     return ActividadMateriaRepository.findById(res.id);
   }
 
   async update(id: string, nombreActividad: string) {
-    await ActividadMateriaRepository.update(id, { nombreActividad });
+    await ActividadMateriaRepository.update(id, { nombre: nombreActividad });
     return ActividadMateriaRepository.findById(id);
   }
 

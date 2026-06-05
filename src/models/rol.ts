@@ -1,11 +1,11 @@
 export interface RolRow {
-  id_rol: string;
-  nombre_rol: string;
+  id: string;
+  nombre: string;
 }
 
 export interface Rol {
-  idRol: string;
-  nombreRol: string;
+  id: string;
+  nombre: string;
 }
 
 import { mapRowToEntity } from './dbMappers';

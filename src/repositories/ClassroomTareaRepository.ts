@@ -7,14 +7,14 @@ class ClassroomTareaRepository {
   async findByCarga(idCargaAcademica: string) {
     const [rows] = await pool.query(
       `SELECT ct.*,
-              m.nombre_materia,
+              m.nombre AS nombre_materia,
               g.nombre AS nombre_grado,
               p.numero_periodo
        FROM classroom_tarea ct
-       JOIN carga_academica ca ON ct.id_carga_academica = ca.id_carga_academica
-       JOIN materia m ON ca.id_materia = m.id_materia
-       JOIN grado_educacion g ON ca.id_grado_educacion = g.id_grado_educacion
-       JOIN periodo p ON ct.id_periodo = p.id_periodo
+       JOIN carga_academica ca ON ct.id_carga_academica = ca.id
+       JOIN materia m ON ca.id_materia = m.id
+       JOIN grado_educacion g ON ca.id_grado_educacion = g.id
+       JOIN periodo p ON ct.id_periodo = p.id
        WHERE ct.id_carga_academica = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idCargaAcademica]
@@ -25,12 +25,12 @@ class ClassroomTareaRepository {
   async findByGrado(idGradoEducacion: string, idAnioElectivo: string) {
     const [rows] = await pool.query(
       `SELECT ct.*,
-              m.nombre_materia,
+              m.nombre AS nombre_materia,
               p.numero_periodo
        FROM classroom_tarea ct
-       JOIN carga_academica ca ON ct.id_carga_academica = ca.id_carga_academica
-       JOIN materia m ON ca.id_materia = m.id_materia
-       JOIN periodo p ON ct.id_periodo = p.id_periodo
+       JOIN carga_academica ca ON ct.id_carga_academica = ca.id
+       JOIN materia m ON ca.id_materia = m.id
+       JOIN periodo p ON ct.id_periodo = p.id
        WHERE ca.id_grado_educacion = ? AND ca.id_anio_electivo = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idGradoEducacion, idAnioElectivo]
@@ -41,15 +41,15 @@ class ClassroomTareaRepository {
   async findById(id: string) {
     const [rows] = await pool.query(
       `SELECT ct.*,
-              m.nombre_materia,
+              m.nombre AS nombre_materia,
               g.nombre AS nombre_grado,
               p.numero_periodo
        FROM classroom_tarea ct
-       JOIN carga_academica ca ON ct.id_carga_academica = ca.id_carga_academica
-       JOIN materia m ON ca.id_materia = m.id_materia
-       JOIN grado_educacion g ON ca.id_grado_educacion = g.id_grado_educacion
-       JOIN periodo p ON ct.id_periodo = p.id_periodo
-       WHERE ct.id_classroom_tarea = ?`,
+       JOIN carga_academica ca ON ct.id_carga_academica = ca.id
+       JOIN materia m ON ca.id_materia = m.id
+       JOIN grado_educacion g ON ca.id_grado_educacion = g.id
+       JOIN periodo p ON ct.id_periodo = p.id
+       WHERE ct.id = ?`,
       [id]
     );
     const row = (rows as any[])[0] ?? null;
@@ -59,7 +59,7 @@ class ClassroomTareaRepository {
   async create(data: { idCargaAcademica: string; idPeriodo: string; titulo: string; instrucciones: string; fechaLimite: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO classroom_tarea (id_classroom_tarea, id_carga_academica, id_periodo, titulo, instrucciones, fecha_limite, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())',
+      'INSERT INTO classroom_tarea (id, id_carga_academica, id_periodo, titulo, instrucciones, fecha_limite, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())',
       [id, data.idCargaAcademica, data.idPeriodo, data.titulo, data.instrucciones, data.fechaLimite]
     );
     return { id };
@@ -67,18 +67,17 @@ class ClassroomTareaRepository {
 
   async update(id: string, data: { titulo: string; instrucciones: string; fechaLimite: string }) {
     const [result] = await pool.execute(
-      'UPDATE classroom_tarea SET titulo = ?, instrucciones = ?, fecha_limite = ? WHERE id_classroom_tarea = ?',
+      'UPDATE classroom_tarea SET titulo = ?, instrucciones = ?, fecha_limite = ? WHERE id = ?',
       [data.titulo, data.instrucciones, data.fechaLimite, id]
     );
     return result;
   }
 
   async remove(id: string) {
-    const [result] = await pool.execute('DELETE FROM classroom_tarea WHERE id_classroom_tarea = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM classroom_tarea WHERE id = ?', [id]);
     return result;
   }
 
-  // Adjuntos
   async findAdjuntos(idTarea: string) {
     const [rows] = await pool.query(
       'SELECT * FROM classroom_tarea_adjunto WHERE id_classroom_tarea = ?',
@@ -90,14 +89,14 @@ class ClassroomTareaRepository {
   async createAdjunto(data: { idClassroomTarea: string; urlArchivo: string; nombreArchivo: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO classroom_tarea_adjunto (id_classroom_tarea_adjunto, id_classroom_tarea, url_archivo, nombre_archivo) VALUES (?, ?, ?, ?)',
+      'INSERT INTO classroom_tarea_adjunto (id, id_classroom_tarea, url_archivo, nombre_archivo) VALUES (?, ?, ?, ?)',
       [id, data.idClassroomTarea, data.urlArchivo, data.nombreArchivo]
     );
     return { id };
   }
 
   async removeAdjunto(id: string) {
-    const [result] = await pool.execute('DELETE FROM classroom_tarea_adjunto WHERE id_classroom_tarea_adjunto = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM classroom_tarea_adjunto WHERE id = ?', [id]);
     return result;
   }
 }

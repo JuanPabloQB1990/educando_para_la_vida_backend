@@ -1,5 +1,5 @@
 export interface PagoRow {
-  id_pago: string;
+  id: string;
   id_obligacion_pago: string;
   monto_pagado: string;
   fecha_pago_real?: string | null;
@@ -10,7 +10,7 @@ export interface PagoRow {
 }
 
 export interface Pago {
-  idPago: string;
+  id: string;
   idObligacionPago: string;
   montoPagado: string;
   fechaPagoReal?: string | null;

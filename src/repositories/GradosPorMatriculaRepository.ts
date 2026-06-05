@@ -4,54 +4,48 @@ import type { GradosPorMatricula } from '../models/gradosPorMatricula';
 
 class GradosPorMatriculaRepository {
   async findAll() {
-    const [rows] = await pool.query('SELECT * FROM grados_por_matricula ORDER BY id_estudiante_periodo');
+    const [rows] = await pool.query('SELECT * FROM grados_por_matricula ORDER BY id_estudiante_matricula');
     return mapRowsToEntities<GradosPorMatricula>(rows as any[]);
   }
 
-  async findByPK(id_estudiante_periodo: string, id_grado_educacion: string) {
-    const [rows] = await pool.query('SELECT * FROM grados_por_matricula WHERE id_estudiante_periodo = ? AND id_grado_educacion = ?', [id_estudiante_periodo, id_grado_educacion]);
+  async findByPK(id_estudiante_matricula: string, id_grado_educacion: string) {
+    const [rows] = await pool.query('SELECT * FROM grados_por_matricula WHERE id_estudiante_matricula = ? AND id_grado_educacion = ?', [id_estudiante_matricula, id_grado_educacion]);
     const row = (rows as any[])[0] || null;
     return row ? mapRowToEntity<GradosPorMatricula>(row) : null;
   }
 
   async createMany(values: any[]) {
-    console.log(values);
-    
     try {
-      const sql = `INSERT INTO grados_por_matricula (id_estudiante_periodo, id_grado_educacion, estado) VALUES ?`;
-    
+      const sql = `INSERT INTO grados_por_matricula (id_estudiante_matricula, id_grado_educacion, estado) VALUES ?`;
       return pool.query(sql, [values]);
-      
     } catch (error) {
-      console.error('Error inserting multiple records into grados_por_matricula:', error);
       throw error;
     }
-}
+  }
 
-  async update(id_estudiante_periodo: string, id_grado_educacion: string, estado: string) {
-    const [result] = await pool.execute('UPDATE grados_por_matricula SET estado=? WHERE id_estudiante_periodo=? AND id_grado_educacion=?', [estado, id_estudiante_periodo, id_grado_educacion]);
+  async update(id_estudiante_matricula: string, id_grado_educacion: string, estado: string) {
+    const [result] = await pool.execute('UPDATE grados_por_matricula SET estado=? WHERE id_estudiante_matricula=? AND id_grado_educacion=?', [estado, id_estudiante_matricula, id_grado_educacion]);
     return result;
   }
 
-  async remove(id_estudiante_periodo: string, id_grado_educacion: string) {
-    const [result] = await pool.execute('DELETE FROM grados_por_matricula WHERE id_estudiante_periodo=? AND id_grado_educacion=?', [id_estudiante_periodo, id_grado_educacion]);
+  async remove(id_estudiante_matricula: string, id_grado_educacion: string) {
+    const [result] = await pool.execute('DELETE FROM grados_por_matricula WHERE id_estudiante_matricula=? AND id_grado_educacion=?', [id_estudiante_matricula, id_grado_educacion]);
     return result;
   }
 
-  async findByEstudiantePeriodo(id_estudiante_periodo: string) {
+  async findByEstudianteMatricula(id_estudiante_matricula: string) {
     try {
       const sql = `
-        SELECT gpm.id_estudiante_periodo, gpm.id_grado_educacion, gpm.estado,
+        SELECT gpm.id_estudiante_matricula, gpm.id_grado_educacion, gpm.estado,
                ge.nombre AS nombre_grado
         FROM grados_por_matricula gpm
-        INNER JOIN grado_educacion ge ON gpm.id_grado_educacion = ge.id_grado_educacion
-        WHERE gpm.id_estudiante_periodo = ?
+        INNER JOIN grado_educacion ge ON gpm.id_grado_educacion = ge.id
+        WHERE gpm.id_estudiante_matricula = ?
         ORDER BY ge.nombre
       `;
-      const [rows] = await pool.query(sql, [id_estudiante_periodo]);
+      const [rows] = await pool.query(sql, [id_estudiante_matricula]);
       return mapRowsToEntities<any>(rows as any[]);
     } catch (error) {
-      console.error(error);
       throw error;
     }
   }

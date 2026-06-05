@@ -14,12 +14,12 @@ class AsistenciaService {
   }
 
   async create(data: { idEstudiante: string; idPeriodo: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
-    const res = await AsistenciaRepository.create(data);
+    const res = await AsistenciaRepository.create({ idEstudiante: data.idEstudiante, idPeriodo: data.idPeriodo, fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
     return AsistenciaRepository.findById(res.id);
   }
 
   async update(id: string, data: { fecha: string; estadoAsistencia: string; observacion?: string }) {
-    await AsistenciaRepository.update(id, data);
+    await AsistenciaRepository.update(id, { fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
     return AsistenciaRepository.findById(id);
   }
 

@@ -1,6 +1,6 @@
 export interface ObligacionPagoRow {
-  id_obligacion_pago: string;
-  id_estudiante_periodo: string;
+  id: string;
+  id_estudiante_matricula: string;
   id_rubro: string;
   monto_cuota: string;
   fecha_vencimiento?: string | null;
@@ -8,8 +8,8 @@ export interface ObligacionPagoRow {
 }
 
 export interface ObligacionPago {
-  idObligacionPago: string;
-  idEstudiantePeriodo: string;
+  id: string;
+  idEstudianteMatricula: string;
   idRubro: string;
   montoCuota: string;
   fechaVencimiento?: string | null;

@@ -6,7 +6,7 @@ import { FormularioMatriculaSchema } from "../types";
 import { generatePrimaryKey } from "../utils/generatePrimaryKey";
 import { EmailService } from "../utils/sendEmail";
 import { uploadFileToS3 } from "../utils/uploadFIleAWSS3";
-import EstudiantePeriodoService from "./EstudiantePeriodoService";
+import EstudianteMatriculaService from "./EstudianteMatriculaService";
 import EstudianteService from "./EstudianteService";
 import GradosPorMatriculaService from "./GradosPorMatriculaService";
 import ObligacionPagoService from "./ObligacionPagoService";
@@ -23,11 +23,10 @@ class MatriculaService {
     const no_documento = form.no_documento ?? form.no_documento ?? null;
     // obtener id del rol 'estudiante' desde la tabla rol
     const rol = await RolService.findByName("estudiante");
-    const id_rol = rol?.idRol;
+    const id_rol = rol?.id;
 
     const user = await UsuarioRepository.findByDocumento(no_documento, id_rol);
-      console.log(user);
-      
+  
     if (user) return { exists: true };
 
     // No existe: proceder a crear usuario y estudiante.
@@ -106,10 +105,10 @@ class MatriculaService {
     const idEstudiante = await EstudianteService.create(payloadToCreateStudent);
     console.log('id estudiante: ' + idEstudiante);
     
-    // crear registro en estudiante_periodo con id_estudiante recién creado
+    // crear registro en estudiante_matricula con id_estudiante recién creado
 
-    let EstudiantePeriodo = {
-      id_estudiante_periodo: generatePrimaryKey(),
+    let estudianteMatricula = {
+      id_estudiante_matricula: generatePrimaryKey(),
       id_estudiante: idEstudiante,
       id_tipo_estudio: payload.id_tipo_estudio || null,
       id_tiempo_validacion: payload.id_tiempo_validacion || null,
@@ -117,28 +116,28 @@ class MatriculaService {
       file_certificado_grados: payloadFiles.file_certificado_grados || null,
       file_compromiso: payloadFiles.file_compromiso || null,
     };
-  
-    const idCreatedEstudiantePeriodo = await EstudiantePeriodoService.create(EstudiantePeriodo);
-    console.log('id estudiante_período: ' + idCreatedEstudiantePeriodo);
+
+    const idCreatedEstudianteMatricula = await EstudianteMatriculaService.create(estudianteMatricula);
+    console.log('id estudiante_matricula: ' + idCreatedEstudianteMatricula);
     
-    // crear registro en grados_por_matricula con id_estudiante_periodo recién creado
+    // crear registro en grados_por_matricula con id_estudiante_matricula recién creado
 
     const gradosPayload = payload.id_grado_educacion.map((idGrado: string) => [
-      idCreatedEstudiantePeriodo,
+      idCreatedEstudianteMatricula,
       idGrado,
       GradoMatriculaEstado.PENDIENTE,
     ]);
 
     await GradosPorMatriculaService.createMany(gradosPayload);
 
-    // crear registro en obligacion_pago con id_estudiante_periodo recién creado
+    // crear registro en obligacion_pago con id_estudiante_matricula recién creado
 
     const rubro = await RubroService.findByName("Matricula");
 
     let obligacionPago = {
       id_obligacion_pago: generatePrimaryKey(),
-      id_estudiante_periodo: idCreatedEstudiantePeriodo,
-      id_rubro: rubro?.idRubro,
+      id_estudiante_matricula: idCreatedEstudianteMatricula,
+      id_rubro: rubro?.id,
       monto_cuota: rubro?.montoBase || 0,
       fecha_vencimiento: null,
       estado: ObligacionPagoEstado.PENDIENTE,

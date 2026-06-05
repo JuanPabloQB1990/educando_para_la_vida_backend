@@ -57,6 +57,7 @@ src/
 ├── config/         # Variables de entorno y configuraciones (DB, AWS, etc.)
 ├── database/       # Pool de conexión, scripts de migración y seeds SQL
 ├── routes/         # Definición de endpoints expuestos de la API
+├── error/          # Definicion de clases para errores personalizados
 ├── middlewares/    # Interceptores (Auth, Roles, Manejo de Errores, Multer)
 ├── schemas/        # Esquemas de validación Zod (Reemplaza a validators)
 ├── controllers/    # Manejo exclusivo de req y res (Extracción de datos)
@@ -139,8 +140,10 @@ usuario:
 - inactivo
 
 grados_por_matricula:
-- finalizado
 - pendiente
+- cursando
+- aprobado
+- reprobado
 - retirado
 
 classroom_entrega

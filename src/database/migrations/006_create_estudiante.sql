@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS estudiante (
-  id_estudiante VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
+  id VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
   id_usuario VARCHAR(100) NOT NULL,
   fecha_nacimiento DATE NOT NULL,
   edad INT NOT NULL,
@@ -64,5 +64,5 @@ CREATE TABLE IF NOT EXISTS estudiante (
   ips VARCHAR(150) NOT NULL,
   rh VARCHAR(10) NOT NULL,
   observaciones TEXT,
-  CONSTRAINT fk_estudiante_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE RESTRICT
+  CONSTRAINT fk_estudiante_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

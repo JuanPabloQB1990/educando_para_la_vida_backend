@@ -1,5 +1,6 @@
 -- Seed: 100_seed_rol.sql
-INSERT IGNORE INTO rol (nombre_rol) VALUES
+INSERT IGNORE INTO rol (nombre) VALUES
   ('admin'),
   ('estudiante'),
-  ('profesor');
+  ('secretari@'),
+  ('profesor(a)');

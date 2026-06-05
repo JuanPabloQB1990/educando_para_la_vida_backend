@@ -1,10 +1,10 @@
 export interface TipoDocumentoRow {
-  id_tipo_documento: string;
+  id: string;
   nombre: string;
 }
 
 export interface TipoDocumento {
-  idTipoDocumento: string;
+  id: string;
   nombre: string;
 }
 

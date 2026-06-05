@@ -1,5 +1,5 @@
 -- Seed: 105_seed_rubro.sql
-INSERT IGNORE INTO rubro (nombre_rubro, descripcion, monto_base) VALUES
+INSERT IGNORE INTO rubro (nombre, descripcion, monto_base) VALUES
   ('Matricula', 'Pago matrícula', 230000),
   ('Mensualidad 1° a 5°', 'Pago mensual de matrícula de 1° a 5°', 117000),
   ('Mensualidad 6° a 8°', 'Pago mensual de matrícula de 6° a 8°', 122000),

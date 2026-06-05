@@ -1,5 +1,5 @@
 export interface PlanEstudioRow {
-  id_plan_estudio: string;
+  id: string;
   id_grado_educacion: string;
   id_materia: string;
   nombre_grado?: string;
@@ -7,7 +7,7 @@ export interface PlanEstudioRow {
 }
 
 export interface PlanEstudio {
-  idPlanEstudio: string;
+  id: string;
   idGradoEducacion: string;
   idMateria: string;
   nombreGrado?: string;

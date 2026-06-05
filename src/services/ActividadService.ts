@@ -10,12 +10,12 @@ class ActividadService {
   }
 
   async create(data: { idPeriodo: string; idGradoEducacion: string; nombreActividad: string; semana: number; descripcion?: string }) {
-    const res = await ActividadRepository.create(data);
+    const res = await ActividadRepository.create({ idPeriodo: data.idPeriodo, idGradoEducacion: data.idGradoEducacion, nombre: data.nombreActividad, semana: data.semana, descripcion: data.descripcion });
     return ActividadRepository.findById(res.id);
   }
 
   async update(id: string, data: { nombreActividad: string; semana: number; descripcion?: string }) {
-    await ActividadRepository.update(id, data);
+    await ActividadRepository.update(id, { nombre: data.nombreActividad, semana: data.semana, descripcion: data.descripcion });
     return ActividadRepository.findById(id);
   }
 

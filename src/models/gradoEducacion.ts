@@ -1,11 +1,13 @@
 export interface GradoEducacionRow {
-  id_grado_educacion: string;
+  id: string;
   nombre: string;
+  orden: number;
 }
 
 export interface GradoEducacion {
-  idGradoEducacion: string;
+  id: string;
   nombre: string;
+  orden: number;
 }
 
 import { mapRowToEntity } from './dbMappers';

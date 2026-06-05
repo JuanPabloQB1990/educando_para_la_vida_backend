@@ -1,5 +1,5 @@
 export interface CalificacionRow {
-  id_calificacion: string;
+  id: string;
   id_estudiante: string;
   id_actividad_materia: string;
   nota: number;
@@ -10,7 +10,7 @@ export interface CalificacionRow {
 }
 
 export interface Calificacion {
-  idCalificacion: string;
+  id: string;
   idEstudiante: string;
   idActividadMateria: string;
   nota: number;

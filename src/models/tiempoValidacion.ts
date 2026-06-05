@@ -1,10 +1,10 @@
 export interface TiempoValidacionRow {
-  id_tiempo_validacion: string;
+  id: string;
   tiempo: number;
 }
 
 export interface TiempoValidacion {
-  idTiempoValidacion: string;
+  id: string;
   tiempo: number;
 }
 

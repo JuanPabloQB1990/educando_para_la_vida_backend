@@ -1,11 +1,11 @@
 export interface AnioElectivoRow {
-  id_anio_electivo: string;
+  id: string;
   anio: number;
   estado: 'activo' | 'cerrado';
 }
 
 export interface AnioElectivo {
-  idAnioElectivo: string;
+  id: string;
   anio: number;
   estado: 'activo' | 'cerrado';
 }

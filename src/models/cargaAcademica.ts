@@ -1,5 +1,5 @@
 export interface CargaAcademicaRow {
-  id_carga_academica: string;
+  id: string;
   id_usuario: string;
   id_materia: string;
   id_grado_educacion: string;
@@ -11,7 +11,7 @@ export interface CargaAcademicaRow {
 }
 
 export interface CargaAcademica {
-  idCargaAcademica: string;
+  id: string;
   idUsuario: string;
   idMateria: string;
   idGradoEducacion: string;

@@ -16,7 +16,7 @@ export interface PagoAdminFilters {
 
 class PagoRepository {
   async findAll() {
-    const [rows] = await pool.query('SELECT * FROM pago ORDER BY id_pago');
+    const [rows] = await pool.query('SELECT * FROM pago ORDER BY id');
     return mapRowsToEntities<Pago>(rows as any[]);
   }
 
@@ -61,11 +61,11 @@ class PagoRepository {
 
     const sql = `
       SELECT
-        p.id_pago, p.id_obligacion_pago, p.monto_pagado, p.fecha_pago_real,
+        p.id AS id_pago, p.id_obligacion_pago, p.monto_pagado, p.fecha_pago_real,
         p.file_comprobante, p.observaciones, p.estado, p.fecha_verificacion,
         op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado AS estado_obligacion,
-        r.nombre_rubro,
-        ep.id_estudiante_periodo, ep.id_estudiante, ep.fecha_inscripcion, ep.file_compromiso, ep.file_certificado_grados,
+        r.nombre AS nombre_rubro,
+        ep.id AS id_estudiante_matricula, ep.id_estudiante, ep.fecha_inscripcion, ep.file_compromiso, ep.file_certificado_grados,
         te.nombre AS nombre_tipo_estudio,
         tv.tiempo AS tiempo_validacion,
         e.fecha_nacimiento, e.edad, e.sexo,
@@ -92,14 +92,14 @@ class PagoRepository {
         u.contacto1, u.contacto2, u.estado AS estado_usuario, u.fecha_expedicion_documento,
         td.nombre AS nombre_tipo_documento
       FROM pago p
-      INNER JOIN obligacion_pago op ON p.id_obligacion_pago = op.id_obligacion_pago
-      INNER JOIN rubro r ON op.id_rubro = r.id_rubro
-      INNER JOIN estudiante_periodo ep ON op.id_estudiante_periodo = ep.id_estudiante_periodo
-      INNER JOIN estudiante e ON ep.id_estudiante = e.id_estudiante
-      INNER JOIN usuario u ON e.id_usuario = u.id_usuario
-      LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id_tipo_documento
-      LEFT JOIN tipo_estudio te ON ep.id_tipo_estudio = te.id_tipo_estudio
-      LEFT JOIN tiempo_validacion tv ON ep.id_tiempo_validacion = tv.id_tiempo_validacion
+      INNER JOIN obligacion_pago op ON p.id_obligacion_pago = op.id
+      INNER JOIN rubro r ON op.id_rubro = r.id
+      INNER JOIN estudiante_matricula ep ON op.id_estudiante_matricula = ep.id
+      INNER JOIN estudiante e ON ep.id_estudiante = e.id
+      INNER JOIN usuario u ON e.id_usuario = u.id
+      LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id
+      LEFT JOIN tipo_estudio te ON ep.id_tipo_estudio = te.id
+      LEFT JOIN tiempo_validacion tv ON ep.id_tiempo_validacion = tv.id
       ${where}
       ORDER BY p.fecha_pago_real DESC
     `;
@@ -120,7 +120,7 @@ class PagoRepository {
       await conn.beginTransaction();
 
       const [pagoRows] = await conn.query(
-        'SELECT id_obligacion_pago FROM pago WHERE id_pago = ?',
+        'SELECT id_obligacion_pago FROM pago WHERE id = ?',
         [idPago]
       );
       const pagoActual = (pagoRows as any[])[0];
@@ -130,7 +130,6 @@ class PagoRepository {
       const idObligacionFinal = idObligacionPagoNuevo ?? idObligacionActual;
       const cambiandoObligacion = idObligacionPagoNuevo && idObligacionPagoNuevo !== idObligacionActual;
 
-      // Construir UPDATE dinámico del pago
       const setClauses: string[] = ['estado = ?', 'fecha_verificacion = NOW()', 'observaciones = ?'];
       const values: unknown[] = [accion, observaciones ?? null];
 
@@ -144,12 +143,11 @@ class PagoRepository {
       }
       values.push(idPago);
 
-      await conn.execute(`UPDATE pago SET ${setClauses.join(', ')} WHERE id_pago = ?`, values as any);
+      await conn.execute(`UPDATE pago SET ${setClauses.join(', ')} WHERE id = ?`, values as any);
 
-      // Si cambió la obligación y la anterior estaba pagada, revertirla
       if (cambiandoObligacion) {
         const [oldOpRows] = await conn.query(
-          'SELECT estado, fecha_vencimiento FROM obligacion_pago WHERE id_obligacion_pago = ?',
+          'SELECT estado, fecha_vencimiento FROM obligacion_pago WHERE id = ?',
           [idObligacionActual]
         );
         const oldOp = (oldOpRows as any[])[0];
@@ -157,19 +155,18 @@ class PagoRepository {
           const fechaVenc = oldOp.fecha_vencimiento ? new Date(oldOp.fecha_vencimiento) : null;
           const estadoRevertido = fechaVenc && fechaVenc < new Date() ? 'vencido' : 'pendiente';
           await conn.execute(
-            'UPDATE obligacion_pago SET estado = ? WHERE id_obligacion_pago = ?',
+            'UPDATE obligacion_pago SET estado = ? WHERE id = ?',
             [estadoRevertido, idObligacionActual]
           );
         }
       }
 
-      // Actualizar estado de la obligación final
       let estadoObligacion: string;
       if (accion === 'aprobado') {
         estadoObligacion = 'pagado';
       } else {
         const [opRows] = await conn.query(
-          'SELECT fecha_vencimiento FROM obligacion_pago WHERE id_obligacion_pago = ?',
+          'SELECT fecha_vencimiento FROM obligacion_pago WHERE id = ?',
           [idObligacionFinal]
         );
         const op = (opRows as any[])[0];
@@ -178,7 +175,7 @@ class PagoRepository {
       }
 
       await conn.execute(
-        'UPDATE obligacion_pago SET estado = ? WHERE id_obligacion_pago = ?',
+        'UPDATE obligacion_pago SET estado = ? WHERE id = ?',
         [estadoObligacion, idObligacionFinal]
       );
 
@@ -193,26 +190,26 @@ class PagoRepository {
   }
 
   async findById(id: string) {
-    const [rows] = await pool.query('SELECT * FROM pago WHERE id_pago = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM pago WHERE id = ?', [id]);
     const row = (rows as any[])[0] || null;
     return row ? mapRowToEntity<Pago>(row) : null;
   }
 
   async create(data: any) {
     const { id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion } = data;
-    const id_pago = generatePrimaryKey();
-    const [result] = await pool.execute('INSERT INTO pago (id_pago, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion) VALUES (?,?,?,?,?,?,?,?)', [id_pago, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion]);
-    return { id: id_pago };
+    const id = generatePrimaryKey();
+    const [result] = await pool.execute('INSERT INTO pago (id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion) VALUES (?,?,?,?,?,?,?,?)', [id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion]);
+    return { id };
   }
 
   async update(id: string, data: any) {
     const { id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion } = data;
-    const [result] = await pool.execute('UPDATE pago SET id_obligacion_pago=?, monto_pagado=?, fecha_pago_real=?, file_comprobante=?, observaciones=?, estado=?, fecha_verificacion=? WHERE id_pago=?', [id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion, id]);
+    const [result] = await pool.execute('UPDATE pago SET id_obligacion_pago=?, monto_pagado=?, fecha_pago_real=?, file_comprobante=?, observaciones=?, estado=?, fecha_verificacion=? WHERE id=?', [id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion, id]);
     return result;
   }
 
   async remove(id: string) {
-    const [result] = await pool.execute('DELETE FROM pago WHERE id_pago = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM pago WHERE id = ?', [id]);
     return result;
   }
 }

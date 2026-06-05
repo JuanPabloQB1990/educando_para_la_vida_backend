@@ -1,8 +1,8 @@
 export interface ActividadRow {
-  id_actividad: string;
+  id: string;
   id_periodo: string;
   id_grado_educacion: string;
-  nombre_actividad: string;
+  nombre: string;
   semana: number;
   descripcion: string | null;
   numero_periodo?: number;
@@ -10,10 +10,10 @@ export interface ActividadRow {
 }
 
 export interface Actividad {
-  idActividad: string;
+  id: string;
   idPeriodo: string;
   idGradoEducacion: string;
-  nombreActividad: string;
+  nombre: string;
   semana: number;
   descripcion: string | null;
   numeroPeriodo?: number;

@@ -1,5 +1,5 @@
 export interface DireccionGradoRow {
-  id_direccion_grado: string;
+  id: string;
   id_grado_educacion: string;
   id_usuario: string;
   id_anio_electivo: string;
@@ -11,7 +11,7 @@ export interface DireccionGradoRow {
 }
 
 export interface DireccionGrado {
-  idDireccionGrado: string;
+  id: string;
   idGradoEducacion: string;
   idUsuario: string;
   idAnioElectivo: string;

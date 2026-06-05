@@ -1,10 +1,10 @@
 export interface TipoEstudioRow {
-  id_tipo_estudio: string;
+  id: string;
   nombre: string;
 }
 
 export interface TipoEstudio {
-  idTipoEstudio: string;
+  id: string;
   nombre: string;
 }
 

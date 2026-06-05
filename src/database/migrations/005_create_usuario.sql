@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS usuario (
-  id_usuario VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
+  id VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
   nombres VARCHAR(150) NOT NULL,
   apellido1 VARCHAR(150) NOT NULL,
   apellido2 VARCHAR(150) NOT NULL,
@@ -12,6 +12,6 @@ CREATE TABLE IF NOT EXISTS usuario (
   id_rol VARCHAR(100) NOT NULL,
   no_documento VARCHAR(100) NOT NULL,
   fecha_expedicion_documento DATE NOT NULL,
-  CONSTRAINT fk_usuario_tipo_documento FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id_tipo_documento),
-  CONSTRAINT fk_usuario_rol FOREIGN KEY (id_rol) REFERENCES rol(id_rol)
+  CONSTRAINT fk_usuario_tipo_documento FOREIGN KEY (id_tipo_documento) REFERENCES tipo_documento(id),
+  CONSTRAINT fk_usuario_rol FOREIGN KEY (id_rol) REFERENCES rol(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

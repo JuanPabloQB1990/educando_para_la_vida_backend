@@ -1,11 +1,11 @@
 export interface PeriodoRow {
-  id_periodo: string;
+  id: string;
   id_anio_electivo: string;
   numero_periodo: number;
 }
 
 export interface Periodo {
-  idPeriodo: string;
+  id: string;
   idAnioElectivo: string;
   numeroPeriodo: number;
 }

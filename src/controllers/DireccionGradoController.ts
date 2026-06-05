@@ -11,7 +11,7 @@ class DireccionGradoController {
   }
 
   async get(req: Request, res: Response) {
-    const data = await DireccionGradoService.get(req.params.id);
+    const data = await DireccionGradoService.get(req.params.id as string);
     if (!data) return res.status(404).json({ success: false, message: 'No encontrado', data: null, error: 'Not found' });
     res.json({ success: true, message: 'Dirección de grado obtenida', data, error: null });
   }
@@ -30,7 +30,7 @@ class DireccionGradoController {
     if (!idGradoEducacion || !idUsuario || !idAnioElectivo) {
       return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await DireccionGradoService.update(req.params.id, { idGradoEducacion, idUsuario, idAnioElectivo });
+    const data = await DireccionGradoService.update(req.params.id as string, { idGradoEducacion, idUsuario, idAnioElectivo });
     res.json({ success: true, message: 'Dirección de grado actualizada', data, error: null });
   }
 
@@ -39,12 +39,12 @@ class DireccionGradoController {
     if (!linkClaseVirtual) {
       return res.status(400).json({ success: false, message: 'linkClaseVirtual es requerido', data: null, error: 'Dato faltante' });
     }
-    const data = await DireccionGradoService.updateLink(req.params.id, linkClaseVirtual);
+    const data = await DireccionGradoService.updateLink(req.params.id as string, linkClaseVirtual);
     res.json({ success: true, message: 'Link de clase virtual actualizado', data, error: null });
   }
 
   async delete(req: Request, res: Response) {
-    await DireccionGradoService.delete(req.params.id);
+    await DireccionGradoService.delete(req.params.id as string);
     res.json({ success: true, message: 'Dirección de grado eliminada', data: null, error: null });
   }
 }

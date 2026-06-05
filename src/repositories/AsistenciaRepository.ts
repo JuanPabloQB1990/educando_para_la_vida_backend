@@ -10,11 +10,11 @@ class AsistenciaRepository {
               CONCAT(u.nombres, ' ', u.apellido1) AS nombre_estudiante,
               p.numero_periodo
        FROM asistencia a
-       JOIN estudiante e ON a.id_estudiante = e.id_estudiante
-       JOIN usuario u ON e.id_usuario = u.id_usuario
-       JOIN periodo p ON a.id_periodo = p.id_periodo
-       JOIN estudiante_periodo ep ON ep.id_estudiante = e.id_estudiante
-       JOIN grados_por_matricula gpm ON gpm.id_estudiante_periodo = ep.id_estudiante_periodo
+       JOIN estudiante e ON a.id_estudiante = e.id
+       JOIN usuario u ON e.id_usuario = u.id
+       JOIN periodo p ON a.id_periodo = p.id
+       JOIN estudiante_matricula em ON em.id_estudiante = e.id
+       JOIN grados_por_matricula gpm ON gpm.id_estudiante_matricula = em.id
        WHERE gpm.id_grado_educacion = ? AND a.id_periodo = ?
        ORDER BY a.fecha DESC, u.apellido1`,
       [idGradoEducacion, idPeriodo]
@@ -25,7 +25,7 @@ class AsistenciaRepository {
   async findByEstudiante(idEstudiante: string, idPeriodo?: string) {
     let sql = `SELECT a.*, p.numero_periodo
                FROM asistencia a
-               JOIN periodo p ON a.id_periodo = p.id_periodo
+               JOIN periodo p ON a.id_periodo = p.id
                WHERE a.id_estudiante = ?`;
     const params: any[] = [idEstudiante];
     if (idPeriodo) {
@@ -38,30 +38,30 @@ class AsistenciaRepository {
   }
 
   async findById(id: string) {
-    const [rows] = await pool.query('SELECT * FROM asistencia WHERE id_asistencia = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM asistencia WHERE id = ?', [id]);
     const row = (rows as any[])[0] ?? null;
     return row ? mapRowToEntity<Asistencia>(row) : null;
   }
 
-  async create(data: { idEstudiante: string; idPeriodo: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+  async create(data: { idEstudiante: string; idPeriodo: string; fecha: string; estado: string; observacion?: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO asistencia (id_asistencia, id_estudiante, id_periodo, fecha, estado_asistencia, observacion) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, data.idEstudiante, data.idPeriodo, data.fecha, data.estadoAsistencia, data.observacion ?? null]
+      'INSERT INTO asistencia (id, id_estudiante, id_periodo, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, data.idEstudiante, data.idPeriodo, data.fecha, data.estado, data.observacion ?? null]
     );
     return { id };
   }
 
-  async update(id: string, data: { fecha: string; estadoAsistencia: string; observacion?: string }) {
+  async update(id: string, data: { fecha: string; estado: string; observacion?: string }) {
     const [result] = await pool.execute(
-      'UPDATE asistencia SET fecha = ?, estado_asistencia = ?, observacion = ? WHERE id_asistencia = ?',
-      [data.fecha, data.estadoAsistencia, data.observacion ?? null, id]
+      'UPDATE asistencia SET fecha = ?, estado = ?, observacion = ? WHERE id = ?',
+      [data.fecha, data.estado, data.observacion ?? null, id]
     );
     return result;
   }
 
   async remove(id: string) {
-    const [result] = await pool.execute('DELETE FROM asistencia WHERE id_asistencia = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM asistencia WHERE id = ?', [id]);
     return result;
   }
 }

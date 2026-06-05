@@ -2,12 +2,11 @@ import express from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import RubroController from '../controllers/RubroController';
 import EstudianteController from '../controllers/EstudianteController';
-import EstudiantePeriodoController from '../controllers/EstudiantePeriodoController';
+import EstudianteMatriculaController from '../controllers/EstudianteMatriculaController';
 import AnioElectivoController from '../controllers/AnioElectivoController';
 import GradosPorMatriculaController from '../controllers/GradosPorMatriculaController';
 import ObligacionPagoController from '../controllers/ObligacionPagoController';
 import PagoController from '../controllers/PagoController';
-
 const router = express.Router();
 
 // Rubro
@@ -24,15 +23,15 @@ router.post('/estudiante', asyncHandler((req: express.Request, res: express.Resp
 router.put('/estudiante/:id', asyncHandler((req: express.Request, res: express.Response) => EstudianteController.update(req, res)));
 router.delete('/estudiante/:id', asyncHandler((req: express.Request, res: express.Response) => EstudianteController.delete(req, res)));
 
-// Estudiante Periodo
-router.get('/estudiante_periodo', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.list(req, res)));
-router.get('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.get(req, res)));
-router.post('/estudiante_periodo', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.create(req, res)));
-router.put('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.update(req, res)));
-router.delete('/estudiante_periodo/:id', asyncHandler((req: express.Request, res: express.Response) => EstudiantePeriodoController.delete(req, res)));
-router.get('/estudiante_periodo/:id/grados', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.getGrados(req, res, next)));
-router.get('/estudiante_periodo/:id/obligaciones', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.getObligaciones(req, res, next)));
-router.post('/estudiante_periodo/:id/matricular-anio', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudiantePeriodoController.matricularAnio(req, res, next)));
+// Estudiante Matricula
+router.get('/estudiante_matricula', asyncHandler((req: express.Request, res: express.Response) => EstudianteMatriculaController.list(req, res)));
+router.get('/estudiante_matricula/:id', asyncHandler((req: express.Request, res: express.Response) => EstudianteMatriculaController.get(req, res)));
+router.post('/estudiante_matricula', asyncHandler((req: express.Request, res: express.Response) => EstudianteMatriculaController.create(req, res)));
+router.put('/estudiante_matricula/:id', asyncHandler((req: express.Request, res: express.Response) => EstudianteMatriculaController.update(req, res)));
+router.delete('/estudiante_matricula/:id', asyncHandler((req: express.Request, res: express.Response) => EstudianteMatriculaController.delete(req, res)));
+router.get('/estudiante_matricula/:id/grados', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudianteMatriculaController.getGrados(req, res, next)));
+router.get('/estudiante_matricula/:id/obligaciones', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudianteMatriculaController.getObligaciones(req, res, next)));
+router.post('/estudiante_matricula/:id/matricular-anio', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudianteMatriculaController.matricularAnio(req, res, next)));
 
 // Anio Electivo
 router.get('/anio_electivo', asyncHandler((req: express.Request, res: express.Response) => AnioElectivoController.list(req, res)));

@@ -1,5 +1,5 @@
 -- Seed: 107_seed_materia.sql
-INSERT IGNORE INTO materia (nombre_materia) VALUES
+INSERT IGNORE INTO materia (nombre) VALUES
   ('Ciencias Naturales/Ed.Ambiental Y Biología'),
   ('Ciencias Sociales'),
   ('Ed. Artística'),

@@ -1,5 +1,5 @@
 export interface UsuarioRow {
-  id_usuario: string;
+  id: string;
   nombres: string;
   apellido1: string;
   apellido2?: string | null;
@@ -15,7 +15,7 @@ export interface UsuarioRow {
 }
 
 export interface Usuario {
-  idUsuario: string;
+  id: string;
   nombres: string;
   apellido1: string;
   apellido2?: string | null;

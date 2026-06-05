@@ -1,11 +1,11 @@
 export interface GradosPorMatriculaRow {
-  id_estudiante_periodo: string;
+  id_estudiante_matricula: string;
   id_grado_educacion: string;
   estado: string;
 }
 
 export interface GradosPorMatricula {
-  idEstudiantePeriodo: string;
+  idEstudianteMatricula: string;
   idGradoEducacion: string;
   estado: string;
 }

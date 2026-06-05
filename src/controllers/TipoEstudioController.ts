@@ -13,7 +13,7 @@ class TipoEstudioController {
 
   async get(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       const data = await tipoEstudioService.get(id);
       if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
       res.json({ success: true, data, error: null });
@@ -34,7 +34,7 @@ class TipoEstudioController {
 
   async update(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       const { nombre } = req.body;
       await tipoEstudioService.update(id, nombre);
       res.json({ success: true, data: null, error: null });
@@ -45,7 +45,7 @@ class TipoEstudioController {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       await tipoEstudioService.delete(id);
       res.json({ success: true, data: null, error: null });
     } catch (error) {

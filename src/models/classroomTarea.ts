@@ -1,5 +1,5 @@
 export interface ClassroomTareaRow {
-  id_classroom_tarea: string;
+  id: string;
   id_carga_academica: string;
   id_periodo: string;
   titulo: string;
@@ -12,7 +12,7 @@ export interface ClassroomTareaRow {
 }
 
 export interface ClassroomTarea {
-  idClassroomTarea: string;
+  id: string;
   idCargaAcademica: string;
   idPeriodo: string;
   titulo: string;
@@ -25,14 +25,14 @@ export interface ClassroomTarea {
 }
 
 export interface ClassroomTareaAdjuntoRow {
-  id_classroom_tarea_adjunto: string;
+  id: string;
   id_classroom_tarea: string;
   url_archivo: string;
   nombre_archivo: string;
 }
 
 export interface ClassroomTareaAdjunto {
-  idClassroomTareaAdjunto: string;
+  id: string;
   idClassroomTarea: string;
   urlArchivo: string;
   nombreArchivo: string;

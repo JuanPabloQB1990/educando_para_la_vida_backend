@@ -28,22 +28,21 @@ class AuthService {
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
   
     if (!usuario) {
-      throw { statusCode: 401, message: 'Usuario no registrado' };
+      throw new AppError(401, 'Usuario no registrado');
     }
 
     if (usuario.estado !== UsuarioEstado.ACTIVO) {
-      throw { statusCode: 403, message: 'Usuario inactivo. Contacta al administrador.' };
+      throw new AppError(403, 'Usuario inactivo. Contacta al administrador.');
     }
    
     const passwordValida = await bcrypt.compare(password, usuario.password!);
     
     if (!passwordValida) {
-      console.log(passwordValida);
-      throw { statusCode: 401, message: 'Contraseña incorrecta' };
+      throw new AppError(401, 'Contraseña incorrecta');
     }
 
     const payload: JwtPayload = {
-      idUsuario: usuario.idUsuario,
+      id: usuario.id,
       idRol: usuario.idRol!,
       nombreRol: usuario.nombreRol!,
       email: usuario.email!,
@@ -54,7 +53,7 @@ class AuthService {
     });
 
     const refreshToken = jwt.sign(
-      { idUsuario: usuario.idUsuario },
+      { id: usuario.id },
       getJwtRefreshSecret(),
       { expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN as any) ?? '7d' }
     );
@@ -63,7 +62,7 @@ class AuthService {
     refreshExpiracion.setDate(refreshExpiracion.getDate() + 7);
 
     await AuthRepository.crearSesion({
-      idUsuario: usuario.idUsuario,
+      idUsuario: usuario.id,
       token: refreshToken,
       ip,
       userAgent,
@@ -77,21 +76,21 @@ class AuthService {
   async refresh(refreshToken: string) {
     const sesion = await AuthRepository.findSesionByToken(refreshToken);
     if (!sesion) {
-      throw { statusCode: 401, message: 'Sesión inválida o expirada' };
+      throw new AppError(401, 'Sesión inválida o expirada');
     }
 
     let decoded: any;
     try {
       decoded = jwt.verify(refreshToken, getJwtRefreshSecret());
     } catch {
-      throw { statusCode: 401, message: 'Refresh token inválido' };
+      throw new AppError(401, 'Refresh token inválido');
     }
 
-    const usuario = await UsuarioRepository.findByEmailWithRol(decoded.idUsuario);
-    if (!usuario) throw { statusCode: 401, message: 'Usuario no encontrado' };
+    const usuario = await UsuarioRepository.findByEmailWithRol(decoded.id);
+    if (!usuario) throw new AppError(401, 'Usuario no encontrado');
 
     const payload: JwtPayload = {
-      idUsuario: usuario.idUsuario,
+      id: usuario.id,
       idRol: usuario.idRol!,
       nombreRol: usuario.nombreRol!,
       email: usuario.email!,
@@ -117,7 +116,7 @@ class AuthService {
     expiracion.setMinutes(expiracion.getMinutes() + 15);
 
     await AuthRepository.crearCodigoRecuperacion({
-      idUsuario: usuario.idUsuario,
+      idUsuario: usuario.id,
       codigo,
       fechaExpiracion: expiracion,
     });
@@ -143,10 +142,10 @@ class AuthService {
 
   async nuevaPassword(email: string, codigo: string, nuevaPassword: string) {
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
-    if (!usuario) throw { statusCode: 400, message: 'Datos inválidos' };
+    if (!usuario) throw new AppError(400, 'Datos inválidos');
 
     const valido = await AuthRepository.verificarCodigoRecuperacion(usuario.idUsuario, codigo);
-    if (!valido) throw { statusCode: 400, message: 'Código inválido o expirado' };
+    if (!valido) throw new AppError(400, 'Código inválido o expirado');
 
     const hash = await bcrypt.hash(nuevaPassword, 10);
     await UsuarioRepository.updatePassword(usuario.idUsuario, hash);

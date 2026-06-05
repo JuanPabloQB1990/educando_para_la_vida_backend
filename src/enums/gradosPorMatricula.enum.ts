@@ -1,5 +1,7 @@
 export enum GradoMatriculaEstado {
-    FINALIZADO = 'finalizado',
     PENDIENTE = 'pendiente',
     RETIRADO = 'retirado',
+    APROBADO = 'aprobado',
+    REPROBADO = 'reprobado'
+
 }

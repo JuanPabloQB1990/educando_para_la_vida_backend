@@ -15,20 +15,20 @@ const OMIT_FROM_ESTUDIANTE = new Set([
 class EstudianteRepository {
   async findAll() {
     const [rows] = await pool.query(
-      `SELECT e.*, u.id_usuario AS usuario_id_usuario, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1, u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1, u.contacto2 AS usuario_contacto2, u.email AS usuario_email, u.id_rol AS usuario_id_rol, u.estado AS usuario_estado, u.id_tipo_documento AS usuario_id_tipo_documento, u.no_documento AS usuario_no_documento, u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
+      `SELECT e.*, u.id AS usuario_id, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1, u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1, u.contacto2 AS usuario_contacto2, u.email AS usuario_email, u.id_rol AS usuario_id_rol, u.estado AS usuario_estado, u.id_tipo_documento AS usuario_id_tipo_documento, u.no_documento AS usuario_no_documento, u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
        FROM estudiante e
-       LEFT JOIN usuario u ON e.id_usuario = u.id_usuario
-       ORDER BY e.id_estudiante`
+       LEFT JOIN usuario u ON e.id_usuario = u.id
+       ORDER BY e.id`
     );
     return mapRowsToEntities<any>(rows as any[]);
   }
 
   async findById(id: string) {
     const [rows] = await pool.query(
-      `SELECT e.*, u.id_usuario AS usuario_id_usuario, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1, u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1, u.contacto2 AS usuario_contacto2, u.email AS usuario_email, u.id_rol AS usuario_id_rol, u.estado AS usuario_estado, u.id_tipo_documento AS usuario_id_tipo_documento, u.no_documento AS usuario_no_documento, u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
+      `SELECT e.*, u.id AS usuario_id, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1, u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1, u.contacto2 AS usuario_contacto2, u.email AS usuario_email, u.id_rol AS usuario_id_rol, u.estado AS usuario_estado, u.id_tipo_documento AS usuario_id_tipo_documento, u.no_documento AS usuario_no_documento, u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
        FROM estudiante e
-       LEFT JOIN usuario u ON e.id_usuario = u.id_usuario
-       WHERE e.id_estudiante = ? LIMIT 1`,
+       LEFT JOIN usuario u ON e.id_usuario = u.id
+       WHERE e.id = ? LIMIT 1`,
       [id]
     );
     const row = (rows as any[])[0] || null;
@@ -39,15 +39,12 @@ class EstudianteRepository {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-      // The service layer is responsible for creating `usuario` and passing `id_usuario` here.
-      //const id_usuario = data.id_usuario;
       if (!data.id_usuario) throw new Error('id_usuario is required to create estudiante; create usuario in service first');
 
-      // prepare estudiante data (remove usuario-only fields)
-      const id_estudiante : string= generatePrimaryKey();
+      const id: string = generatePrimaryKey();
     
       const row = {
-            id_estudiante,
+            id,
             id_usuario: data.id_usuario,
             fecha_nacimiento: data.fecha_nacimiento,
             edad: data.edad,
@@ -131,7 +128,7 @@ class EstudianteRepository {
       await conn.execute(sql, values);
 
       await conn.commit();
-      return id_estudiante;
+      return id;
     } catch (err) {
       console.log(err);
       
@@ -149,14 +146,14 @@ class EstudianteRepository {
     const values = keys.map((k) => payload[k]);
     const setClause = keys.map((k) => `${k}=?`).join(',');
     const [result] = await pool.execute(
-      `UPDATE estudiante SET ${setClause} WHERE id_estudiante = ?`,
+      `UPDATE estudiante SET ${setClause} WHERE id = ?`,
       [...values, id]
     );
     return result;
   }
 
   async remove(id: string) {
-    const [result] = await pool.execute('DELETE FROM estudiante WHERE id_estudiante = ?', [id]);
+    const [result] = await pool.execute('DELETE FROM estudiante WHERE id = ?', [id]);
     return result;
   }
 }

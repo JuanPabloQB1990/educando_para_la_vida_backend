@@ -2,12 +2,12 @@
 -- Primero–Once (12 materias base) + Décimo y Once (Bachiller Comercial adicional)
 -- Maternal, Prejardin, Jardín, Transición (10 materias preescolar)
 INSERT INTO plan_estudio (id_grado_educacion, id_materia)
-SELECT g.id_grado_educacion, m.id_materia
+SELECT g.id, m.id
 FROM grado_educacion g
 JOIN materia m ON (
   (
     g.nombre IN ('Primero','Segundo','Tercero','Cuarto','Quinto','Sexto','Séptimo','Octavo','Noveno','Décimo','Once')
-    AND m.nombre_materia IN (
+    AND m.nombre IN (
       'Ciencias Naturales/Ed.Ambiental Y Biología',
       'Convivencia',
       'Ciencias Sociales',
@@ -24,7 +24,7 @@ JOIN materia m ON (
   )
   OR (
     g.nombre IN ('Maternal','Prejardin','Jardín','Transición')
-    AND m.nombre_materia IN (
+    AND m.nombre IN (
       'Dimension Corporal',
       'Emprendimiento',
       'Convivencia',
@@ -39,11 +39,11 @@ JOIN materia m ON (
   )
   OR (
     g.nombre IN ('Décimo','Once')
-    AND m.nombre_materia IN ('Bachiller Comercial con enfasis en emprendimiento', 'Alfabetización')
+    AND m.nombre IN ('Bachiller Comercial con enfasis en emprendimiento', 'Alfabetización')
   )
 )
 WHERE NOT EXISTS (
   SELECT 1 FROM plan_estudio pe
-  WHERE pe.id_grado_educacion = g.id_grado_educacion
-    AND pe.id_materia = m.id_materia
+  WHERE pe.id_grado_educacion = g.id
+    AND pe.id_materia = m.id
 );

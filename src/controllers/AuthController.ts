@@ -53,7 +53,7 @@ class AuthController {
   }
 
   async logout(req: Request, res: Response): Promise<void> {
-    await AuthService.logout(req.user!.idUsuario);
+    await AuthService.logout(req.user!.id);
     res.status(200).json({ success: true, message: 'Sesión cerrada', data: null, error: null });
   }
 
