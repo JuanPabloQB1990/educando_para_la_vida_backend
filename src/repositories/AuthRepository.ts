@@ -20,7 +20,7 @@ class AuthRepository {
     const id = generatePrimaryKey();
     await pool.execute(
       `INSERT INTO sesion_usuario (id, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
-       VALUES (?, ?, ?, ?, ?, NOW(), ?)`,
+       VALUES (?, ?, ?, ?, ?, UTC_TIMESTAMP(), ?)`,
       [id, data.idUsuario, data.token, data.ip ?? null, data.userAgent ?? null, data.fechaExpiracion]
     );
     return id;
@@ -28,7 +28,7 @@ class AuthRepository {
 
   async findSesionByToken(token: string) {
     const [rows] = await pool.query(
-      `SELECT * FROM sesion_usuario WHERE token = ? AND user_agent != 'RECOVERY_CODE' AND fecha_expiracion > NOW()`,
+      `SELECT * FROM sesion_usuario WHERE token = ? AND user_agent != 'RECOVERY_CODE' AND fecha_expiracion > UTC_TIMESTAMP()`,
       [token]
     );
     return (rows as any[])[0] ?? null;
@@ -49,7 +49,7 @@ class AuthRepository {
     const id = generatePrimaryKey();
     await pool.execute(
       `INSERT INTO sesion_usuario (id, id_usuario, token, ip, user_agent, fecha_login, fecha_expiracion)
-       VALUES (?, ?, ?, NULL, 'RECOVERY_CODE', NOW(), ?)`,
+       VALUES (?, ?, ?, NULL, 'RECOVERY_CODE', UTC_TIMESTAMP(), ?)`,
       [id, data.idUsuario, data.codigo, data.fechaExpiracion]
     );
   }
@@ -57,7 +57,7 @@ class AuthRepository {
   async verificarCodigoRecuperacion(idUsuario: string, codigo: string): Promise<boolean> {
     const [rows] = await pool.query(
       `SELECT id FROM sesion_usuario
-       WHERE id_usuario = ? AND token = ? AND user_agent = 'RECOVERY_CODE' AND fecha_expiracion > NOW()`,
+       WHERE id_usuario = ? AND token = ? AND user_agent = 'RECOVERY_CODE' AND fecha_expiracion > UTC_TIMESTAMP()`,
       [idUsuario, codigo]
     );
     return (rows as any[]).length > 0;

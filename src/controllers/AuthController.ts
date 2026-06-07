@@ -13,13 +13,13 @@ const recuperarSchema = z.object({
 
 const verificarCodigoSchema = z.object({
   email: z.string().email(),
-  codigo: z.string().length(6, 'El código debe tener 6 dígitos'),
+  code: z.string().length(6, 'El código debe tener 6 dígitos'),
 });
 
 const nuevaPasswordSchema = z.object({
   email: z.string().email(),
-  codigo: z.string().length(6),
-  nuevaPassword: z.string().min(8, 'La contraseña debe tener mínimo 8 caracteres'),
+  code: z.string().length(6),
+  newPassword: z.string().min(8, 'La contraseña debe tener mínimo 8 caracteres'),
 });
 
 class AuthController {
@@ -80,9 +80,9 @@ class AuthController {
       return;
     }
 
-    const valido = await AuthService.verificarCodigo(parsed.data.email, parsed.data.codigo);
+    const valido = await AuthService.verificarCodigo(parsed.data.email, parsed.data.code);
     if (!valido) {
-      res.status(400).json({ success: false, message: 'Código inválido o expirado', data: null, error: 'Código inválido o expirado' });
+      res.status(400).json({ success: false, message: 'Código inválido o expirado cambiado', data: null, error: 'Código inválido o expirado cambiado' });
       return;
     }
 
@@ -96,7 +96,7 @@ class AuthController {
       return;
     }
 
-    await AuthService.nuevaPassword(parsed.data.email, parsed.data.codigo, parsed.data.nuevaPassword);
+    await AuthService.nuevaPassword(parsed.data.email, parsed.data.code, parsed.data.newPassword);
     res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente', data: null, error: null });
   }
 }

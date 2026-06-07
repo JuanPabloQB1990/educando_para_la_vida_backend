@@ -1,4 +1,4 @@
-import pool from '../config/database.ts';
+import pool from '../config/database';
 
 async function setupDatabase() {
   await pool.execute(`

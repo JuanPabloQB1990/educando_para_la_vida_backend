@@ -41,7 +41,7 @@ class GradosPorMatriculaRepository {
         FROM grados_por_matricula gpm
         INNER JOIN grado_educacion ge ON gpm.id_grado_educacion = ge.id
         WHERE gpm.id_estudiante_matricula = ?
-        ORDER BY ge.nombre
+        ORDER BY ge.orden
       `;
       const [rows] = await pool.query(sql, [id_estudiante_matricula]);
       return mapRowsToEntities<any>(rows as any[]);

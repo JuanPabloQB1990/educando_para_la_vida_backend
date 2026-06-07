@@ -1,39 +1,24 @@
-import { SendEmailCommand } from "@aws-sdk/client-ses";
-import dotenv from "dotenv";
-dotenv.config();
-
-import { sesClient } from "../config/awsSES";
+import { resend } from "../config/resend";
 
 export class EmailService {
-  static async sendMail(to: string, subject: string, html: string) {
+  static async sendMail(
+    to: string,
+    subject: string,
+    html: string
+  ) {
     try {
-      console.log(process.env.SES_FROM_EMAIL);
-      
-      const command = new SendEmailCommand({
-        Source: process.env.SES_FROM_EMAIL!,
-        Destination: {
-          ToAddresses: [to],
-        },
-        Message: {
-          Subject: {
-            Data: subject,
-          },
-          Body: {
-            Html: {
-              Data: html,
-            },
-          },
-        },
+      const result = await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to,
+        subject,
+        html,
       });
 
-      const response = await sesClient.send(command);
+      console.log("Email enviado:", result);
 
-      console.log("EMAIL ENVIADO:", response);
-
-      return response;
-
+      return result;
     } catch (error) {
-      console.error("ERROR SES:", error);
+      console.error("Error enviando email:", error);
       throw error;
     }
   }

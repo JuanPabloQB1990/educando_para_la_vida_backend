@@ -6,6 +6,7 @@ import AuthRepository from '../repositories/AuthRepository';
 import { EmailService } from '../utils/sendEmail';
 import { UsuarioEstado } from '../enums/usuario.enum';
 import { AppError } from '../error/AppError';
+import { recuperacionPassword } from '../templates/templatesSendEmail';
 
 function getJwtSecret(): string {
   const secret = process.env.JWT_SECRET;
@@ -122,34 +123,31 @@ class AuthService {
     });
 
     await EmailService.sendMail(
-      'juanpab_19@hotmail.com',
+      'juanpabloqb1990@gmail.com',
       'Recuperación de contraseña - Educando Para La Vida',
-      `
-        <h2>Recuperación de contraseña</h2>
-        <p>Tu código de recuperación es:</p>
-        <h1 style="letter-spacing: 8px;">${codigo}</h1>
-        <p>Este código es válido por <strong>15 minutos</strong>.</p>
-        <p>Si no solicitaste este cambio, ignora este correo.</p>
-      `
+      recuperacionPassword(codigo)
     );
   }
 
   async verificarCodigo(email: string, codigo: string): Promise<boolean> {
+    
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
     if (!usuario) return false;
-    return AuthRepository.verificarCodigoRecuperacion(usuario.idUsuario, codigo);
+    return AuthRepository.verificarCodigoRecuperacion(usuario.id, codigo);
   }
 
   async nuevaPassword(email: string, codigo: string, nuevaPassword: string) {
+  
     const usuario = await UsuarioRepository.findByEmailWithRol(email);
     if (!usuario) throw new AppError(400, 'Datos inválidos');
 
-    const valido = await AuthRepository.verificarCodigoRecuperacion(usuario.idUsuario, codigo);
+    const valido = await AuthRepository.verificarCodigoRecuperacion(usuario.id, codigo);
+    
     if (!valido) throw new AppError(400, 'Código inválido o expirado');
-
+    console.log(nuevaPassword);
     const hash = await bcrypt.hash(nuevaPassword, 10);
-    await UsuarioRepository.updatePassword(usuario.idUsuario, hash);
-    await AuthRepository.eliminarCodigoRecuperacion(usuario.idUsuario);
+    await UsuarioRepository.updatePassword(usuario.id, hash);
+    await AuthRepository.eliminarCodigoRecuperacion(usuario.id);
   }
 }
 

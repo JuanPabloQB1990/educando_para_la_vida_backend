@@ -13,6 +13,7 @@ import routerDocente from './routes/docenteRoutes';
 import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';
 import config from './config/environment.js';
+import { EmailService } from './utils/sendEmail';
 
 const app: Application = express();
 
@@ -36,7 +37,6 @@ async function bootstrap() {
   // Rutas protegidas — solo admin
   app.use('/api/usuario', routerUsuario);
   app.use('/api/gestion', verifyToken, requireRoles('admin'), routerGestion);
-
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {
