@@ -17,11 +17,11 @@ class CargaAcademicaController {
   }
 
   async create(req: Request, res: Response) {
-    const { idUsuario, idMateria, idGradoEducacion, idAnioElectivo } = req.body;
+    const { idUsuario, idMateria, idGradoEducacion, idAnioElectivo, idBloque } = req.body;
     if (!idUsuario || !idMateria || !idGradoEducacion || !idAnioElectivo) {
       return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await CargaAcademicaService.create({ idUsuario, idMateria, idGradoEducacion, idAnioElectivo });
+    const data = await CargaAcademicaService.create({ idUsuario, idMateria, idGradoEducacion, idAnioElectivo, idBloque: idBloque ?? null });
     res.status(201).json({ success: true, message: 'Carga académica creada', data, error: null });
   }
 

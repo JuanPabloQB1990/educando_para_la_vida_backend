@@ -1,55 +1,55 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import tiempoService from '../services/TiempoValidacionService';
 
 class TiempoValidacionController {
-  async list(req: Request, res: Response) {
+  async list(req: Request, res: Response, next: NextFunction) {
     try {
       const data = await tiempoService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Tiempos de validación listados', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing tiempo_validacion' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       const data = await tiempoService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      if (!data) return res.status(404).json({ success: false, message: 'No encontrado', data: null, error: null });
+      res.json({ success: true, message: 'Tiempo de validación encontrado', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching tiempo_validacion' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const { tiempo } = req.body;
-      const result = await tiempoService.create(tiempo);
-      res.status(201).json({ success: true, data: result, error: null });
+      const data = await tiempoService.create(tiempo);
+      res.status(201).json({ success: true, message: 'Tiempo de validación creado', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating tiempo_validacion' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       const { tiempo } = req.body;
-      await tiempoService.update(id, tiempo);
-      res.json({ success: true, data: null, error: null });
+      const data = await tiempoService.update(id, tiempo);
+      res.json({ success: true, message: 'Tiempo de validación actualizado', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating tiempo_validacion' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Number(req.params.id);
+      const id = req.params.id as string;
       await tiempoService.delete(id);
-      res.json({ success: true, data: null, error: null });
+      res.json({ success: true, message: 'Tiempo de validación eliminado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting tiempo_validacion' } });
+      next(error);
     }
   }
 }

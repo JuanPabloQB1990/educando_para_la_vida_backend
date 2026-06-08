@@ -17,7 +17,8 @@ class TiempoValidacionService {
   }
 
   async update(id: string, tiempo: string) {
-    return await TiempoValidacionRepository.update(id, tiempo);
+    await TiempoValidacionRepository.update(id, tiempo);
+    return await TiempoValidacionRepository.findById(id);
   }
 
   async delete(id: string) {

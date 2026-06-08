@@ -13,8 +13,8 @@ class AsistenciaService {
     return AsistenciaRepository.findById(id);
   }
 
-  async create(data: { idEstudiante: string; idPeriodo: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
-    const res = await AsistenciaRepository.create({ idEstudiante: data.idEstudiante, idPeriodo: data.idPeriodo, fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
+  async create(data: { idEstudiante: string; idPeriodo: string; idActividadMateria: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+    const res = await AsistenciaRepository.create({ idEstudiante: data.idEstudiante, idPeriodo: data.idPeriodo, idActividadMateria: data.idActividadMateria, fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
     return AsistenciaRepository.findById(res.id);
   }
 

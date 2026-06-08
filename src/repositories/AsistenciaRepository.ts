@@ -43,11 +43,11 @@ class AsistenciaRepository {
     return row ? mapRowToEntity<Asistencia>(row) : null;
   }
 
-  async create(data: { idEstudiante: string; idPeriodo: string; fecha: string; estado: string; observacion?: string }) {
+  async create(data: { idEstudiante: string; idPeriodo: string; idActividadMateria: string; fecha: string; estado: string; observacion?: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO asistencia (id, id_estudiante, id_periodo, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, data.idEstudiante, data.idPeriodo, data.fecha, data.estado, data.observacion ?? null]
+      'INSERT INTO asistencia (id, id_estudiante, id_periodo, id_actividad_materia, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id, data.idEstudiante, data.idPeriodo, data.idActividadMateria, data.fecha, data.estado, data.observacion ?? null]
     );
     return { id };
   }

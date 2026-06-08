@@ -22,11 +22,11 @@ class AsistenciaController {
   }
 
   async create(req: Request, res: Response) {
-    const { idEstudiante, idPeriodo, fecha, estadoAsistencia, observacion } = req.body;
-    if (!idEstudiante || !idPeriodo || !fecha || !estadoAsistencia) {
+    const { idEstudiante, idPeriodo, idActividadMateria, fecha, estadoAsistencia, observacion } = req.body;
+    if (!idEstudiante || !idPeriodo || !idActividadMateria || !fecha || !estadoAsistencia) {
       return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
     }
-    const data = await AsistenciaService.create({ idEstudiante, idPeriodo, fecha, estadoAsistencia, observacion });
+    const data = await AsistenciaService.create({ idEstudiante, idPeriodo, idActividadMateria, fecha, estadoAsistencia, observacion });
     res.status(201).json({ success: true, message: 'Asistencia registrada', data, error: null });
   }
 

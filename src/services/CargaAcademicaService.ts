@@ -13,7 +13,7 @@ class CargaAcademicaService {
     return CargaAcademicaRepository.findById(id);
   }
 
-  async create(data: { idUsuario: string; idMateria: string; idGradoEducacion: string; idAnioElectivo: string }) {
+  async create(data: { idUsuario: string; idMateria: string; idGradoEducacion: string; idAnioElectivo: string; idBloque?: string | null }) {
     const res = await CargaAcademicaRepository.create(data);
     return CargaAcademicaRepository.findById(res.id);
   }
