@@ -3,8 +3,7 @@ import type { AsistenciaEstado } from '../enums/asistencia.enum';
 export interface AsistenciaRow {
   id: string;
   id_estudiante: string;
-  id_periodo: string;
-  id_actividad_materia: string;
+  id_actividad: string;
   fecha: string;
   estado: AsistenciaEstado;
   observacion: string | null;
@@ -15,8 +14,7 @@ export interface AsistenciaRow {
 export interface Asistencia {
   id: string;
   idEstudiante: string;
-  idPeriodo: string;
-  idActividadMateria: string;
+  idActividad: string;
   fecha: string;
   estado: AsistenciaEstado;
   observacion: string | null;

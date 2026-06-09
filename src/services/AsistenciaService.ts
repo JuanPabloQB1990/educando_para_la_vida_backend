@@ -13,8 +13,34 @@ class AsistenciaService {
     return AsistenciaRepository.findById(id);
   }
 
-  async create(data: { idEstudiante: string; idPeriodo: string; idActividadMateria: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
-    const res = await AsistenciaRepository.create({ idEstudiante: data.idEstudiante, idPeriodo: data.idPeriodo, idActividadMateria: data.idActividadMateria, fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
+  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+    const res = await AsistenciaRepository.create({
+      idEstudiante: data.idEstudiante,
+      idActividad: data.idActividad,
+      fecha: data.fecha,
+      estado: data.estadoAsistencia,
+      observacion: data.observacion,
+    });
+    return AsistenciaRepository.findById(res.id);
+  }
+
+  async upsert(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+    const existente = await AsistenciaRepository.findByEstudianteAndActividad(data.idEstudiante, data.idActividad);
+    if (existente) {
+      await AsistenciaRepository.update(existente.id, {
+        fecha: data.fecha,
+        estado: data.estadoAsistencia,
+        observacion: data.observacion,
+      });
+      return AsistenciaRepository.findById(existente.id);
+    }
+    const res = await AsistenciaRepository.create({
+      idEstudiante: data.idEstudiante,
+      idActividad: data.idActividad,
+      fecha: data.fecha,
+      estado: data.estadoAsistencia,
+      observacion: data.observacion,
+    });
     return AsistenciaRepository.findById(res.id);
   }
 

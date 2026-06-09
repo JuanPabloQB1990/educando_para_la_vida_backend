@@ -16,18 +16,29 @@ class AsistenciaController {
   }
 
   async get(req: Request, res: Response) {
+    console.log('Obteniendo asistencia con ID:', req.params.id);
     const data = await AsistenciaService.get(req.params.id);
     if (!data) return res.status(404).json({ success: false, message: 'Asistencia no encontrada', data: null, error: 'Not found' });
     res.json({ success: true, message: 'Asistencia obtenida', data, error: null });
   }
 
   async create(req: Request, res: Response) {
-    const { idEstudiante, idPeriodo, idActividadMateria, fecha, estadoAsistencia, observacion } = req.body;
-    if (!idEstudiante || !idPeriodo || !idActividadMateria || !fecha || !estadoAsistencia) {
+    const { idEstudiante, idActividad, fecha, estadoAsistencia, observacion } = req.body;
+    if (!idEstudiante || !idActividad || !fecha || !estadoAsistencia) {
       return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
     }
-    const data = await AsistenciaService.create({ idEstudiante, idPeriodo, idActividadMateria, fecha, estadoAsistencia, observacion });
+    const data = await AsistenciaService.create({ idEstudiante, idActividad, fecha, estadoAsistencia, observacion });
     res.status(201).json({ success: true, message: 'Asistencia registrada', data, error: null });
+  }
+
+  async upsert(req: Request, res: Response) {
+    console.log('Upsert asistencia con datos:', req.body);
+    const { idEstudiante, idActividad, fecha, estadoAsistencia, observacion } = req.body;
+    if (!idEstudiante || !idActividad || !fecha || !estadoAsistencia) {
+      return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
+    }
+    const data = await AsistenciaService.upsert({ idEstudiante, idActividad, fecha, estadoAsistencia, observacion });
+    res.status(200).json({ success: true, message: 'Asistencia guardada', data, error: null });
   }
 
   async update(req: Request, res: Response) {

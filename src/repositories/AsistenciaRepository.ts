@@ -12,10 +12,11 @@ class AsistenciaRepository {
        FROM asistencia a
        JOIN estudiante e ON a.id_estudiante = e.id
        JOIN usuario u ON e.id_usuario = u.id
-       JOIN periodo p ON a.id_periodo = p.id
+       JOIN actividad act ON a.id_actividad = act.id
+       JOIN periodo p ON act.id_periodo = p.id
        JOIN estudiante_matricula em ON em.id_estudiante = e.id
        JOIN grados_por_matricula gpm ON gpm.id_estudiante_matricula = em.id
-       WHERE gpm.id_grado_educacion = ? AND a.id_periodo = ?
+       WHERE gpm.id_grado_educacion = ? AND act.id_periodo = ?
        ORDER BY a.fecha DESC, u.apellido1`,
       [idGradoEducacion, idPeriodo]
     );
@@ -25,11 +26,12 @@ class AsistenciaRepository {
   async findByEstudiante(idEstudiante: string, idPeriodo?: string) {
     let sql = `SELECT a.*, p.numero_periodo
                FROM asistencia a
-               JOIN periodo p ON a.id_periodo = p.id
+               JOIN actividad act ON a.id_actividad = act.id
+               JOIN periodo p ON act.id_periodo = p.id
                WHERE a.id_estudiante = ?`;
     const params: any[] = [idEstudiante];
     if (idPeriodo) {
-      sql += ' AND a.id_periodo = ?';
+      sql += ' AND act.id_periodo = ?';
       params.push(idPeriodo);
     }
     sql += ' ORDER BY a.fecha DESC';
@@ -43,11 +45,20 @@ class AsistenciaRepository {
     return row ? mapRowToEntity<Asistencia>(row) : null;
   }
 
-  async create(data: { idEstudiante: string; idPeriodo: string; idActividadMateria: string; fecha: string; estado: string; observacion?: string }) {
+  async findByEstudianteAndActividad(idEstudiante: string, idActividad: string) {
+    const [rows] = await pool.query(
+      'SELECT * FROM asistencia WHERE id_estudiante = ? AND id_actividad = ? LIMIT 1',
+      [idEstudiante, idActividad]
+    );
+    const row = (rows as any[])[0] ?? null;
+    return row ? mapRowToEntity<Asistencia>(row) : null;
+  }
+
+  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estado: string; observacion?: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO asistencia (id, id_estudiante, id_periodo, id_actividad_materia, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [id, data.idEstudiante, data.idPeriodo, data.idActividadMateria, data.fecha, data.estado, data.observacion ?? null]
+      'INSERT INTO asistencia (id, id_estudiante, id_actividad, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, data.idEstudiante, data.idActividad, data.fecha, data.estado, data.observacion ?? null]
     );
     return { id };
   }

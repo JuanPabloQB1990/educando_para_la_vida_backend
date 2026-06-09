@@ -1,6 +1,7 @@
 import pool from '../config/database';
 import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
 import type { Periodo } from '../models/periodo';
+import { PeriodoEstado } from '../enums/periodo.enum';
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 
 class PeriodoRepository {
@@ -23,12 +24,20 @@ class PeriodoRepository {
     return row ? mapRowToEntity<Periodo>(row) : null;
   }
 
+  async updateEstado(id: string, estado: PeriodoEstado): Promise<void> {
+    try {
+      await pool.execute('UPDATE periodo SET estado = ? WHERE id = ?', [estado, id]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createCuatroPeriodos(idAnioElectivo: string): Promise<void> {
     for (let i = 1; i <= 4; i++) {
       const id = generatePrimaryKey();
       await pool.execute(
-        'INSERT INTO periodo (id, id_anio_electivo, numero_periodo) VALUES (?, ?, ?)',
-        [id, idAnioElectivo, i]
+        'INSERT INTO periodo (id, id_anio_electivo, numero_periodo, estado) VALUES (?, ?, ?, ?)',
+        [id, idAnioElectivo, i, PeriodoEstado.CERRADO]
       );
     }
   }

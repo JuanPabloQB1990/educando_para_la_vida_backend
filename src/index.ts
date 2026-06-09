@@ -36,7 +36,7 @@ async function bootstrap() {
   app.use('/api/docente', routerDocente);
   // Rutas protegidas — solo admin
   app.use('/api/usuario', routerUsuario);
-  app.use('/api/gestion', verifyToken, requireRoles('admin', 'secretari@'), routerGestion);
+  app.use('/api/gestion', verifyToken, routerGestion);
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {
