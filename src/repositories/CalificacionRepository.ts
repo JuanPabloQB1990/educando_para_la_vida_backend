@@ -53,6 +53,8 @@ class CalificacionRepository {
   }
 
   async update(id: string, data: { nota: number; observacion?: string }) {
+    
+    
     const [result] = await pool.execute(
       'UPDATE calificacion SET nota = ?, observacion = ? WHERE id = ?',
       [data.nota, data.observacion ?? null, id]
@@ -63,6 +65,37 @@ class CalificacionRepository {
   async remove(id: string) {
     const [result] = await pool.execute('DELETE FROM calificacion WHERE id = ?', [id]);
     return result;
+  }
+
+  async findIdUsuarioByActividadMateria(idActividadMateria: string): Promise<string | null> {
+    try {
+      const [rows] = await pool.query(
+        `SELECT ca.id_usuario
+         FROM actividad_materia am
+         JOIN carga_academica ca ON ca.id = am.id_carga_academica
+         WHERE am.id = ?`,
+        [idActividadMateria]
+      );
+      return (rows as any[])[0]?.id_usuario ?? null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findIdUsuarioByCalificacion(idCalificacion: string): Promise<string | null> {
+    try {
+      const [rows] = await pool.query(
+        `SELECT ca.id_usuario
+         FROM calificacion c
+         JOIN actividad_materia am ON am.id = c.id_actividad_materia
+         JOIN carga_academica ca ON ca.id = am.id_carga_academica
+         WHERE c.id = ?`,
+        [idCalificacion]
+      );
+      return (rows as any[])[0]?.id_usuario ?? null;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

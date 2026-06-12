@@ -54,7 +54,7 @@ class AsistenciaRepository {
     return row ? mapRowToEntity<Asistencia>(row) : null;
   }
 
-  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estado: string; observacion?: string }) {
+  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estado: string | null; observacion?: string | null }) {
     const id = generatePrimaryKey();
     await pool.execute(
       'INSERT INTO asistencia (id, id_estudiante, id_actividad, fecha, estado, observacion) VALUES (?, ?, ?, ?, ?, ?)',
@@ -63,10 +63,18 @@ class AsistenciaRepository {
     return { id };
   }
 
-  async update(id: string, data: { fecha: string; estado: string; observacion?: string }) {
+  async update(id: string, data: { fecha: string; estado: string | null; observacion?: string | null }) {
     const [result] = await pool.execute(
       'UPDATE asistencia SET fecha = ?, estado = ?, observacion = ? WHERE id = ?',
       [data.fecha, data.estado, data.observacion ?? null, id]
+    );
+    return result;
+  }
+
+  async updateFechaByActividadFecha(idActividad: string, fechaActual: string, fechaNueva: string) {
+    const [result] = await pool.execute(
+      'UPDATE asistencia SET fecha = ? WHERE id_actividad = ? AND fecha = ?',
+      [fechaNueva, idActividad, fechaActual]
     );
     return result;
   }

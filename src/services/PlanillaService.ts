@@ -36,6 +36,7 @@ class PlanillaService {
       if (row.am_id) {
         actividadesMap.get(row.actividad_id)!.materias.push({
           id: row.am_id,
+          idMateria: row.materia_id,
           nombreMateria: row.materia_nombre,
           abreviaturaMateria: row.materia_abreviatura ?? '',
         });
@@ -45,9 +46,10 @@ class PlanillaService {
 
     const estudianteIds = estudiantesRaw.map((e: any) => e.id as string);
 
-    const [calificacionesRaw, asistenciasRaw] = await Promise.all([
+    const [calificacionesRaw, asistenciasRaw, autoevaluacionesRaw] = await Promise.all([
       PlanillaRepository.getCalificaciones(allAmIds),
       PlanillaRepository.getAsistencias(idPeriodo, estudianteIds),
+      PlanillaRepository.getAutoevaluaciones(idGradoEducacion, idPeriodo),
     ]);
 
     // Fechas únicas por actividad
@@ -98,6 +100,8 @@ class PlanillaService {
       const porcentajeAsistencia =
         totalSesiones > 0 ? Math.round((totalPresente / totalSesiones) * 100) : 0;
 
+      const autoRaw = autoevaluacionesRaw.find((a: any) => a.id_estudiante === est.id);
+
       return {
         id: est.id,
         nombre: est.nombre,
@@ -107,6 +111,9 @@ class PlanillaService {
         asistencias,
         totalPresente,
         porcentajeAsistencia,
+        autoevaluacion: autoRaw ? parseFloat(autoRaw.nota) : null,
+        autoevaluacionId: autoRaw ? autoRaw.id : null,
+        autoevaluacionObservacion: autoRaw ? (autoRaw.observacion ?? null) : null,
       };
     });
 

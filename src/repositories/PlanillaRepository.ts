@@ -50,6 +50,7 @@ class PlanillaRepository {
     const [rows] = await pool.query(
       `SELECT a.id AS actividad_id, a.nombre AS actividad_nombre,
               am.id AS am_id,
+              m.id AS materia_id,
               m.nombre AS materia_nombre, m.abreviatura AS materia_abreviatura
        FROM actividad a
        LEFT JOIN actividad_materia am ON am.id_actividad = a.id
@@ -69,6 +70,14 @@ class PlanillaRepository {
        FROM calificacion
        WHERE id_actividad_materia IN (${placeholders})`,
       actividadMateriaIds
+    );
+    return rows as any[];
+  }
+
+  async getAutoevaluaciones(idGradoEducacion: string, idPeriodo: string) {
+    const [rows] = await pool.query(
+      `SELECT id, id_estudiante, nota, observacion FROM autoevaluacion WHERE id_grado_educacion = ? AND id_periodo = ?`,
+      [idGradoEducacion, idPeriodo]
     );
     return rows as any[];
   }

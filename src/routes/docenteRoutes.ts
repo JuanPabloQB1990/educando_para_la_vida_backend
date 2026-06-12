@@ -12,6 +12,7 @@ import ClassroomTareaController from '../controllers/ClassroomTareaController';
 import ClassroomEntregaController from '../controllers/ClassroomEntregaController';
 import PeriodoController from '../controllers/PeriodoController';
 import PlanillaController from '../controllers/PlanillaController';
+import AutoevaluacionController from '../controllers/AutoevaluacionController';
 
 const router = express.Router();
 
@@ -46,17 +47,18 @@ router.post('/actividad_materia', requireRoles('admin', 'profesor(a)'), asyncHan
 router.delete('/actividad_materia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.delete(req, res)));
 
 // Calificaciones — admin y profesor
-router.get('/calificacion', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response) => CalificacionController.list(req, res)));
-router.get('/calificacion/:id', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response) => CalificacionController.get(req, res)));
-router.post('/calificacion', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => CalificacionController.create(req, res)));
-router.put('/calificacion/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => CalificacionController.update(req, res)));
-router.delete('/calificacion/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => CalificacionController.delete(req, res)));
+router.get('/calificacion', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => CalificacionController.list(req, res, next)));
+router.get('/calificacion/:id', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => CalificacionController.get(req, res, next)));
+router.post('/calificacion', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => CalificacionController.create(req, res, next)));
+router.put('/calificacion/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => CalificacionController.update(req, res, next)));
+router.delete('/calificacion/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => CalificacionController.delete(req, res, next)));
 
 // Asistencias — admin y profesor
 router.get('/asistencia', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.list(req, res)));
 router.get('/asistencia/:id', requireRoles('admin', 'profesor(a)', 'estudiante'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.get(req, res)));
 router.post('/asistencia', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.create(req, res)));
 router.post('/asistencia/upsert', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.upsert(req, res)));
+router.patch('/asistencia/fecha', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.updateFecha(req, res)));
 router.put('/asistencia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.update(req, res)));
 router.delete('/asistencia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => AsistenciaController.delete(req, res)));
 
@@ -87,5 +89,9 @@ router.patch('/periodo/:id/estado', requireRoles('admin', 'secretari@'), asyncHa
 
 // Planilla Académica — admin, secretari@ y profesor
 router.get('/planilla_academica', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => PlanillaController.get(req, res)));
+
+// Autoevaluación — director de grado registra por estudiante/periodo
+router.post('/autoevaluacion/upsert', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => AutoevaluacionController.upsert(req, res, next)));
+router.delete('/autoevaluacion/:id', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => AutoevaluacionController.delete(req, res, next)));
 
 export default router;

@@ -5,7 +5,7 @@ export interface AsistenciaRow {
   id_estudiante: string;
   id_actividad: string;
   fecha: string;
-  estado: AsistenciaEstado;
+  estado: AsistenciaEstado | null;
   observacion: string | null;
   nombre_estudiante?: string;
   numero_periodo?: number;
@@ -16,7 +16,7 @@ export interface Asistencia {
   idEstudiante: string;
   idActividad: string;
   fecha: string;
-  estado: AsistenciaEstado;
+  estado: AsistenciaEstado | null;
   observacion: string | null;
   nombreEstudiante?: string;
   numeroPeriodo?: number;

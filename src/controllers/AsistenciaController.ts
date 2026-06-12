@@ -32,7 +32,7 @@ class AsistenciaController {
 
   async upsert(req: Request, res: Response) {
     const { idEstudiante, idActividad, fecha, estadoAsistencia, observacion } = req.body;
-    if (!idEstudiante || !idActividad || !fecha || !estadoAsistencia) {
+    if (!idEstudiante || !idActividad || !fecha) {
       return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
     }
     const data = await AsistenciaService.upsert({ idEstudiante, idActividad, fecha, estadoAsistencia, observacion });
@@ -48,8 +48,20 @@ class AsistenciaController {
     res.json({ success: true, message: 'Asistencia actualizada', data, error: null });
   }
 
+  async updateFecha(req: Request, res: Response) {
+    const { idActividad, fechaActual, fechaNueva } = req.body;
+    if (!idActividad || !fechaActual || !fechaNueva) {
+      return res.status(400).json({ success: false, message: 'idActividad, fechaActual y fechaNueva son requeridos', data: null, error: 'Datos faltantes' });
+    }
+    if (fechaActual === fechaNueva) {
+      return res.status(400).json({ success: false, message: 'La fecha nueva debe ser distinta a la actual', data: null, error: 'Fecha igual' });
+    }
+    const data = await AsistenciaService.updateFechaSesion(idActividad, fechaActual, fechaNueva);
+    res.json({ success: true, message: 'Fecha de sesión actualizada', data, error: null });
+  }
+
   async delete(req: Request, res: Response) {
-    await AsistenciaService.delete(req.params.id);
+    await AsistenciaService.delete(req.params.id as string);
     res.json({ success: true, message: 'Asistencia eliminada', data: null, error: null });
   }
 }

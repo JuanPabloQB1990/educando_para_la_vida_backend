@@ -13,7 +13,7 @@ class AsistenciaService {
     return AsistenciaRepository.findById(id);
   }
 
-  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+  async create(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string | null; observacion?: string | null }) {
     const res = await AsistenciaRepository.create({
       idEstudiante: data.idEstudiante,
       idActividad: data.idActividad,
@@ -24,7 +24,7 @@ class AsistenciaService {
     return AsistenciaRepository.findById(res.id);
   }
 
-  async upsert(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
+  async upsert(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string | null; observacion?: string | null }) {
     const existente = await AsistenciaRepository.findByEstudianteActividadFecha(data.idEstudiante, data.idActividad, data.fecha);
     if (existente) {
       await AsistenciaRepository.update(existente.id, {
@@ -44,9 +44,13 @@ class AsistenciaService {
     return AsistenciaRepository.findById(res.id);
   }
 
-  async update(id: string, data: { fecha: string; estadoAsistencia: string; observacion?: string }) {
+  async update(id: string, data: { fecha: string; estadoAsistencia: string | null; observacion?: string | null }) {
     await AsistenciaRepository.update(id, { fecha: data.fecha, estado: data.estadoAsistencia, observacion: data.observacion });
     return AsistenciaRepository.findById(id);
+  }
+
+  async updateFechaSesion(idActividad: string, fechaActual: string, fechaNueva: string) {
+    return AsistenciaRepository.updateFechaByActividadFecha(idActividad, fechaActual, fechaNueva);
   }
 
   async delete(id: string) {

@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS asistencia (
   id_estudiante VARCHAR(100) NOT NULL,
   id_actividad VARCHAR(100) NOT NULL,
   fecha DATE NOT NULL,
-  estado ENUM('asistio','falla','falla_justificada', 'retraso') NOT NULL,
+  estado ENUM('asistio','falla','falla_justificada', 'retraso'),
   observacion TEXT,
   CONSTRAINT uq_asistencia_estudiante_actividad_fecha UNIQUE (id_estudiante, id_actividad, fecha),
   CONSTRAINT fk_asistencia_estudiante FOREIGN KEY (id_estudiante) REFERENCES estudiante(id),
