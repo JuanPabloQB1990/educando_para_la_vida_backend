@@ -9,19 +9,11 @@ class ActividadMateriaService {
     return ActividadMateriaRepository.findById(id);
   }
 
-  async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string; nombreActividad: string }) {
+  async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string }) {
     const existente = await ActividadMateriaRepository.findByActividadAndMateria(data.idActividad, data.idMateria);
-    if (existente) {
-      await ActividadMateriaRepository.update(existente.id, { nombre: data.nombreActividad });
-      return ActividadMateriaRepository.findById(existente.id);
-    }
-    const res = await ActividadMateriaRepository.create({ idActividad: data.idActividad, idMateria: data.idMateria, idCargaAcademica: data.idCargaAcademica, nombre: data.nombreActividad });
+    if (existente) return existente;
+    const res = await ActividadMateriaRepository.create(data);
     return ActividadMateriaRepository.findById(res.id);
-  }
-
-  async update(id: string, nombreActividad: string) {
-    await ActividadMateriaRepository.update(id, { nombre: nombreActividad });
-    return ActividadMateriaRepository.findById(id);
   }
 
   async delete(id: string) {

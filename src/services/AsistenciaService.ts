@@ -25,7 +25,7 @@ class AsistenciaService {
   }
 
   async upsert(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string; observacion?: string }) {
-    const existente = await AsistenciaRepository.findByEstudianteAndActividad(data.idEstudiante, data.idActividad);
+    const existente = await AsistenciaRepository.findByEstudianteActividadFecha(data.idEstudiante, data.idActividad, data.fecha);
     if (existente) {
       await AsistenciaRepository.update(existente.id, {
         fecha: data.fecha,

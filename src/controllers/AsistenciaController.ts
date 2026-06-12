@@ -16,7 +16,6 @@ class AsistenciaController {
   }
 
   async get(req: Request, res: Response) {
-    console.log('Obteniendo asistencia con ID:', req.params.id);
     const data = await AsistenciaService.get(req.params.id);
     if (!data) return res.status(404).json({ success: false, message: 'Asistencia no encontrada', data: null, error: 'Not found' });
     res.json({ success: true, message: 'Asistencia obtenida', data, error: null });
@@ -32,7 +31,6 @@ class AsistenciaController {
   }
 
   async upsert(req: Request, res: Response) {
-    console.log('Upsert asistencia con datos:', req.body);
     const { idEstudiante, idActividad, fecha, estadoAsistencia, observacion } = req.body;
     if (!idEstudiante || !idActividad || !fecha || !estadoAsistencia) {
       return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });

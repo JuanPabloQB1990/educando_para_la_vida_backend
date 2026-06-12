@@ -18,21 +18,12 @@ class ActividadMateriaController {
   }
 
   async create(req: Request, res: Response) {
-    const { idActividad, idMateria, idCargaAcademica, nombreActividad } = req.body;
-    if (!idActividad || !idMateria || !idCargaAcademica || !nombreActividad) {
+    const { idActividad, idMateria, idCargaAcademica } = req.body;
+    if (!idActividad || !idMateria || !idCargaAcademica) {
       return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await ActividadMateriaService.create({ idActividad, idMateria, idCargaAcademica, nombreActividad });
+    const data = await ActividadMateriaService.create({ idActividad, idMateria, idCargaAcademica });
     res.status(201).json({ success: true, message: 'Actividad-materia creada', data, error: null });
-  }
-
-  async update(req: Request, res: Response) {
-    const { nombreActividad } = req.body;
-    if (!nombreActividad) {
-      return res.status(400).json({ success: false, message: 'nombreActividad es requerido', data: null, error: 'Dato faltante' });
-    }
-    const data = await ActividadMateriaService.update(req.params.id, nombreActividad);
-    res.json({ success: true, message: 'Actividad-materia actualizada', data, error: null });
   }
 
   async delete(req: Request, res: Response) {

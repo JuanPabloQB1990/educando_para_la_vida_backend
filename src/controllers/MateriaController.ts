@@ -14,16 +14,18 @@ class MateriaController {
   }
 
   async create(req: Request, res: Response) {
-    const { nombreMateria } = req.body;
+    const { nombreMateria, abreviatura } = req.body;
     if (!nombreMateria) return res.status(400).json({ success: false, message: 'nombreMateria es requerido', data: null, error: 'Dato faltante' });
-    const data = await MateriaService.create(nombreMateria);
+    if (!abreviatura) return res.status(400).json({ success: false, message: 'abreviatura es requerida', data: null, error: 'Dato faltante' });
+    const data = await MateriaService.create(nombreMateria, abreviatura);
     res.status(201).json({ success: true, message: 'Materia creada', data, error: null });
   }
 
   async update(req: Request, res: Response) {
-    const { nombreMateria } = req.body;
+    const { nombreMateria, abreviatura } = req.body;
     if (!nombreMateria) return res.status(400).json({ success: false, message: 'nombreMateria es requerido', data: null, error: 'Dato faltante' });
-    const data = await MateriaService.update(req.params.id, nombreMateria);
+    if (!abreviatura) return res.status(400).json({ success: false, message: 'abreviatura es requerida', data: null, error: 'Dato faltante' });
+    const data = await MateriaService.update(req.params.id, nombreMateria, abreviatura);
     res.json({ success: true, message: 'Materia actualizada', data, error: null });
   }
 

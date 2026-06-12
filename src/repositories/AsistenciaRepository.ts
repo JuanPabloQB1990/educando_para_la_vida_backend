@@ -45,10 +45,10 @@ class AsistenciaRepository {
     return row ? mapRowToEntity<Asistencia>(row) : null;
   }
 
-  async findByEstudianteAndActividad(idEstudiante: string, idActividad: string) {
+  async findByEstudianteActividadFecha(idEstudiante: string, idActividad: string, fecha: string) {
     const [rows] = await pool.query(
-      'SELECT * FROM asistencia WHERE id_estudiante = ? AND id_actividad = ? LIMIT 1',
-      [idEstudiante, idActividad]
+      'SELECT * FROM asistencia WHERE id_estudiante = ? AND id_actividad = ? AND fecha = ? LIMIT 1',
+      [idEstudiante, idActividad, fecha]
     );
     const row = (rows as any[])[0] ?? null;
     return row ? mapRowToEntity<Asistencia>(row) : null;

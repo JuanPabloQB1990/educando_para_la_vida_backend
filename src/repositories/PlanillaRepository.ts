@@ -48,14 +48,14 @@ class PlanillaRepository {
 
   async getActividadesConMaterias(idGradoEducacion: string, idPeriodo: string) {
     const [rows] = await pool.query(
-      `SELECT a.id AS actividad_id, a.nombre AS actividad_nombre, a.semana,
-              am.id AS am_id, am.nombre AS am_nombre,
-              m.nombre AS materia_nombre
+      `SELECT a.id AS actividad_id, a.nombre AS actividad_nombre,
+              am.id AS am_id,
+              m.nombre AS materia_nombre, m.abreviatura AS materia_abreviatura
        FROM actividad a
        LEFT JOIN actividad_materia am ON am.id_actividad = a.id
        LEFT JOIN materia m ON am.id_materia = m.id
        WHERE a.id_grado_educacion = ? AND a.id_periodo = ?
-       ORDER BY a.semana, m.nombre`,
+       ORDER BY a.created_at ASC, m.nombre`,
       [idGradoEducacion, idPeriodo]
     );
     return rows as any[];

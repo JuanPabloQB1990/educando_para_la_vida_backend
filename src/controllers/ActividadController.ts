@@ -18,20 +18,20 @@ class ActividadController {
   }
 
   async create(req: Request, res: Response) {
-    const { idPeriodo, idGradoEducacion, nombreActividad, semana, descripcion } = req.body;
-    if (!idPeriodo || !idGradoEducacion || !nombreActividad || semana == null) {
+    const { idPeriodo, idGradoEducacion, nombreActividad } = req.body;
+    if (!idPeriodo || !idGradoEducacion || !nombreActividad) {
       return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
     }
-    const data = await ActividadService.create({ idPeriodo, idGradoEducacion, nombreActividad, semana: Number(semana), descripcion });
+    const data = await ActividadService.create({ idPeriodo, idGradoEducacion, nombreActividad });
     res.status(201).json({ success: true, message: 'Actividad creada', data, error: null });
   }
 
   async update(req: Request, res: Response) {
-    const { nombreActividad, semana, descripcion } = req.body;
-    if (!nombreActividad || semana == null) {
-      return res.status(400).json({ success: false, message: 'nombreActividad y semana son requeridos', data: null, error: 'Datos faltantes' });
+    const { nombreActividad } = req.body;
+    if (!nombreActividad) {
+      return res.status(400).json({ success: false, message: 'nombreActividad es requerido', data: null, error: 'Datos faltantes' });
     }
-    const data = await ActividadService.update(req.params.id, { nombreActividad, semana: Number(semana), descripcion });
+    const data = await ActividadService.update(req.params.id, { nombreActividad });
     res.json({ success: true, message: 'Actividad actualizada', data, error: null });
   }
 

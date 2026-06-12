@@ -4,8 +4,7 @@ CREATE TABLE IF NOT EXISTS actividad (
   id_periodo VARCHAR(100) NOT NULL,
   id_grado_educacion VARCHAR(100) NOT NULL,
   nombre VARCHAR(255) NOT NULL,
-  semana INT NOT NULL,
-  descripcion TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT fk_actividad_periodo FOREIGN KEY (id_periodo) REFERENCES periodo(id),
   CONSTRAINT fk_actividad_grado FOREIGN KEY (id_grado_educacion) REFERENCES grado_educacion(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

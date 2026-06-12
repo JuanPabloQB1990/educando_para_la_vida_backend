@@ -15,14 +15,14 @@ class MateriaRepository {
     return row ? mapRowToEntity<Materia>(row) : null;
   }
 
-  async create(nombre: string) {
+  async create(nombre: string, abreviatura: string) {
     const id = generatePrimaryKey();
-    await pool.execute('INSERT INTO materia (id, nombre) VALUES (?, ?)', [id, nombre]);
+    await pool.execute('INSERT INTO materia (id, nombre, abreviatura) VALUES (?, ?, ?)', [id, nombre, abreviatura]);
     return { id };
   }
 
-  async update(id: string, nombre: string) {
-    const [result] = await pool.execute('UPDATE materia SET nombre = ? WHERE id = ?', [nombre, id]);
+  async update(id: string, nombre: string, abreviatura: string) {
+    const [result] = await pool.execute('UPDATE materia SET nombre = ?, abreviatura = ? WHERE id = ?', [nombre, abreviatura, id]);
     return result;
   }
 

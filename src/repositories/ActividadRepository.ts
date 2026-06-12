@@ -11,7 +11,7 @@ class ActividadRepository {
        JOIN periodo p ON a.id_periodo = p.id
        JOIN grado_educacion g ON a.id_grado_educacion = g.id
        WHERE a.id_grado_educacion = ? AND a.id_periodo = ?
-       ORDER BY a.semana`,
+       ORDER BY a.nombre`,
       [idGradoEducacion, idPeriodo]
     );
     return mapRowsToEntities<Actividad>(rows as any[]);
@@ -30,19 +30,19 @@ class ActividadRepository {
     return row ? mapRowToEntity<Actividad>(row) : null;
   }
 
-  async create(data: { idPeriodo: string; idGradoEducacion: string; nombre: string; semana: number; descripcion?: string }) {
+  async create(data: { idPeriodo: string; idGradoEducacion: string; nombre: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO actividad (id, id_periodo, id_grado_educacion, nombre, semana, descripcion) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, data.idPeriodo, data.idGradoEducacion, data.nombre, data.semana, data.descripcion ?? null]
+      'INSERT INTO actividad (id, id_periodo, id_grado_educacion, nombre) VALUES (?, ?, ?, ?)',
+      [id, data.idPeriodo, data.idGradoEducacion, data.nombre]
     );
     return { id };
   }
 
-  async update(id: string, data: { nombre: string; semana: number; descripcion?: string }) {
+  async update(id: string, data: { nombre: string }) {
     const [result] = await pool.execute(
-      'UPDATE actividad SET nombre = ?, semana = ?, descripcion = ? WHERE id = ?',
-      [data.nombre, data.semana, data.descripcion ?? null, id]
+      'UPDATE actividad SET nombre = ? WHERE id = ?',
+      [data.nombre, id]
     );
     return result;
   }

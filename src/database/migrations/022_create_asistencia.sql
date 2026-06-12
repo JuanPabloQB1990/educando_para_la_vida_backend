@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS asistencia (
   fecha DATE NOT NULL,
   estado ENUM('asistio','falla','falla_justificada', 'retraso') NOT NULL,
   observacion TEXT,
+  CONSTRAINT uq_asistencia_estudiante_actividad_fecha UNIQUE (id_estudiante, id_actividad, fecha),
   CONSTRAINT fk_asistencia_estudiante FOREIGN KEY (id_estudiante) REFERENCES estudiante(id),
   CONSTRAINT fk_asistencia_actividad FOREIGN KEY (id_actividad) REFERENCES actividad(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

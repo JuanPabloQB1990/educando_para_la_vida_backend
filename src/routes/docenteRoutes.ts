@@ -43,7 +43,6 @@ router.delete('/actividad/:id', requireRoles('admin', 'profesor(a)'), asyncHandl
 router.get('/actividad_materia', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.list(req, res)));
 router.get('/actividad_materia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.get(req, res)));
 router.post('/actividad_materia', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.create(req, res)));
-router.put('/actividad_materia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.update(req, res)));
 router.delete('/actividad_materia/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ActividadMateriaController.delete(req, res)));
 
 // Calificaciones — admin y profesor

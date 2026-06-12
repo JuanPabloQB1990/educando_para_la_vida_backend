@@ -9,13 +9,13 @@ class ActividadService {
     return ActividadRepository.findById(id);
   }
 
-  async create(data: { idPeriodo: string; idGradoEducacion: string; nombreActividad: string; semana: number; descripcion?: string }) {
-    const res = await ActividadRepository.create({ idPeriodo: data.idPeriodo, idGradoEducacion: data.idGradoEducacion, nombre: data.nombreActividad, semana: data.semana, descripcion: data.descripcion });
+  async create(data: { idPeriodo: string; idGradoEducacion: string; nombreActividad: string }) {
+    const res = await ActividadRepository.create({ idPeriodo: data.idPeriodo, idGradoEducacion: data.idGradoEducacion, nombre: data.nombreActividad });
     return ActividadRepository.findById(res.id);
   }
 
-  async update(id: string, data: { nombreActividad: string; semana: number; descripcion?: string }) {
-    await ActividadRepository.update(id, { nombre: data.nombreActividad, semana: data.semana, descripcion: data.descripcion });
+  async update(id: string, data: { nombreActividad: string }) {
+    await ActividadRepository.update(id, { nombre: data.nombreActividad });
     return ActividadRepository.findById(id);
   }
 

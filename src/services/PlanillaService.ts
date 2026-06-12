@@ -30,15 +30,14 @@ class PlanillaService {
         actividadesMap.set(row.actividad_id, {
           id: row.actividad_id,
           nombre: row.actividad_nombre,
-          semana: row.semana,
           materias: [],
         });
       }
       if (row.am_id) {
         actividadesMap.get(row.actividad_id)!.materias.push({
           id: row.am_id,
-          nombre: row.am_nombre,
           nombreMateria: row.materia_nombre,
+          abreviaturaMateria: row.materia_abreviatura ?? '',
         });
         allAmIds.push(row.am_id);
       }
@@ -51,9 +50,21 @@ class PlanillaService {
       PlanillaRepository.getAsistencias(idPeriodo, estudianteIds),
     ]);
 
-    // Fechas únicas ordenadas (columnas de asistencia)
-    const fechasSet = new Set<string>(asistenciasRaw.map((a: any) => a.fecha as string));
-    const fechasAsistencia = Array.from(fechasSet).sort();
+    // Fechas únicas por actividad
+    const fechasPorActividad = new Map<string, Set<string>>();
+    for (const a of asistenciasRaw) {
+      if (!fechasPorActividad.has(a.id_actividad)) {
+        fechasPorActividad.set(a.id_actividad, new Set());
+      }
+      fechasPorActividad.get(a.id_actividad)!.add(a.fecha as string);
+    }
+
+    const actividades = Array.from(actividadesMap.values()).map((act) => ({
+      ...act,
+      fechasAsistencia: Array.from(fechasPorActividad.get(act.id) ?? []).sort(),
+    }));
+
+    const totalSesiones = actividades.reduce((s, act) => s + act.fechasAsistencia.length, 0);
 
     const estudiantes: PlanillaEstudiante[] = estudiantesRaw.map((est: any) => {
       const calificaciones: PlanillaEstudiante['calificaciones'] = {};
@@ -67,11 +78,13 @@ class PlanillaService {
         }
       }
 
-      // Una asistencia por fecha (primera registrada si hay duplicados)
+      // Asistencias agrupadas por idActividad → fecha (primera registrada si hay duplicados)
       const asistencias: PlanillaEstudiante['asistencias'] = {};
       for (const a of asistenciasRaw) {
-        if (a.id_estudiante === est.id && !(a.fecha in asistencias)) {
-          asistencias[a.fecha] = {
+        if (a.id_estudiante !== est.id) continue;
+        if (!asistencias[a.id_actividad]) asistencias[a.id_actividad] = {};
+        if (!(a.fecha in asistencias[a.id_actividad])) {
+          asistencias[a.id_actividad][a.fecha] = {
             id: a.id,
             estado: a.estado,
             observacion: a.observacion ?? null,
@@ -79,10 +92,9 @@ class PlanillaService {
         }
       }
 
-      const totalPresente = Object.values(asistencias).filter(
-        (a) => a.estado === 'asistio'
-      ).length;
-      const totalSesiones = fechasAsistencia.length;
+      const totalPresente = Object.values(asistencias)
+        .flatMap((byFecha) => Object.values(byFecha))
+        .filter((a) => a.estado === 'asistio').length;
       const porcentajeAsistencia =
         totalSesiones > 0 ? Math.round((totalPresente / totalSesiones) * 100) : 0;
 
@@ -103,8 +115,7 @@ class PlanillaService {
       anio: meta.anio,
       periodo: { id: meta.periodo_id, numeroPeriodo: meta.numero_periodo },
       director,
-      actividades: Array.from(actividadesMap.values()),
-      fechasAsistencia,
+      actividades,
       estudiantes,
     };
   }

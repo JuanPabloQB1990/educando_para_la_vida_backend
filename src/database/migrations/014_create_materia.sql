@@ -1,5 +1,6 @@
 -- Migration: 014_create_materia.sql
 CREATE TABLE IF NOT EXISTS materia (
   id VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
-  nombre VARCHAR(255) NOT NULL UNIQUE
+  nombre VARCHAR(255) NOT NULL UNIQUE,
+  abreviatura VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

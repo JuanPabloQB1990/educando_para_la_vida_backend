@@ -41,21 +41,13 @@ class ActividadMateriaRepository {
     return row ? mapRowToEntity<ActividadMateria>(row) : null;
   }
 
-  async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string; nombre: string }) {
+  async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
-      'INSERT INTO actividad_materia (id, id_actividad, id_materia, id_carga_academica, nombre) VALUES (?, ?, ?, ?, ?)',
-      [id, data.idActividad, data.idMateria, data.idCargaAcademica, data.nombre]
+      'INSERT INTO actividad_materia (id, id_actividad, id_materia, id_carga_academica) VALUES (?, ?, ?, ?)',
+      [id, data.idActividad, data.idMateria, data.idCargaAcademica]
     );
     return { id };
-  }
-
-  async update(id: string, data: { nombre: string }) {
-    const [result] = await pool.execute(
-      'UPDATE actividad_materia SET nombre = ? WHERE id = ?',
-      [data.nombre, id]
-    );
-    return result;
   }
 
   async remove(id: string) {

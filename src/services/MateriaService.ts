@@ -9,13 +9,13 @@ class MateriaService {
     return MateriaRepository.findById(id);
   }
 
-  async create(nombreMateria: string) {
-    const res = await MateriaRepository.create(nombreMateria);
+  async create(nombreMateria: string, abreviatura: string) {
+    const res = await MateriaRepository.create(nombreMateria, abreviatura);
     return MateriaRepository.findById(res.id);
   }
 
-  async update(id: string, nombreMateria: string) {
-    await MateriaRepository.update(id, nombreMateria);
+  async update(id: string, nombreMateria: string, abreviatura: string) {
+    await MateriaRepository.update(id, nombreMateria, abreviatura);
     return MateriaRepository.findById(id);
   }
 
