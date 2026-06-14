@@ -55,6 +55,59 @@ class ObligacionPagoRepository {
       throw error;
     }
   }
+
+  async findByIdAndEstudiante(idObligacionPago: string, idEstudiante: string) {
+    try {
+      const sql = `
+        SELECT op.*
+        FROM obligacion_pago op
+        INNER JOIN estudiante_matricula em ON op.id_estudiante_matricula = em.id
+        WHERE op.id = ? AND em.id_estudiante = ?
+      `;
+      const [rows] = await pool.query(sql, [idObligacionPago, idEstudiante]);
+      const row = (rows as any[])[0] || null;
+      return row ? mapRowToEntity<ObligacionPago>(row) : null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findWithPagosByMatricula(idEstudianteMatricula: string) {
+    try {
+      const sql = `
+        SELECT
+          op.id AS id_obligacion_pago, op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado AS estado_obligacion,
+          r.nombre AS nombre_rubro,
+          p.id AS pago_id, p.monto_pagado, p.fecha_pago_real, p.file_comprobante,
+          p.observaciones AS pago_observaciones, p.estado AS pago_estado, p.fecha_verificacion
+        FROM obligacion_pago op
+        INNER JOIN rubro r ON op.id_rubro = r.id
+        LEFT JOIN pago p ON p.id_obligacion_pago = op.id
+        WHERE op.id_estudiante_matricula = ?
+        ORDER BY op.fecha_vencimiento ASC
+      `;
+      const [rows] = await pool.query(sql, [idEstudianteMatricula]);
+      return (rows as any[]).map((row: any) => ({
+        idObligacionPago: row.id_obligacion_pago,
+        idRubro: row.id_rubro,
+        nombreRubro: row.nombre_rubro,
+        montoCuota: row.monto_cuota,
+        fechaVencimiento: row.fecha_vencimiento,
+        estadoObligacion: row.estado_obligacion,
+        pago: row.pago_id ? {
+          id: row.pago_id,
+          montoPagado: row.monto_pagado,
+          fechaPagoReal: row.fecha_pago_real,
+          fileComprobante: row.file_comprobante,
+          observaciones: row.pago_observaciones,
+          estado: row.pago_estado,
+          fechaVerificacion: row.fecha_verificacion,
+        } : null,
+      }));
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default new ObligacionPagoRepository();

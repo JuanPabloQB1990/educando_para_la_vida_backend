@@ -2,6 +2,10 @@ import ClassroomEntregaRepository from '../repositories/ClassroomEntregaReposito
 import { ClassroomEntregaEstado } from '../enums/classroomEntrega.enum';
 
 class ClassroomEntregaService {
+  async listByCarga(idCargaAcademica: string, idPeriodo?: string) {
+    return ClassroomEntregaRepository.findByCarga(idCargaAcademica, idPeriodo);
+  }
+
   async listByTarea(idTarea: string) {
     return ClassroomEntregaRepository.findByTarea(idTarea);
   }

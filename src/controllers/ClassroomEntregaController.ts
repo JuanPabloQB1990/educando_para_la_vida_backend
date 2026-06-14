@@ -3,14 +3,16 @@ import ClassroomEntregaService from '../services/ClassroomEntregaService';
 
 class ClassroomEntregaController {
   async list(req: Request, res: Response) {
-    const { idTarea, idEstudiante } = req.query;
+    const { idTarea, idEstudiante, idCargaAcademica, idPeriodo } = req.query;
     let data;
-    if (idTarea) {
+    if (idCargaAcademica) {
+      data = await ClassroomEntregaService.listByCarga(idCargaAcademica as string, idPeriodo as string | undefined);
+    } else if (idTarea) {
       data = await ClassroomEntregaService.listByTarea(idTarea as string);
     } else if (idEstudiante) {
       data = await ClassroomEntregaService.listByEstudiante(idEstudiante as string);
     } else {
-      return res.status(400).json({ success: false, message: 'Se requiere idTarea o idEstudiante', data: null, error: 'Params faltantes' });
+      return res.status(400).json({ success: false, message: 'Se requiere idTarea, idEstudiante o idCargaAcademica', data: null, error: 'Params faltantes' });
     }
     res.json({ success: true, message: 'Entregas obtenidas', data, error: null });
   }

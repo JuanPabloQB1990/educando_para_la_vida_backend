@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS estudiante_matricula (
   file_certificado_grados VARCHAR(255),
   file_compromiso VARCHAR(255) NOT NULL,
   id_anio_electivo VARCHAR(100),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP;
   CONSTRAINT fk_em_estudiante FOREIGN KEY (id_estudiante) REFERENCES estudiante(id) ON DELETE CASCADE,
   CONSTRAINT fk_em_tipo_estudio FOREIGN KEY (id_tipo_estudio) REFERENCES tipo_estudio(id),
   CONSTRAINT fk_em_tiempo_validacion FOREIGN KEY (id_tiempo_validacion) REFERENCES tiempo_validacion(id),

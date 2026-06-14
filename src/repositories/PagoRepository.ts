@@ -189,6 +189,12 @@ class PagoRepository {
     }
   }
 
+  async findByObligacionPago(idObligacionPago: string) {
+    const [rows] = await pool.query('SELECT * FROM pago WHERE id_obligacion_pago = ? LIMIT 1', [idObligacionPago]);
+    const row = (rows as any[])[0] || null;
+    return row ? mapRowToEntity<Pago>(row) : null;
+  }
+
   async findById(id: string) {
     const [rows] = await pool.query('SELECT * FROM pago WHERE id = ?', [id]);
     const row = (rows as any[])[0] || null;
@@ -198,8 +204,15 @@ class PagoRepository {
   async create(data: any) {
     const { id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion } = data;
     const id = generatePrimaryKey();
-    const [result] = await pool.execute('INSERT INTO pago (id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion) VALUES (?,?,?,?,?,?,?,?)', [id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion]);
+    await pool.execute('INSERT INTO pago (id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion) VALUES (?,?,?,?,?,?,?,?)', [id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion]);
     return { id };
+  }
+
+  async updateComprobante(id: string, fileComprobante: string, fechaPagoReal: Date) {
+    await pool.execute(
+      'UPDATE pago SET file_comprobante = ?, fecha_pago_real = ?, estado = ?, observaciones = NULL, fecha_verificacion = NULL WHERE id = ?',
+      [fileComprobante, fechaPagoReal, 'pendiente', id]
+    );
   }
 
   async update(id: string, data: any) {

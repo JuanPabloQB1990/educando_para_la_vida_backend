@@ -2,7 +2,6 @@ import { google } from "googleapis";
 import path from "path";
 import { Readable } from "stream";
 import { config } from "../config/environment";
-import type { Express } from "express";
 
 // 1. Inicializar el cliente OAuth2 mapeando tus variables de entorno (.env)
 const oauth2Client = new google.auth.OAuth2(
@@ -25,10 +24,9 @@ interface UploadParams {
   studentName: string;
   documentNumber: string;
   fileType: string;
-  FOLDER_ID: string;
 }
 
-export async function uploadFileToDrive({ file, studentName, documentNumber, fileType, FOLDER_ID }: UploadParams) {
+export async function uploadFileToDrive({ file, studentName, documentNumber, fileType }: UploadParams) {
   if (!file) return null;
 
   // Formatear nombre del archivo
@@ -44,7 +42,7 @@ export async function uploadFileToDrive({ file, studentName, documentNumber, fil
 
   try {
     // Tomar el ID de la carpeta desde el .env (o dejar el tuyo como fallback por seguridad)
-    
+    const FOLDER_ID = config.googleDriveFolderId || "1p13dEQUETRERsBudsUCm6Wa4omVSofvO";
     const fileMetadata = {
       name: fileName,
       parents: [FOLDER_ID], 
@@ -70,13 +68,12 @@ export async function uploadFileToDrive({ file, studentName, documentNumber, fil
   }
 }
 
-export const uploadHelper = async (file: any, fileType: string, studentName: string, documentNumber: string, FOLDER_ID: string) => {
+export const uploadHelper = async (file: any, fileType: string, studentName: string, documentNumber: string) => {
   return await uploadFileToDrive({
     file,
     studentName,
     documentNumber,
-    fileType,
-    FOLDER_ID,
+    fileType
   });
 };
 

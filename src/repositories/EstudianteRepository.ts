@@ -156,6 +156,28 @@ class EstudianteRepository {
     const [result] = await pool.execute('DELETE FROM estudiante WHERE id = ?', [id]);
     return result;
   }
+
+  async findByIdUsuario(idUsuario: string) {
+    const [rows] = await pool.query(
+      `SELECT e.*, u.id AS usuario_id, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1, u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1, u.contacto2 AS usuario_contacto2, u.email AS usuario_email, u.id_rol AS usuario_id_rol, u.estado AS usuario_estado, u.id_tipo_documento AS usuario_id_tipo_documento, u.no_documento AS usuario_no_documento, u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
+       FROM estudiante e
+       LEFT JOIN usuario u ON e.id_usuario = u.id
+       WHERE e.id_usuario = ? LIMIT 1`,
+      [idUsuario]
+    );
+    const row = (rows as any[])[0] || null;
+    return row ? mapRowToEntity<any>(row) : null;
+  }
+
+  async updateArchivo(id: string, campo: string, url: string) {
+    const ALLOWED: readonly string[] = ['file_foto', 'file_doc', 'file_diagnostico', 'padre_file', 'madre_file', 'acudiente_file'];
+    if (!ALLOWED.includes(campo)) throw new Error(`Campo de archivo no permitido: ${campo}`);
+    const [result] = await pool.execute(
+      `UPDATE estudiante SET ${campo} = ? WHERE id = ?`,
+      [url, id]
+    );
+    return result;
+  }
 }
 
 export default new EstudianteRepository();

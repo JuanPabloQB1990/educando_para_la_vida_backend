@@ -4,6 +4,26 @@ import type { ClassroomEntrega, ClassroomEntregaAdjunto } from '../models/classr
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 
 class ClassroomEntregaRepository {
+  async findByCarga(idCargaAcademica: string, idPeriodo?: string) {
+    const params: string[] = [idCargaAcademica];
+    let sql = `
+      SELECT ce.*,
+             ct.titulo AS titulo_tarea,
+             CONCAT(u.nombres, ' ', u.apellido1) AS nombre_estudiante
+      FROM classroom_entrega ce
+      JOIN classroom_tarea ct ON ce.id_classroom_tarea = ct.id
+      JOIN estudiante e ON ce.id_estudiante = e.id
+      JOIN usuario u ON e.id_usuario = u.id
+      WHERE ct.id_carga_academica = ?`;
+    if (idPeriodo) {
+      sql += ' AND ct.id_periodo = ?';
+      params.push(idPeriodo);
+    }
+    sql += ' ORDER BY ct.titulo, ce.fecha_entrega DESC';
+    const [rows] = await pool.query(sql, params);
+    return mapRowsToEntities<ClassroomEntrega>(rows as any[]);
+  }
+
   async findByTarea(idTarea: string) {
     const [rows] = await pool.query(
       `SELECT ce.*,

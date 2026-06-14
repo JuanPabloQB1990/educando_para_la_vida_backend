@@ -43,6 +43,29 @@ class EstudianteMatriculaRepository {
     return result;
   }
 
+  async findMostRecentByEstudiante(idEstudiante: string) {
+    try {
+      const sql = `
+        SELECT em.*,
+          ae.anio AS anio_electivo_anio, ae.estado AS anio_electivo_estado,
+          te.nombre AS nombre_tipo_estudio,
+          tv.tiempo AS meses_tiempo_validacion
+        FROM estudiante_matricula em
+        LEFT JOIN anio_electivo ae ON em.id_anio_electivo = ae.id
+        LEFT JOIN tipo_estudio te ON em.id_tipo_estudio = te.id
+        LEFT JOIN tiempo_validacion tv ON em.id_tiempo_validacion = tv.id
+        WHERE em.id_estudiante = ?
+        ORDER BY em.created_at DESC
+        LIMIT 1
+      `;
+      const [rows] = await pool.query(sql, [idEstudiante]);
+      const row = (rows as any[])[0] || null;
+      return row ? mapRowToEntity<any>(row) : null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async matricularAnio(
     idEstudianteMatricula: string,
     idAnioElectivo: string,

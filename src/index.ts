@@ -12,6 +12,7 @@ import routerCatalogo from './routes/catalogoRoutes';
 import routerDocente from './routes/docenteRoutes';
 import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';
+import routerEstudiante from './routes/estudianteRoutes';
 import config from './config/environment.js';
 import { EmailService } from './utils/sendEmail';
 
@@ -32,11 +33,13 @@ async function bootstrap() {
   // Rutas públicas de catálogos (usadas por el formulario de matrícula)
   app.use('/api/academico', routerAcademico);
   app.use('/api/catalogo', routerCatalogo);
-  // Rutas académicas (docentes, calificaciones, asistencias, classroom)
+  // Rutas académicas (docentes, c
+  // alificaciones, asistencias, classroom)
   app.use('/api/docente', routerDocente);
   // Rutas protegidas — solo admin
   app.use('/api/usuario', routerUsuario);
   app.use('/api/gestion', verifyToken, routerGestion);
+  app.use('/api/estudiante', routerEstudiante);
 
   // Health check
   app.get('/api/health', (req : express.Request, res : express.Response) => {
