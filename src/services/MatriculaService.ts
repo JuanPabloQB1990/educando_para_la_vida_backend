@@ -15,6 +15,7 @@ import PagoService from "./PagoService";
 import RolService from "./RolService";
 import RubroService from "./RubroService";
 import UsuarioService from "./UsuarioService";
+import { config } from "../config/environment";
 
 
 
@@ -38,32 +39,34 @@ class MatriculaService {
     // SUBIR ARCHIVOS A GOOGLE DRIVE
     // =========================
 
+  const FOLDER_ID = config.googleDriveFolderId || "1p13dEQUETRERsBudsUCm6Wa4omVSofvO";
+
   const payloadFiles = {
-    file_doc: await uploadHelper(payload.file_doc, "documento", payload.nombres, payload.no_documento),
+    file_doc: await uploadHelper(payload.file_doc, "documento", payload.nombres, payload.no_documento, FOLDER_ID),
 
-    file_foto: await uploadHelper(payload.file_foto, "foto", payload.nombres, payload.no_documento),
+    file_foto: await uploadHelper(payload.file_foto, "foto", payload.nombres, payload.no_documento, FOLDER_ID),
 
-    file_compromiso: await uploadHelper(payload.file_compromiso, "compromiso", payload.nombres, payload.no_documento),
+    file_compromiso: await uploadHelper(payload.file_compromiso, "compromiso", payload.nombres, payload.no_documento, FOLDER_ID),
 
-    padre_file: await uploadHelper(payload.padre_file, "padre", payload.nombres, payload.no_documento),
+    padre_file: await uploadHelper(payload.padre_file, "padre", payload.nombres, payload.no_documento, FOLDER_ID),
 
-    madre_file: await uploadHelper(payload.madre_file, "madre", payload.nombres, payload.no_documento),
+    madre_file: await uploadHelper(payload.madre_file, "madre", payload.nombres, payload.no_documento, FOLDER_ID),
 
-    acudiente_file: await uploadHelper(payload.acudiente_file, "acudiente", payload.nombres, payload.no_documento),
+    acudiente_file: await uploadHelper(payload.acudiente_file, "acudiente", payload.nombres, payload.no_documento, FOLDER_ID),
 
     // nullable
     file_diagnostico: payload.file_diagnostico
-      ? await uploadHelper(payload.file_diagnostico, "diagnostico", payload.nombres, payload.no_documento)
+      ? await uploadHelper(payload.file_diagnostico, "diagnostico", payload.nombres, payload.no_documento, FOLDER_ID)
       : null,
 
     file_certificado_grados: await uploadHelper(
       payload.file_certificado_grados,
-      "certificado_grados", payload.nombres, payload.no_documento
+      "certificado_grados", payload.nombres, payload.no_documento, FOLDER_ID
     ),
 
     file_comprobante_pago: await uploadHelper(
       payload.file_comprobante_pago,
-      "comprobante_pago", payload.nombres, payload.no_documento
+      "comprobante_pago", payload.nombres, payload.no_documento, FOLDER_ID
     ),
   };
 

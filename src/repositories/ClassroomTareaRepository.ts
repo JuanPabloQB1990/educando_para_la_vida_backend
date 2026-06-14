@@ -78,6 +78,15 @@ class ClassroomTareaRepository {
     return result;
   }
 
+  async findAdjuntoById(id: string) {
+    const [rows] = await pool.query(
+      'SELECT * FROM classroom_tarea_adjunto WHERE id = ?',
+      [id]
+    );
+    const row = (rows as any[])[0] ?? null;
+    return row ? mapRowToEntity<ClassroomTareaAdjunto>(row) : null;
+  }
+
   async findAdjuntos(idTarea: string) {
     const [rows] = await pool.query(
       'SELECT * FROM classroom_tarea_adjunto WHERE id_classroom_tarea = ?',

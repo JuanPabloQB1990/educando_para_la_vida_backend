@@ -49,13 +49,13 @@ class ClassroomTareaController {
     res.json({ success: true, message: 'Adjuntos obtenidos', data, error: null });
   }
 
-  async createAdjunto(req: Request, res: Response) {
-    const { urlArchivo, nombreArchivo } = req.body;
-    if (!urlArchivo || !nombreArchivo) {
-      return res.status(400).json({ success: false, message: 'urlArchivo y nombreArchivo son requeridos', data: null, error: 'Datos faltantes' });
+  async createAdjuntos(req: Request, res: Response) {
+    const files = (req as any).files as Express.Multer.File[] | undefined;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ success: false, message: 'Se requiere al menos un archivo', data: null, error: 'Datos faltantes' });
     }
-    const data = await ClassroomTareaService.createAdjunto({ idClassroomTarea: req.params.id, urlArchivo, nombreArchivo });
-    res.status(201).json({ success: true, message: 'Adjunto creado', data, error: null });
+    const data = await ClassroomTareaService.createAdjuntos(req.params.id, files);
+    res.status(201).json({ success: true, message: 'Adjuntos subidos', data, error: null });
   }
 
   async deleteAdjunto(req: Request, res: Response) {

@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS classroom_tarea (
   id VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
   id_carga_academica VARCHAR(100) NOT NULL,
-  id_periodo VARCHAR(100) NOT NULL,
+  id_periodo VARCHAR(100),
   titulo VARCHAR(255) NOT NULL,
   instrucciones TEXT NOT NULL,
   fecha_limite DATETIME NOT NULL,

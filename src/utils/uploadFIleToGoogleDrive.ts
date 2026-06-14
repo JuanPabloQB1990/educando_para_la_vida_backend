@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import path from "path";
 import { Readable } from "stream";
 import { config } from "../config/environment";
+import type { Express } from "express";
 
 // 1. Inicializar el cliente OAuth2 mapeando tus variables de entorno (.env)
 const oauth2Client = new google.auth.OAuth2(
@@ -24,9 +25,10 @@ interface UploadParams {
   studentName: string;
   documentNumber: string;
   fileType: string;
+  FOLDER_ID: string;
 }
 
-export async function uploadFileToDrive({ file, studentName, documentNumber, fileType }: UploadParams) {
+export async function uploadFileToDrive({ file, studentName, documentNumber, fileType, FOLDER_ID }: UploadParams) {
   if (!file) return null;
 
   // Formatear nombre del archivo
@@ -42,8 +44,7 @@ export async function uploadFileToDrive({ file, studentName, documentNumber, fil
 
   try {
     // Tomar el ID de la carpeta desde el .env (o dejar el tuyo como fallback por seguridad)
-    const FOLDER_ID = config.googleDriveFolderId || "1p13dEQUETRERsBudsUCm6Wa4omVSofvO";
-
+    
     const fileMetadata = {
       name: fileName,
       parents: [FOLDER_ID], 
@@ -69,11 +70,40 @@ export async function uploadFileToDrive({ file, studentName, documentNumber, fil
   }
 }
 
-export const uploadHelper = async (file: any, fileType: string, studentName: string, documentNumber: string) => {
+export const uploadHelper = async (file: any, fileType: string, studentName: string, documentNumber: string, FOLDER_ID: string) => {
   return await uploadFileToDrive({
     file,
     studentName,
     documentNumber,
     fileType,
+    FOLDER_ID,
   });
 };
+
+export async function uploadClassroomFile(file: Express.Multer.File): Promise<{ url: string; nombre: string }> {
+  const FOLDER_CLASSROOM_ID = config.googleDriveFolderClassroomId;
+  const ext = path.extname(file.originalname).toLowerCase();
+  const date = new Date().toISOString().split('T')[0];
+  const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9._-]/g, '_');
+  const fileName = `classroom-${date}-${baseName}${ext}`;
+
+  const bufferStream = new Readable();
+  bufferStream.push(file.buffer);
+  bufferStream.push(null);
+
+  const response = await drive.files.create({
+    requestBody: { name: fileName, parents: [FOLDER_CLASSROOM_ID] },
+    media: { mimeType: file.mimetype, body: bufferStream },
+    fields: 'id, webViewLink',
+  });
+
+  if (!response.data.webViewLink) {
+    throw new Error('No se pudo obtener el enlace del archivo subido a Drive');
+  }
+
+  return { url: response.data.webViewLink, nombre: fileName };
+}
+
+export async function deleteFileFromDrive(fileId: string): Promise<void> {
+  await drive.files.delete({ fileId });
+}

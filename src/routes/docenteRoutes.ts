@@ -1,7 +1,10 @@
 import express from 'express';
+import multer from 'multer';
 import { asyncHandler } from '../middleware/errorHandler';
 import { verifyToken } from '../middleware/auth';
 import { requireRoles } from '../middleware/roles';
+
+const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } });
 import CargaAcademicaController from '../controllers/CargaAcademicaController';
 import DireccionGradoController from '../controllers/DireccionGradoController';
 import ActividadController from '../controllers/ActividadController';
@@ -69,7 +72,7 @@ router.post('/classroom_tarea', requireRoles('admin', 'profesor(a)'), asyncHandl
 router.put('/classroom_tarea/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.update(req, res)));
 router.delete('/classroom_tarea/:id', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.delete(req, res)));
 router.get('/classroom_tarea/:id/adjuntos', asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.listAdjuntos(req, res)));
-router.post('/classroom_tarea/:id/adjuntos', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.createAdjunto(req, res)));
+router.post('/classroom_tarea/:id/adjuntos', requireRoles('admin', 'profesor(a)'), upload.array('files', 10), asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.createAdjuntos(req, res)));
 router.delete('/classroom_tarea/:id/adjuntos/:adjuntoId', requireRoles('admin', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => ClassroomTareaController.deleteAdjunto(req, res)));
 
 // Classroom Entregas — estudiante entrega, profesor revisa

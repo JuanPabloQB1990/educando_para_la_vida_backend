@@ -19,6 +19,7 @@ export const config = {
   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
   googleRefreshToken: process.env.GOOGLE_REFRESH_TOKEN || '',
   googleDriveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID || '',
+  googleDriveFolderClassroomId: process.env.GOOGLE_DRIVE_FOLDER_CLASSROOM_ID || '',
   resendApiKey: process.env.RESEND_API_KEY || '',
 };
 
