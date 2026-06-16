@@ -1,5 +1,12 @@
+import path from 'path';
 import ClassroomEntregaRepository from '../repositories/ClassroomEntregaRepository';
+import EstudianteRepository from '../repositories/EstudianteRepository';
 import { ClassroomEntregaEstado } from '../enums/classroomEntrega.enum';
+import { uploadClassroomFile, deleteFileFromDrive } from '../utils/uploadFIleToGoogleDrive';
+import { AppError } from '../error/AppError';
+
+const ALLOWED_EXTS = ['.pdf', '.jpg', '.jpeg', '.png', '.docx'];
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 
 class ClassroomEntregaService {
   async listByCarga(idCargaAcademica: string, idPeriodo?: string) {
@@ -44,6 +51,67 @@ class ClassroomEntregaService {
   }
 
   async deleteAdjunto(id: string) {
+    return ClassroomEntregaRepository.removeAdjunto(id);
+  }
+
+  async listForEstudiante(idUsuario: string) {
+    const estudiante = await EstudianteRepository.findByIdUsuario(idUsuario);
+    if (!estudiante) throw new AppError(404, 'Estudiante no encontrado');
+    return ClassroomEntregaRepository.findByEstudiante((estudiante as any).id);
+  }
+
+  async createForEstudiante(idUsuario: string, idClassroomTarea: string) {
+    const estudiante = await EstudianteRepository.findByIdUsuario(idUsuario);
+    if (!estudiante) throw new AppError(404, 'Estudiante no encontrado');
+
+    const idEstudiante = (estudiante as any).id;
+    const existing = await ClassroomEntregaRepository.findByEstudianteAndTarea(idEstudiante, idClassroomTarea);
+    if (existing) throw new AppError(409, 'Ya existe una entrega para esta tarea');
+
+    const res = await ClassroomEntregaRepository.create({
+      idClassroomTarea,
+      idEstudiante,
+      estado: ClassroomEntregaEstado.PENDIENTE,
+    });
+    return ClassroomEntregaRepository.findById(res.id);
+  }
+
+  async uploadAdjuntosForEstudiante(idEntrega: string, files: Express.Multer.File[]) {
+    const entrega = await ClassroomEntregaRepository.findById(idEntrega);
+    if (!entrega) throw new AppError(404, 'Entrega no encontrada');
+
+    for (const file of files) {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (!ALLOWED_EXTS.includes(ext)) {
+        throw new AppError(400, `Extensión no permitida: ${ext}. Permitidas: pdf, jpg, jpeg, png, docx`);
+      }
+      if (file.size > MAX_SIZE_BYTES) {
+        throw new AppError(400, `El archivo "${file.originalname}" excede el límite de 10 MB`);
+      }
+    }
+
+    const adjuntos = [];
+    for (const file of files) {
+      const { url, nombre } = await uploadClassroomFile(file);
+      const { id } = await ClassroomEntregaRepository.createAdjunto({
+        idClassroomEntrega: idEntrega,
+        urlArchivo: url,
+        nombreArchivo: nombre,
+      });
+      adjuntos.push({ id, idClassroomEntrega: idEntrega, urlArchivo: url, nombreArchivo: nombre });
+    }
+    return adjuntos;
+  }
+
+  async deleteAdjuntoWithFile(id: string) {
+    const adjunto = await ClassroomEntregaRepository.findAdjuntoById(id);
+    if (!adjunto) throw new AppError(404, 'Adjunto no encontrado');
+
+    const match = adjunto.urlArchivo.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) {
+      await deleteFileFromDrive(match[1]);
+    }
+
     return ClassroomEntregaRepository.removeAdjunto(id);
   }
 }

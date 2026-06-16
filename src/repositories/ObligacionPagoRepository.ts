@@ -59,8 +59,9 @@ class ObligacionPagoRepository {
   async findByIdAndEstudiante(idObligacionPago: string, idEstudiante: string) {
     try {
       const sql = `
-        SELECT op.*
+        SELECT op.*, r.nombre AS nombre_rubro
         FROM obligacion_pago op
+        JOIN rubro r ON op.id_rubro = r.id
         INNER JOIN estudiante_matricula em ON op.id_estudiante_matricula = em.id
         WHERE op.id = ? AND em.id_estudiante = ?
       `;
@@ -70,6 +71,56 @@ class ObligacionPagoRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  async updateVencidosByMatricula(idEstudianteMatricula: string) {
+    try {
+      await pool.execute(
+        `UPDATE obligacion_pago
+         SET estado = 'vencido'
+         WHERE id_estudiante_matricula = ?
+           AND estado = 'pendiente'
+           AND fecha_vencimiento < NOW()`,
+        [idEstudianteMatricula]
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findPendientesVencenEn(dias: number) {
+    const [rows] = await pool.query(
+      `SELECT op.id, op.monto_cuota, op.fecha_vencimiento,
+              r.nombre AS nombre_rubro,
+              u.email AS email_estudiante,
+              CONCAT(u.nombres, ' ', u.apellido1) AS nombre_estudiante
+       FROM obligacion_pago op
+       JOIN rubro r ON op.id_rubro = r.id
+       JOIN estudiante_matricula em ON op.id_estudiante_matricula = em.id
+       JOIN estudiante e ON em.id_estudiante = e.id
+       JOIN usuario u ON e.id_usuario = u.id
+       WHERE op.estado = 'pendiente'
+         AND DATE(op.fecha_vencimiento) = DATE(NOW() + INTERVAL ? DAY)`,
+      [dias]
+    );
+    return rows as any[];
+  }
+
+  async findPendientesVencenHoy() {
+    const [rows] = await pool.query(
+      `SELECT op.id, op.monto_cuota, op.fecha_vencimiento,
+              r.nombre AS nombre_rubro,
+              u.email AS email_estudiante,
+              CONCAT(u.nombres, ' ', u.apellido1) AS nombre_estudiante
+       FROM obligacion_pago op
+       JOIN rubro r ON op.id_rubro = r.id
+       JOIN estudiante_matricula em ON op.id_estudiante_matricula = em.id
+       JOIN estudiante e ON em.id_estudiante = e.id
+       JOIN usuario u ON e.id_usuario = u.id
+       WHERE op.estado = 'pendiente'
+         AND DATE(op.fecha_vencimiento) = CURDATE()`
+    );
+    return rows as any[];
   }
 
   async findWithPagosByMatricula(idEstudianteMatricula: string) {

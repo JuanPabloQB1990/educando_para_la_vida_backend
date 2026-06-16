@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import ClassroomTareaService from '../services/ClassroomTareaService';
 
 class ClassroomTareaController {
@@ -61,6 +61,15 @@ class ClassroomTareaController {
   async deleteAdjunto(req: Request, res: Response) {
     await ClassroomTareaService.deleteAdjunto(req.params.adjuntoId);
     res.json({ success: true, message: 'Adjunto eliminado', data: null, error: null });
+  }
+
+  async listForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await ClassroomTareaService.listForEstudiante(req.user!.id);
+      res.json({ success: true, message: 'Tareas obtenidas', data, error: null });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

@@ -7,6 +7,9 @@ import { requireRoles } from '../middleware/roles';
 import { asyncHandler } from '../middleware/errorHandler';
 import EstudiantePerfilController from '../controllers/EstudiantePerfilController';
 import EstudiantePagosController from '../controllers/EstudiantePagosController';
+import ClassroomTareaController from '../controllers/ClassroomTareaController';
+import ClassroomEntregaController from '../controllers/ClassroomEntregaController';
+import DireccionGradoController from '../controllers/DireccionGradoController';
 
 const router = express.Router();
 
@@ -30,5 +33,14 @@ router.patch('/perfil/archivo', upload.single('archivo'), asyncHandler((req: Req
 
 router.get('/pagos', asyncHandler((req: Request, res: Response, next: NextFunction) => EstudiantePagosController.get(req, res, next)));
 router.post('/pagos/comprobante', upload.single('comprobante'), asyncHandler((req: Request, res: Response, next: NextFunction) => EstudiantePagosController.subirComprobante(req, res, next)));
+
+router.get('/classroom/tareas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomTareaController.listForEstudiante(req, res, next)));
+
+router.get('/classroom/entregas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.listForEstudiante(req, res, next)));
+router.post('/classroom/entregas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.createForEstudiante(req, res, next)));
+router.post('/classroom/entregas/:id/adjuntos', upload.array('files', 5), asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.uploadAdjuntosForEstudiante(req, res, next)));
+router.delete('/classroom/entregas/:id/adjuntos/:adjuntoId', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.deleteAdjuntoForEstudiante(req, res, next)));
+
+router.get('/clase-virtual', asyncHandler((req: Request, res: Response, next: NextFunction) => DireccionGradoController.getForEstudiante(req, res, next)));
 
 export default router;

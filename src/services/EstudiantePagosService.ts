@@ -5,6 +5,8 @@ import ObligacionPagoRepository from '../repositories/ObligacionPagoRepository';
 import PagoRepository from '../repositories/PagoRepository';
 import { uploadHelper, deleteFileFromDrive } from '../utils/uploadFIleToGoogleDrive';
 import { AppError } from '../error/AppError';
+import { EmailService } from '../utils/sendEmail';
+import { comprobanteRecibido } from '../templates/templatesSendEmail';
 
 function extractDriveFileId(url: string): string | null {
   const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
@@ -67,6 +69,19 @@ class EstudiantePagosService {
         fecha_verificacion: null,
       });
     }
+
+    const fechaPago = new Date().toLocaleDateString('es-CO', {
+      day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    });
+    await EmailService.sendMail(
+      (estudiante as any).usuarioEmail,
+      `Comprobante de pago recibido – ${(obligacion as any).nombreRubro ?? 'Mensualidad'}`,
+      comprobanteRecibido({
+        nombreEstudiante: studentName,
+        nombreRubro: (obligacion as any).nombreRubro ?? 'Mensualidad',
+        fechaPago,
+      })
+    ).catch(() => {});
   }
 }
 

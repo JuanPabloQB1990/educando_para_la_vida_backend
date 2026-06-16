@@ -3,6 +3,9 @@ import bcrypt from 'bcryptjs';
 import type { JwtPayload } from '../types/express';
 import UsuarioRepository from '../repositories/UsuarioRepository';
 import AuthRepository from '../repositories/AuthRepository';
+import EstudianteRepository from '../repositories/EstudianteRepository';
+import EstudianteMatriculaRepository from '../repositories/EstudianteMatriculaRepository';
+import ObligacionPagoRepository from '../repositories/ObligacionPagoRepository';
 import { EmailService } from '../utils/sendEmail';
 import { UsuarioEstado } from '../enums/usuario.enum';
 import { AppError } from '../error/AppError';
@@ -69,8 +72,23 @@ class AuthService {
       userAgent,
       fechaExpiracion: refreshExpiracion,
     });
+
+    if (usuario.nombreRol === 'estudiante') {
+      try {
+        const estudiante = await EstudianteRepository.findByIdUsuario(usuario.id);
+        if (estudiante) {
+          const matricula = await EstudianteMatriculaRepository.findMostRecentByEstudiante(estudiante.id);
+          if (matricula) {
+            await ObligacionPagoRepository.updateVencidosByMatricula(matricula.id);
+          }
+        }
+      } catch {
+        // No bloquear el login si falla la actualización de vencidos
+      }
+    }
+
     const { password: _pwd, ...usuarioSinPassword } = usuario;
-    
+
     return { accessToken, refreshToken, usuario: usuarioSinPassword };
   }
 

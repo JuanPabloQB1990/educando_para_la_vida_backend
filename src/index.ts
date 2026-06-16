@@ -15,6 +15,7 @@ import routerMatricula from './routes/matriculaRoutes';
 import routerEstudiante from './routes/estudianteRoutes';
 import config from './config/environment.js';
 import { EmailService } from './utils/sendEmail';
+import { startNotificacionPagoJob } from './jobs/notificacionPagoJob';
 
 const app: Application = express();
 
@@ -61,6 +62,9 @@ async function bootstrap() {
 
   // Error handler middleware
   app.use(errorHandler);
+
+  // Start scheduled jobs
+  startNotificacionPagoJob();
 
   // Start server
   const PORT = config.port;

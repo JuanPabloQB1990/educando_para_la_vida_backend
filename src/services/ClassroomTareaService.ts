@@ -1,5 +1,9 @@
 import path from 'path';
 import ClassroomTareaRepository from '../repositories/ClassroomTareaRepository';
+import EstudianteRepository from '../repositories/EstudianteRepository';
+import EstudianteMatriculaRepository from '../repositories/EstudianteMatriculaRepository';
+import GradosPorMatriculaRepository from '../repositories/GradosPorMatriculaRepository';
+import BloqueGradoRepository from '../repositories/BloqueGradoRepository';
 import { uploadClassroomFile, deleteFileFromDrive } from '../utils/uploadFIleToGoogleDrive';
 import { AppError } from '../error/AppError';
 
@@ -73,6 +77,29 @@ class ClassroomTareaService {
     }
 
     return ClassroomTareaRepository.removeAdjunto(id);
+  }
+
+  async listForEstudiante(idUsuario: string) {
+    const estudiante = await EstudianteRepository.findByIdUsuario(idUsuario);
+    if (!estudiante) throw new AppError(404, 'Estudiante no encontrado');
+
+    const matricula = await EstudianteMatriculaRepository.findMostRecentByEstudiante((estudiante as any).id);
+    if (!matricula) throw new AppError(404, 'No se encontró matrícula activa');
+
+    const grados = await GradosPorMatriculaRepository.findByEstudianteMatricula((matricula as any).id);
+    const gradoPendiente = (grados as any[]).find((g) => g.estado === 'pendiente');
+    if (!gradoPendiente) throw new AppError(404, 'No se encontró grado en estado pendiente');
+
+    const idGradoEducacion: string = gradoPendiente.idGradoEducacion;
+    const tipoEstudio = ((matricula as any).nombreTipoEstudio ?? '').toLowerCase();
+
+    if (tipoEstudio.includes('formal')) {
+      return ClassroomTareaRepository.findByGradoFormal(idGradoEducacion);
+    }
+
+    const bloqueGrado = await BloqueGradoRepository.findByGrado(idGradoEducacion);
+    if (!bloqueGrado) throw new AppError(404, 'No se encontró bloque asignado al grado');
+    return ClassroomTareaRepository.findByBloqueValidacion(bloqueGrado.idBloque);
   }
 }
 

@@ -108,6 +108,42 @@ class ClassroomTareaRepository {
     const [result] = await pool.execute('DELETE FROM classroom_tarea_adjunto WHERE id = ?', [id]);
     return result;
   }
+
+  async findByGradoFormal(idGradoEducacion: string) {
+    const [rows] = await pool.query(
+      `SELECT ct.*,
+              m.nombre AS nombre_materia,
+              g.nombre AS nombre_grado,
+              p.numero_periodo
+       FROM classroom_tarea ct
+       JOIN carga_academica ca ON ct.id_carga_academica = ca.id
+       JOIN materia m ON ca.id_materia = m.id
+       JOIN grado_educacion g ON ca.id_grado_educacion = g.id
+       JOIN periodo p ON ct.id_periodo = p.id
+       WHERE ca.id_grado_educacion = ?
+       ORDER BY ct.fecha_creacion DESC`,
+      [idGradoEducacion]
+    );
+    return mapRowsToEntities<ClassroomTarea>(rows as any[]);
+  }
+
+  async findByBloqueValidacion(idBloque: string) {
+    const [rows] = await pool.query(
+      `SELECT ct.*,
+              m.nombre AS nombre_materia,
+              g.nombre AS nombre_grado,
+              p.numero_periodo
+       FROM classroom_tarea ct
+       JOIN carga_academica ca ON ct.id_carga_academica = ca.id
+       JOIN materia m ON ca.id_materia = m.id
+       JOIN grado_educacion g ON ca.id_grado_educacion = g.id
+       JOIN periodo p ON ct.id_periodo = p.id
+       WHERE ca.id_bloque = ?
+       ORDER BY ct.fecha_creacion DESC`,
+      [idBloque]
+    );
+    return mapRowsToEntities<ClassroomTarea>(rows as any[]);
+  }
 }
 
 export default new ClassroomTareaRepository();

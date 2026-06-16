@@ -86,12 +86,30 @@ class ClassroomEntregaRepository {
     return result;
   }
 
+  async findByEstudianteAndTarea(idEstudiante: string, idClassroomTarea: string) {
+    const [rows] = await pool.query(
+      'SELECT * FROM classroom_entrega WHERE id_estudiante = ? AND id_classroom_tarea = ? LIMIT 1',
+      [idEstudiante, idClassroomTarea]
+    );
+    const row = (rows as any[])[0] ?? null;
+    return row ? mapRowToEntity<ClassroomEntrega>(row) : null;
+  }
+
   async findAdjuntos(idEntrega: string) {
     const [rows] = await pool.query(
       'SELECT * FROM classroom_entrega_adjunto WHERE id_classroom_entrega = ?',
       [idEntrega]
     );
     return mapRowsToEntities<ClassroomEntregaAdjunto>(rows as any[]);
+  }
+
+  async findAdjuntoById(id: string) {
+    const [rows] = await pool.query(
+      'SELECT * FROM classroom_entrega_adjunto WHERE id = ? LIMIT 1',
+      [id]
+    );
+    const row = (rows as any[])[0] ?? null;
+    return row ? mapRowToEntity<ClassroomEntregaAdjunto>(row) : null;
   }
 
   async createAdjunto(data: { idClassroomEntrega: string; urlArchivo: string; nombreArchivo: string }) {

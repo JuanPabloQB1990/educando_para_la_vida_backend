@@ -21,6 +21,24 @@ class DireccionGradoRepository {
     return mapRowsToEntities<DireccionGrado>(rows as any[]);
   }
 
+  async findByGradoActivo(idGradoEducacion: string) {
+    const [rows] = await pool.query(
+      `SELECT dg.*,
+              g.nombre AS nombre_grado,
+              CONCAT(u.nombres, ' ', u.apellido1) AS nombre_usuario,
+              ae.anio
+       FROM direccion_grado dg
+       JOIN grado_educacion g ON dg.id_grado_educacion = g.id
+       JOIN usuario u ON dg.id_usuario = u.id
+       JOIN anio_electivo ae ON dg.id_anio_electivo = ae.id
+       WHERE dg.id_grado_educacion = ? AND ae.estado = 'activo'
+       LIMIT 1`,
+      [idGradoEducacion]
+    );
+    const row = (rows as any[])[0] ?? null;
+    return row ? mapRowToEntity<DireccionGrado>(row) : null;
+  }
+
   async findByProfesor(idUsuario: string, idAnioElectivo?: string) {
     let sql = `SELECT dg.*,
                       g.nombre AS nombre_grado,

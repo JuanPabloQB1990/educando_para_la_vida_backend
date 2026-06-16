@@ -1,5 +1,5 @@
 import pool from '../config/database';
-import { mapRowsToEntities } from '../models/dbMappers';
+import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
 import type { BloqueGrado } from '../models/bloqueGrado';
 
 class BloqueGradoRepository {
@@ -65,6 +65,19 @@ class BloqueGradoRepository {
         [idBloque, idGradoEducacion]
       );
       return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async findByGrado(idGradoEducacion: string) {
+    try {
+      const [rows] = await pool.query(
+        'SELECT id_bloque, id_grado_educacion FROM bloque_grado WHERE id_grado_educacion = ? LIMIT 1',
+        [idGradoEducacion]
+      );
+      const row = (rows as any[])[0] ?? null;
+      return row ? mapRowToEntity<BloqueGrado>(row) : null;
     } catch (error) {
       throw error;
     }

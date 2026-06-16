@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import DireccionGradoService from '../services/DireccionGradoService';
 
 class DireccionGradoController {
@@ -46,6 +46,15 @@ class DireccionGradoController {
   async delete(req: Request, res: Response) {
     await DireccionGradoService.delete(req.params.id as string);
     res.json({ success: true, message: 'Dirección de grado eliminada', data: null, error: null });
+  }
+
+  async getForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await DireccionGradoService.getForEstudiante(req.user!.id);
+      res.json({ success: true, message: 'Clase virtual obtenida', data, error: null });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import ClassroomEntregaService from '../services/ClassroomEntregaService';
 
 class ClassroomEntregaController {
@@ -63,6 +63,50 @@ class ClassroomEntregaController {
   async deleteAdjunto(req: Request, res: Response) {
     await ClassroomEntregaService.deleteAdjunto(req.params.adjuntoId);
     res.json({ success: true, message: 'Adjunto eliminado', data: null, error: null });
+  }
+
+  async listForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await ClassroomEntregaService.listForEstudiante(req.user!.id);
+      res.json({ success: true, message: 'Entregas obtenidas', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async createForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { idClassroomTarea } = req.body;
+      if (!idClassroomTarea) {
+        return res.status(400).json({ success: false, message: 'idClassroomTarea es requerido', data: null, error: 'Dato faltante' });
+      }
+      const data = await ClassroomEntregaService.createForEstudiante(req.user!.id, idClassroomTarea);
+      res.status(201).json({ success: true, message: 'Entrega registrada', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async uploadAdjuntosForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      const files = (req as any).files as Express.Multer.File[] | undefined;
+      if (!files || files.length === 0) {
+        return res.status(400).json({ success: false, message: 'Se requiere al menos un archivo', data: null, error: 'Dato faltante' });
+      }
+      const data = await ClassroomEntregaService.uploadAdjuntosForEstudiante(req.params.id as string, files);
+      res.status(201).json({ success: true, message: 'Archivos subidos', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteAdjuntoForEstudiante(req: Request, res: Response, next: NextFunction) {
+    try {
+      await ClassroomEntregaService.deleteAdjuntoWithFile(req.params.adjuntoId as string);
+      res.json({ success: true, message: 'Adjunto eliminado', data: null, error: null });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
