@@ -22,7 +22,7 @@ import UsuarioService from "./UsuarioService";
 class MatriculaService {
  
   async create(form: FormularioMatriculaSchema) {
-    const no_documento = form.no_documento ?? form.no_documento ?? null;
+    const no_documento = form.no_documento ?? null;
     // obtener id del rol 'estudiante' desde la tabla rol
     const rol = await RolService.findByName("estudiante");
     const id_rol = rol?.id;
@@ -70,47 +70,27 @@ class MatriculaService {
     ),
   };
 
-    // Accept nested payloads: { usuario: {...}, estudiante: {...} } or flat
-    let usuarioPayload = {};
-
-    // If usuario nested object not provided, pick top-level usuario fields from data
-    if (!usuarioPayload || Object.keys(usuarioPayload).length === 0) {
-      const possibleKeys = [
-        "nombres",
-        "apellido1",
-        "apellido2",
-        "contacto1",
-        "contacto2",
-        "email",
-        "id_rol",
-        "id_tipo_documento",
-        "no_documento",
-        "fecha_expedicion_documento",
-      ];
-
-      usuarioPayload = {};
-
-      for (const k of possibleKeys) {
-        if (k in payload) (usuarioPayload as any)[k] = (payload as any)[k];
-      }
+    const usuarioKeys = [
+      "nombres", "apellido1", "apellido2", "contacto1", "contacto2",
+      "email", "id_rol", "id_tipo_documento", "no_documento", "fecha_expedicion_documento",
+    ];
+    const usuarioPayload: Record<string, any> = {};
+    for (const k of usuarioKeys) {
+      if (k in payload) usuarioPayload[k] = (payload as any)[k];
     }
 
     // Crear usuario via UsuarioService y obtener id_usuario creado
     const userResult: { plainPassword: string; id: string } | null = await UsuarioService.create(usuarioPayload);
-    console.log('id para crear estudiante:', userResult);
 
     const id_usuario = userResult.id;
 
-    // Build payload for estudiante repository. EstudianteRepository expects `id_usuario` snake_case
     const payloadToCreateStudent = {
       id_usuario,
       ...payload,
       ...payloadFiles,
     };
-    // crear registro en estudiante con id_usuario recién creado, obtener id_estudiante
     const idEstudiante = await EstudianteService.create(payloadToCreateStudent);
-    console.log('id estudiante: ' + idEstudiante);
-    
+
     // crear registro en estudiante_matricula con id_estudiante recién creado
 
     let estudianteMatricula = {
@@ -124,8 +104,7 @@ class MatriculaService {
     };
 
     const idCreatedEstudianteMatricula = await EstudianteMatriculaService.create(estudianteMatricula);
-    console.log('id estudiante_matricula: ' + idCreatedEstudianteMatricula);
-    
+
     // crear registro en grados_por_matricula con id_estudiante_matricula recién creado
 
     const gradosPayload = payload.id_grado_educacion.map((idGrado: string) => [
@@ -150,8 +129,7 @@ class MatriculaService {
     };
 
     const idObligacionPago = await ObligacionPagoService.create(obligacionPago);
-    console.log('id obligación_pago: ' + idObligacionPago);
-    
+
     // crear registro en pago con id_obligacion_pago recién creado
 
     let pago = {
@@ -168,7 +146,7 @@ class MatriculaService {
     await PagoService.create(pago);
 
     await EmailService.sendMail(
-      'juanpabloqb1990@gmail.com',
+      payload.email,
       'Matrícula registrada exitosamente',
       matriculaExitosa(userResult.plainPassword)
     );

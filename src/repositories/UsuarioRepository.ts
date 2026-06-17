@@ -1,15 +1,10 @@
 import pool from '../config/database';
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
-import type { Usuario } from '../models/usuario';
+import type { Usuario, CreateUsuarioDto, UpdateUsuarioDto } from '../models/usuario';
 import { UsuarioEstado } from '../enums/usuario.enum';
 
 class UsuarioRepository {
-  async findAll() {
-    const [rows] = await pool.query('SELECT * FROM usuario ORDER BY id');
-    return mapRowsToEntities<Usuario>(rows as any[]);
-  }
-
   async findById(id: string) {
     const [rows] = await pool.query('SELECT * FROM usuario WHERE id = ?', [id]);
     const row = (rows as any[])[0] || null;
@@ -56,26 +51,22 @@ class UsuarioRepository {
   }
 
   async findAllAdmin() {
-    try {
-      const sql = `
-        SELECT u.id, u.nombres, u.apellido1, u.apellido2,
-               u.contacto1, u.contacto2, u.email, u.estado,
-               u.id_tipo_documento, u.id_rol, u.no_documento, u.fecha_expedicion_documento,
-               r.nombre AS nombre_rol, td.nombre AS nombre_tipo_documento
-        FROM usuario u
-        LEFT JOIN rol r ON u.id_rol = r.id
-        LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id
-        WHERE r.nombre != 'estudiante'
-        ORDER BY u.nombres ASC
-      `;
-      const [rows] = await pool.query(sql);
-      return mapRowsToEntities<any>(rows as any[]);
-    } catch (error) {
-      throw error;
-    }
+    const sql = `
+      SELECT u.id, u.nombres, u.apellido1, u.apellido2,
+             u.contacto1, u.contacto2, u.email, u.estado,
+             u.id_tipo_documento, u.id_rol, u.no_documento, u.fecha_expedicion_documento,
+             r.nombre AS nombre_rol, td.nombre AS nombre_tipo_documento
+      FROM usuario u
+      LEFT JOIN rol r ON u.id_rol = r.id
+      LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id
+      WHERE r.nombre != 'estudiante'
+      ORDER BY u.nombres ASC
+    `;
+    const [rows] = await pool.query(sql);
+    return mapRowsToEntities<any>(rows as any[]);
   }
 
-  async create(data: any) {
+  async create(data: CreateUsuarioDto) {
     const {
       nombres,
       apellido1,
@@ -91,33 +82,28 @@ class UsuarioRepository {
     } = data;
 
     const id = generatePrimaryKey();
-
-    try {
-      await pool.execute(
-        'INSERT INTO usuario (id, nombres, apellido1, apellido2, contacto1, contacto2, email, password, id_rol, estado, id_tipo_documento, no_documento, fecha_expedicion_documento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-        [
-          id,
-          nombres,
-          apellido1,
-          apellido2,
-          contacto1,
-          contacto2 ?? null,
-          email,
-          password,
-          id_rol ?? null,
-          UsuarioEstado.ACTIVO,
-          id_tipo_documento ?? null,
-          no_documento ?? null,
-          fecha_expedicion_documento ?? null,
-        ]
-      );
-      return { id };
-    } catch (error) {
-      throw error;
-    }
+    await pool.execute(
+      'INSERT INTO usuario (id, nombres, apellido1, apellido2, contacto1, contacto2, email, password, id_rol, estado, id_tipo_documento, no_documento, fecha_expedicion_documento) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [
+        id,
+        nombres,
+        apellido1,
+        apellido2,
+        contacto1,
+        contacto2 ?? null,
+        email,
+        password,
+        id_rol ?? null,
+        UsuarioEstado.ACTIVO,
+        id_tipo_documento ?? null,
+        no_documento ?? null,
+        fecha_expedicion_documento ?? null,
+      ]
+    );
+    return { id };
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdateUsuarioDto) {
     const {
       nombres,
       apellido1,

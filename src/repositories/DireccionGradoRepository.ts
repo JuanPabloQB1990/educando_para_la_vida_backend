@@ -12,10 +12,10 @@ class DireccionGradoRepository {
               ae.anio,
               b.nombre AS nombre_bloque
        FROM direccion_grado dg
-       JOIN grado_educacion g ON dg.id_grado_educacion = g.id
+  LEFT JOIN grado_educacion g ON dg.id_grado_educacion = g.id
        JOIN usuario u ON dg.id_usuario = u.id
        JOIN anio_electivo ae ON dg.id_anio_electivo = ae.id
-       LEFT JOIN bloque b ON dg.id_bloque = b.id
+  LEFT JOIN bloque b ON dg.id_bloque = b.id
        ORDER BY ae.anio DESC, g.nombre`
     );
     return mapRowsToEntities<DireccionGrado>(rows as any[]);
@@ -42,10 +42,12 @@ class DireccionGradoRepository {
   async findByProfesor(idUsuario: string, idAnioElectivo?: string) {
     let sql = `SELECT dg.*,
                       g.nombre AS nombre_grado,
-                      ae.anio
+                      ae.anio,
+                      b.nombre AS nombre_bloque
                FROM direccion_grado dg
-               JOIN grado_educacion g ON dg.id_grado_educacion = g.id
+          LEFT JOIN grado_educacion g ON dg.id_grado_educacion = g.id
                JOIN anio_electivo ae ON dg.id_anio_electivo = ae.id
+          LEFT JOIN bloque b ON dg.id_bloque = b.id
                WHERE dg.id_usuario = ?`;
     const params: any[] = [idUsuario];
     if (idAnioElectivo) {
@@ -64,10 +66,10 @@ class DireccionGradoRepository {
               ae.anio,
               b.nombre AS nombre_bloque
        FROM direccion_grado dg
-       JOIN grado_educacion g ON dg.id_grado_educacion = g.id
+  LEFT JOIN grado_educacion g ON dg.id_grado_educacion = g.id
        JOIN usuario u ON dg.id_usuario = u.id
        JOIN anio_electivo ae ON dg.id_anio_electivo = ae.id
-       LEFT JOIN bloque b ON dg.id_bloque = b.id
+  LEFT JOIN bloque b ON dg.id_bloque = b.id
        WHERE dg.id = ?`,
       [id]
     );
@@ -75,7 +77,7 @@ class DireccionGradoRepository {
     return row ? mapRowToEntity<DireccionGrado>(row) : null;
   }
 
-  async create(data: { idGradoEducacion: string; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
+  async create(data: { idGradoEducacion: string | null; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
     const id = generatePrimaryKey();
     await pool.execute(
       'INSERT INTO direccion_grado (id, id_grado_educacion, id_usuario, id_anio_electivo, id_bloque) VALUES (?, ?, ?, ?, ?)',
@@ -92,7 +94,7 @@ class DireccionGradoRepository {
     return result;
   }
 
-  async update(id: string, data: { idGradoEducacion: string; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
+  async update(id: string, data: { idGradoEducacion: string | null; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
     const [result] = await pool.execute(
       'UPDATE direccion_grado SET id_grado_educacion = ?, id_usuario = ?, id_anio_electivo = ?, id_bloque = ? WHERE id = ?',
       [data.idGradoEducacion, data.idUsuario, data.idAnioElectivo, data.idBloque ?? null, id]

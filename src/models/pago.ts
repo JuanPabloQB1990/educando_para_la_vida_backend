@@ -9,6 +9,8 @@ export interface PagoRow {
   fecha_verificacion?: string | null;
 }
 
+export type CreatePagoDto = Omit<PagoRow, 'id'>;
+
 export interface Pago {
   id: string;
   idObligacionPago: string;

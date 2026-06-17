@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { generateSecurePassword } from '../utils/generatePassword';
 import { EmailService } from '../utils/sendEmail';
 import { creacionUsuario } from '../templates/templatesSendEmail';
+import type { CreateUsuarioDto, UpdateUsuarioDto } from '../models/usuario';
 
 class UsuarioService {
   async list() {
@@ -13,12 +14,11 @@ class UsuarioService {
     return await UsuarioRepository.findById(id);
   }
 
-  async create(data: any) {
+  async create(data: Omit<CreateUsuarioDto, 'password'>) {
     const plainPassword = generateSecurePassword();
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
-    const payload = { ...data, password: hashedPassword };
-    const res: any = await UsuarioRepository.create(payload);
-    const id = res?.id;
+    const payload: CreateUsuarioDto = { ...data, password: hashedPassword };
+    const { id } = await UsuarioRepository.create(payload);
 
     const payloadEmail = { 
       nombres: data.nombres,
@@ -29,7 +29,7 @@ class UsuarioService {
     };
     try {
       await EmailService.sendMail(
-        'juanpabloqb1990@gmail.com',
+        data.email,
         'Bienvenido — Credenciales de acceso al sistema Educando para la Vida',
         creacionUsuario(payloadEmail)
       );
@@ -40,7 +40,7 @@ class UsuarioService {
     return { plainPassword, id };
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: UpdateUsuarioDto) {
     return await UsuarioRepository.update(id, data);
   }
 

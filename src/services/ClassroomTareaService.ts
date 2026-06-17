@@ -23,7 +23,7 @@ class ClassroomTareaService {
     return ClassroomTareaRepository.findById(id);
   }
 
-  async create(data: { idCargaAcademica: string; idPeriodo: string; titulo: string; instrucciones: string; fechaLimite: string }) {
+  async create(data: { idCargaAcademica: string; idPeriodo: string | null; titulo: string; instrucciones: string; fechaLimite: string }) {
     const res = await ClassroomTareaRepository.create(data);
     return ClassroomTareaRepository.findById(res.id);
   }

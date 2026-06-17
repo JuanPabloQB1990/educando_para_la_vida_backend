@@ -1,1 +1,0 @@
-ALTER TABLE estudiante_matricula ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP;

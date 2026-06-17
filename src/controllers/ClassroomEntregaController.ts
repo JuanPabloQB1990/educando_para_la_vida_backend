@@ -93,7 +93,7 @@ class ClassroomEntregaController {
       if (!files || files.length === 0) {
         return res.status(400).json({ success: false, message: 'Se requiere al menos un archivo', data: null, error: 'Dato faltante' });
       }
-      const data = await ClassroomEntregaService.uploadAdjuntosForEstudiante(req.params.id as string, files);
+      const data = await ClassroomEntregaService.uploadAdjuntosForEstudiante(req.user!.id, req.params.id as string, files);
       res.status(201).json({ success: true, message: 'Archivos subidos', data, error: null });
     } catch (error) {
       next(error);

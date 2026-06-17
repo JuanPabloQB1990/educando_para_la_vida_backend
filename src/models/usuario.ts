@@ -14,6 +14,9 @@ export interface UsuarioRow {
   fecha_expedicion_documento?: string | null;
 }
 
+export type CreateUsuarioDto = Omit<UsuarioRow, 'id' | 'estado'>;
+export type UpdateUsuarioDto = Omit<UsuarioRow, 'id' | 'password'>;
+
 export interface Usuario {
   id: string;
   nombres: string;

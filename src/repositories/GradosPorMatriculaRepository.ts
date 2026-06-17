@@ -14,6 +14,14 @@ class GradosPorMatriculaRepository {
     return row ? mapRowToEntity<GradosPorMatricula>(row) : null;
   }
 
+  async create(id_estudiante_matricula: string, id_grado_educacion: string, estado: string) {
+    const [result] = await pool.execute(
+      'INSERT INTO grados_por_matricula (id_estudiante_matricula, id_grado_educacion, estado) VALUES (?, ?, ?)',
+      [id_estudiante_matricula, id_grado_educacion, estado]
+    );
+    return result;
+  }
+
   async createMany(values: any[]) {
     try {
       const sql = `INSERT INTO grados_por_matricula (id_estudiante_matricula, id_grado_educacion, estado) VALUES ?`;

@@ -7,11 +7,10 @@ import UsuarioController from '../controllers/UsuarioController';
 import RolController from '../controllers/RolController';
 
 const router = express.Router();
-// recordar pegar esto en create usuario 0> verifyToken, requireRoles('admin'),
 // Usuario — admin only
-router.get('/usuario', verifyToken, requireRoles('admin'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.list(req, res, next)));
+router.get('/usuario', verifyToken, requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.list(req, res, next)));
 router.get('/usuario/:id', verifyToken, requireRoles('admin'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.get(req, res, next)));
-router.post('/usuario',  asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.create(req, res, next)));
+router.post('/usuario', verifyToken, requireRoles('admin'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.create(req, res, next)));
 router.put('/usuario/:id', verifyToken, requireRoles('admin'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.update(req, res, next)));
 router.delete('/usuario/:id', verifyToken, requireRoles('admin'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => UsuarioController.delete(req, res, next)));
 

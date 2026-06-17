@@ -14,7 +14,7 @@ class GradosPorMatriculaController {
   async get(req: Request, res: Response) {
     try {
       const id_ep = Array.isArray(req.params.id_ep) ? req.params.id_ep[0] ?? '' : (req.params.id_ep ?? '');
-      const id_g = Number(req.params.id_g);
+      const id_g = String(req.params.id_g);
       const data = await GradosPorMatriculaService.get(id_ep, id_g);
       if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
       res.json({ success: true, data, error: null });
@@ -35,7 +35,7 @@ class GradosPorMatriculaController {
   async update(req: Request, res: Response) {
     try {
       const id_ep = Array.isArray(req.params.id_ep) ? req.params.id_ep[0] ?? '' : (req.params.id_ep ?? '');
-      const id_g = Number(req.params.id_g);
+      const id_g = String(req.params.id_g);
       await GradosPorMatriculaService.update(id_ep, id_g, req.body);
       res.json({ success: true, data: null, error: null });
     } catch (error) {
@@ -46,7 +46,7 @@ class GradosPorMatriculaController {
   async delete(req: Request, res: Response) {
     try {
       const id_ep = Array.isArray(req.params.id_ep) ? req.params.id_ep[0] ?? '' : (req.params.id_ep ?? '');
-      const id_g = Number(req.params.id_g);
+      const id_g = String(req.params.id_g);
       await GradosPorMatriculaService.delete(id_ep, id_g);
       res.json({ success: true, data: null, error: null });
     } catch (error) {

@@ -27,11 +27,13 @@ class CargaAcademicaRepository {
     let sql = `SELECT ca.*,
                       m.nombre AS nombre_materia,
                       g.nombre AS nombre_grado,
-                      ae.anio
+                      ae.anio,
+                      b.nombre AS nombre_bloque
                FROM carga_academica ca
                JOIN materia m ON ca.id_materia = m.id
                JOIN grado_educacion g ON ca.id_grado_educacion = g.id
                JOIN anio_electivo ae ON ca.id_anio_electivo = ae.id
+               LEFT JOIN bloque b ON ca.id_bloque = b.id
                WHERE ca.id_usuario = ?`;
     const params: any[] = [idUsuario];
     if (idAnioElectivo) {

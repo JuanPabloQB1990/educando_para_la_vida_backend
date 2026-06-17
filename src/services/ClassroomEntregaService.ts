@@ -1,6 +1,7 @@
 import path from 'path';
 import ClassroomEntregaRepository from '../repositories/ClassroomEntregaRepository';
 import EstudianteRepository from '../repositories/EstudianteRepository';
+import ObligacionPagoRepository from '../repositories/ObligacionPagoRepository';
 import { ClassroomEntregaEstado } from '../enums/classroomEntrega.enum';
 import { uploadClassroomFile, deleteFileFromDrive } from '../utils/uploadFIleToGoogleDrive';
 import { AppError } from '../error/AppError';
@@ -65,6 +66,10 @@ class ClassroomEntregaService {
     if (!estudiante) throw new AppError(404, 'Estudiante no encontrado');
 
     const idEstudiante = (estudiante as any).id;
+
+    const tieneVencida = await ObligacionPagoRepository.hasVencidoByEstudiante(idEstudiante);
+    if (tieneVencida) throw new AppError(403, 'Tienes obligaciones de pago vencidas. Regulariza tu situación antes de entregar tareas.');
+
     const existing = await ClassroomEntregaRepository.findByEstudianteAndTarea(idEstudiante, idClassroomTarea);
     if (existing) throw new AppError(409, 'Ya existe una entrega para esta tarea');
 
@@ -76,7 +81,13 @@ class ClassroomEntregaService {
     return ClassroomEntregaRepository.findById(res.id);
   }
 
-  async uploadAdjuntosForEstudiante(idEntrega: string, files: Express.Multer.File[]) {
+  async uploadAdjuntosForEstudiante(idUsuario: string, idEntrega: string, files: Express.Multer.File[]) {
+    const estudiante = await EstudianteRepository.findByIdUsuario(idUsuario);
+    if (!estudiante) throw new AppError(404, 'Estudiante no encontrado');
+
+    const tieneVencida = await ObligacionPagoRepository.hasVencidoByEstudiante((estudiante as any).id);
+    if (tieneVencida) throw new AppError(403, 'Tienes obligaciones de pago vencidas. Regulariza tu situación antes de subir archivos.');
+
     const entrega = await ClassroomEntregaRepository.findById(idEntrega);
     if (!entrega) throw new AppError(404, 'Entrega no encontrada');
 

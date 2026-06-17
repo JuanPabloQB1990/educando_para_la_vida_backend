@@ -53,13 +53,13 @@ class AuthService {
     };
 
     const accessToken = jwt.sign(payload, getJwtSecret(), {
-      expiresIn: (process.env.JWT_EXPIRES_IN as any) ?? '3h',
+      expiresIn: process.env.JWT_EXPIRES_IN || '3h',
     });
 
     const refreshToken = jwt.sign(
       { id: usuario.id },
       getJwtRefreshSecret(),
-      { expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN as any) ?? '7d' }
+      { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d' }
     );
 
     const refreshExpiracion = new Date();
@@ -116,7 +116,7 @@ class AuthService {
     };
 
     const accessToken = jwt.sign(payload, getJwtSecret(), {
-      expiresIn: (process.env.JWT_EXPIRES_IN as any) ?? '3h',
+      expiresIn: process.env.JWT_EXPIRES_IN || '3h',
     });
 
     return { accessToken };
@@ -141,7 +141,7 @@ class AuthService {
     });
 
     await EmailService.sendMail(
-      'juanpabloqb1990@gmail.com',
+      usuario.email!,
       'Recuperación de contraseña - Educando Para La Vida',
       recuperacionPassword(codigo)
     );
@@ -160,9 +160,8 @@ class AuthService {
     if (!usuario) throw new AppError(400, 'Datos inválidos');
 
     const valido = await AuthRepository.verificarCodigoRecuperacion(usuario.id, codigo);
-    
     if (!valido) throw new AppError(400, 'Código inválido o expirado');
-    console.log(nuevaPassword);
+
     const hash = await bcrypt.hash(nuevaPassword, 10);
     await UsuarioRepository.updatePassword(usuario.id, hash);
     await AuthRepository.eliminarCodigoRecuperacion(usuario.id);

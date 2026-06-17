@@ -23,10 +23,10 @@ class ClassroomTareaController {
 
   async create(req: Request, res: Response) {
     const { idCargaAcademica, idPeriodo, titulo, instrucciones, fechaLimite } = req.body;
-    if (!idCargaAcademica || !idPeriodo || !titulo || !instrucciones || !fechaLimite) {
+    if (!idCargaAcademica || !titulo || !instrucciones || !fechaLimite) {
       return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await ClassroomTareaService.create({ idCargaAcademica, idPeriodo, titulo, instrucciones, fechaLimite });
+    const data = await ClassroomTareaService.create({ idCargaAcademica, idPeriodo: idPeriodo || null, titulo, instrucciones, fechaLimite });
     res.status(201).json({ success: true, message: 'Tarea creada', data, error: null });
   }
 

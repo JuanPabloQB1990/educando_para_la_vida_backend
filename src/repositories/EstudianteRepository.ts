@@ -3,7 +3,13 @@ import pool from '../config/database';
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
 import type { Estudiante } from '../models/estudiante';
-import { object } from 'joi';
+
+export interface EstudianteAdminFilters {
+  noDocumento?: string;
+  padreCedula?: string;
+  madreCedula?: string;
+  acudienteCedula?: string;
+}
 
 /** Campos de identificación del documento; viven en `usuario`, no en `estudiante`. */
 const OMIT_FROM_ESTUDIANTE = new Set([
@@ -130,8 +136,6 @@ class EstudianteRepository {
       await conn.commit();
       return id;
     } catch (err) {
-      console.log(err);
-      
       await conn.rollback();
       throw err;
     } finally {
@@ -155,6 +159,47 @@ class EstudianteRepository {
   async remove(id: string) {
     const [result] = await pool.execute('DELETE FROM estudiante WHERE id = ?', [id]);
     return result;
+  }
+
+  async findAllForAdmin(filters: EstudianteAdminFilters) {
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+
+    if (filters.noDocumento) {
+      conditions.push('u.no_documento LIKE ?');
+      params.push(`%${filters.noDocumento}%`);
+    }
+    if (filters.padreCedula) {
+      conditions.push('e.padre_cedula LIKE ?');
+      params.push(`%${filters.padreCedula}%`);
+    }
+    if (filters.madreCedula) {
+      conditions.push('e.madre_cedula LIKE ?');
+      params.push(`%${filters.madreCedula}%`);
+    }
+    if (filters.acudienteCedula) {
+      conditions.push('e.acudiente_cedula LIKE ?');
+      params.push(`%${filters.acudienteCedula}%`);
+    }
+
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const [rows] = await pool.query(
+      `SELECT e.id, e.id_usuario, e.file_foto, e.padre_cedula, e.madre_cedula, e.acudiente_cedula,
+              u.id AS usuario_id, u.nombres AS usuario_nombres, u.apellido1 AS usuario_apellido1,
+              u.apellido2 AS usuario_apellido2, u.contacto1 AS usuario_contacto1,
+              u.contacto2 AS usuario_contacto2, u.email AS usuario_email,
+              u.id_rol AS usuario_id_rol, u.estado AS usuario_estado,
+              u.id_tipo_documento AS usuario_id_tipo_documento,
+              u.no_documento AS usuario_no_documento,
+              u.fecha_expedicion_documento AS usuario_fecha_expedicion_documento
+       FROM estudiante e
+       LEFT JOIN usuario u ON e.id_usuario = u.id
+       ${where}
+       ORDER BY u.nombres ASC`,
+      params
+    );
+    return mapRowsToEntities<any>(rows as any[]);
   }
 
   async findByIdUsuario(idUsuario: string) {

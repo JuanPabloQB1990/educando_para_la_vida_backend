@@ -3,8 +3,6 @@ import AutoevaluacionService from '../services/AutoevaluacionService';
 
 class AutoevaluacionController {
   async upsert(req: Request, res: Response, next: NextFunction) {
-    console.log(req.body);
-    
     try {
       const { idEstudiante, idPeriodo, idGradoEducacion, nota, observacion } = req.body;
       if (!idEstudiante || !idPeriodo || !idGradoEducacion || nota === undefined) {

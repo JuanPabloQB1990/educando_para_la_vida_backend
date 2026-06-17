@@ -18,7 +18,9 @@ router.put('/rubro/:id', requireRoles('admin', 'secretari@'), asyncHandler((req:
 router.delete('/rubro/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => RubroController.delete(req, res)));
 
 // Estudiante
+router.get('/estudiante/admin', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudianteController.listAdmin(req, res, next)));
 router.get('/estudiante', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => EstudianteController.list(req, res)));
+router.get('/estudiante/:id/historial', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => EstudianteController.getHistorial(req, res, next)));
 router.get('/estudiante/:id', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => EstudianteController.get(req, res)));
 router.post('/estudiante', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => EstudianteController.create(req, res)));
 router.put('/estudiante/:id', requireRoles('admin', 'secretari@', 'profesor(a)'), asyncHandler((req: express.Request, res: express.Response) => EstudianteController.update(req, res)));
@@ -56,12 +58,12 @@ router.put('/obligacion_pago/:id', requireRoles('admin', 'secretari@'), asyncHan
 router.delete('/obligacion_pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => ObligacionPagoController.delete(req, res)));
 
 // Pago
-router.get('/pago/admin', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.listAdmin(req, res)));
-router.patch('/pago/:id/verificar', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.verificar(req, res)));
-router.get('/pago', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.list(req, res)));
-router.get('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.get(req, res)));
-router.post('/pago', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.create(req, res)));
-router.put('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.update(req, res)));
-router.delete('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response) => PagoController.delete(req, res)));
+router.get('/pago/admin', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.listAdmin(req, res, next)));
+router.patch('/pago/:id/verificar', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.verificar(req, res, next)));
+router.get('/pago', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.list(req, res, next)));
+router.get('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.get(req, res, next)));
+router.post('/pago', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.create(req, res, next)));
+router.put('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.update(req, res, next)));
+router.delete('/pago/:id', requireRoles('admin', 'secretari@'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => PagoController.delete(req, res, next)));
 
 export default router;

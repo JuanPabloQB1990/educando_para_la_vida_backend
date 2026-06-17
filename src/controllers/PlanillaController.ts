@@ -17,8 +17,6 @@ class PlanillaController {
       idAnioElectivo as string,
       idPeriodo as string
     );
-    console.log(data);
-    
     res.json({ success: true, message: 'Planilla académica obtenida', data, error: null });
   }
 }

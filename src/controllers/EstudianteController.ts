@@ -1,7 +1,27 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import EstudianteService from '../services/EstudianteService';
 
 class EstudianteController {
+  async listAdmin(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { noDocumento, padreCedula, madreCedula, acudienteCedula } = req.query as Record<string, string | undefined>;
+      const data = await EstudianteService.listAdmin({ noDocumento, padreCedula, madreCedula, acudienteCedula });
+      res.json({ success: true, message: 'Estudiantes matriculados obtenidos', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getHistorial(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
+      const data = await EstudianteService.getHistorial(id);
+      res.json({ success: true, message: 'Historial de matrículas obtenido', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async list(req: Request, res: Response) {
     try {
       const data = await EstudianteService.list();

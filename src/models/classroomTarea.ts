@@ -1,7 +1,7 @@
 export interface ClassroomTareaRow {
   id: string;
   id_carga_academica: string;
-  id_periodo: string;
+  id_periodo: string | null;
   titulo: string;
   instrucciones: string;
   fecha_limite: Date;
@@ -14,7 +14,7 @@ export interface ClassroomTareaRow {
 export interface ClassroomTarea {
   id: string;
   idCargaAcademica: string;
-  idPeriodo: string;
+  idPeriodo: string | null;
   titulo: string;
   instrucciones: string;
   fechaLimite: Date;

@@ -17,12 +17,12 @@ class DireccionGradoService {
     return DireccionGradoRepository.findById(id);
   }
 
-  async create(data: { idGradoEducacion: string; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
+  async create(data: { idGradoEducacion: string | null; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
     const res = await DireccionGradoRepository.create(data);
     return DireccionGradoRepository.findById(res.id);
   }
 
-  async update(id: string, data: { idGradoEducacion: string; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
+  async update(id: string, data: { idGradoEducacion: string | null; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {
     await DireccionGradoRepository.update(id, data);
     return DireccionGradoRepository.findById(id);
   }

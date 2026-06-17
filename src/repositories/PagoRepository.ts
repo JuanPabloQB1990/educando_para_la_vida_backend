@@ -1,6 +1,6 @@
 import pool from '../config/database';
 import { mapRowsToEntities, mapRowToEntity } from '../models/dbMappers';
-import type { Pago } from '../models/pago';
+import type { Pago, CreatePagoDto } from '../models/pago';
 import { generatePrimaryKey } from '../utils/generatePrimaryKey';
 
 export interface PagoAdminFilters {
@@ -201,7 +201,7 @@ class PagoRepository {
     return row ? mapRowToEntity<Pago>(row) : null;
   }
 
-  async create(data: any) {
+  async create(data: CreatePagoDto) {
     const { id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion } = data;
     const id = generatePrimaryKey();
     await pool.execute('INSERT INTO pago (id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion) VALUES (?,?,?,?,?,?,?,?)', [id, id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion]);
@@ -215,7 +215,7 @@ class PagoRepository {
     );
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: CreatePagoDto) {
     const { id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion } = data;
     const [result] = await pool.execute('UPDATE pago SET id_obligacion_pago=?, monto_pagado=?, fecha_pago_real=?, file_comprobante=?, observaciones=?, estado=?, fecha_verificacion=? WHERE id=?', [id_obligacion_pago, monto_pagado, fecha_pago_real, file_comprobante, observaciones, estado, fecha_verificacion, id]);
     return result;

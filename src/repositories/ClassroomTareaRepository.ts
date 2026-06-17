@@ -14,7 +14,7 @@ class ClassroomTareaRepository {
        JOIN carga_academica ca ON ct.id_carga_academica = ca.id
        JOIN materia m ON ca.id_materia = m.id
        JOIN grado_educacion g ON ca.id_grado_educacion = g.id
-       JOIN periodo p ON ct.id_periodo = p.id
+  LEFT JOIN periodo p ON ct.id_periodo = p.id
        WHERE ct.id_carga_academica = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idCargaAcademica]
@@ -30,7 +30,7 @@ class ClassroomTareaRepository {
        FROM classroom_tarea ct
        JOIN carga_academica ca ON ct.id_carga_academica = ca.id
        JOIN materia m ON ca.id_materia = m.id
-       JOIN periodo p ON ct.id_periodo = p.id
+  LEFT JOIN periodo p ON ct.id_periodo = p.id
        WHERE ca.id_grado_educacion = ? AND ca.id_anio_electivo = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idGradoEducacion, idAnioElectivo]
@@ -48,7 +48,7 @@ class ClassroomTareaRepository {
        JOIN carga_academica ca ON ct.id_carga_academica = ca.id
        JOIN materia m ON ca.id_materia = m.id
        JOIN grado_educacion g ON ca.id_grado_educacion = g.id
-       JOIN periodo p ON ct.id_periodo = p.id
+  LEFT JOIN periodo p ON ct.id_periodo = p.id
        WHERE ct.id = ?`,
       [id]
     );
@@ -56,11 +56,11 @@ class ClassroomTareaRepository {
     return row ? mapRowToEntity<ClassroomTarea>(row) : null;
   }
 
-  async create(data: { idCargaAcademica: string; idPeriodo: string; titulo: string; instrucciones: string; fechaLimite: string }) {
+  async create(data: { idCargaAcademica: string; idPeriodo: string | null; titulo: string; instrucciones: string; fechaLimite: string }) {
     const id = generatePrimaryKey();
     await pool.execute(
       'INSERT INTO classroom_tarea (id, id_carga_academica, id_periodo, titulo, instrucciones, fecha_limite, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-      [id, data.idCargaAcademica, data.idPeriodo, data.titulo, data.instrucciones, data.fechaLimite]
+      [id, data.idCargaAcademica, data.idPeriodo || null, data.titulo, data.instrucciones, data.fechaLimite]
     );
     return { id };
   }
@@ -119,7 +119,7 @@ class ClassroomTareaRepository {
        JOIN carga_academica ca ON ct.id_carga_academica = ca.id
        JOIN materia m ON ca.id_materia = m.id
        JOIN grado_educacion g ON ca.id_grado_educacion = g.id
-       JOIN periodo p ON ct.id_periodo = p.id
+  LEFT JOIN periodo p ON ct.id_periodo = p.id
        WHERE ca.id_grado_educacion = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idGradoEducacion]
@@ -137,7 +137,7 @@ class ClassroomTareaRepository {
        JOIN carga_academica ca ON ct.id_carga_academica = ca.id
        JOIN materia m ON ca.id_materia = m.id
        JOIN grado_educacion g ON ca.id_grado_educacion = g.id
-       JOIN periodo p ON ct.id_periodo = p.id
+  LEFT JOIN periodo p ON ct.id_periodo = p.id
        WHERE ca.id_bloque = ?
        ORDER BY ct.fecha_creacion DESC`,
       [idBloque]

@@ -3,7 +3,6 @@ import type { Application } from 'express';
 import cors from 'cors';
 import { errorHandler } from './middleware/errorHandler';
 import { verifyToken } from './middleware/auth';
-import { requireRoles } from './middleware/roles';
 import setupDatabase from './database/setup';
 import routerAuth from './routes/authRoutes';
 import routerUsuario from './routes/usuarioRoutes';
@@ -14,7 +13,6 @@ import routerGestion from './routes/gestionRoutes';
 import routerMatricula from './routes/matriculaRoutes';
 import routerEstudiante from './routes/estudianteRoutes';
 import config from './config/environment.js';
-import { EmailService } from './utils/sendEmail';
 import { startNotificacionPagoJob } from './jobs/notificacionPagoJob';
 
 const app: Application = express();
@@ -24,7 +22,7 @@ async function bootstrap() {
   await setupDatabase();
 
   // Middleware
-  app.use(cors());
+  app.use(cors({ origin: config.frontendUrl, credentials: true }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -56,7 +54,7 @@ async function bootstrap() {
     res.status(404).json({
       success: false,
       data: null,
-      error: { message: 'Route not found' },
+      error: { message: 'Ruta no encontrada' },
     });
   });
 
@@ -74,6 +72,6 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  console.error('Failed to start server:', err);
+  console.error('Fallo al iniciar servidor:', err);
   process.exit(1);
 });

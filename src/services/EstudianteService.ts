@@ -1,4 +1,6 @@
-import EstudianteRepository from "../repositories/EstudianteRepository";
+import EstudianteRepository, { type EstudianteAdminFilters } from "../repositories/EstudianteRepository";
+import EstudianteMatriculaRepository from "../repositories/EstudianteMatriculaRepository";
+import GradosPorMatriculaRepository from "../repositories/GradosPorMatriculaRepository";
 import UsuarioRepository from "../repositories/UsuarioRepository";
 
 class EstudianteService {
@@ -67,6 +69,21 @@ class EstudianteService {
     // update estudiante table with estudiante-specific fields
     await EstudianteRepository.update(id, payload);
     return await EstudianteRepository.findById(id);
+  }
+
+  async listAdmin(filters: EstudianteAdminFilters) {
+    return EstudianteRepository.findAllForAdmin(filters);
+  }
+
+  async getHistorial(idEstudiante: string) {
+    const matriculas = await EstudianteMatriculaRepository.findAllByEstudiante(idEstudiante);
+    const result = await Promise.all(
+      matriculas.map(async (m: any) => ({
+        matricula: m,
+        grados: await GradosPorMatriculaRepository.findByEstudianteMatricula(m.id),
+      }))
+    );
+    return result;
   }
 
   async delete(id: string) {

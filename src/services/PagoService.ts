@@ -1,4 +1,5 @@
 import PagoRepository, { type PagoAdminFilters } from '../repositories/PagoRepository';
+import type { CreatePagoDto } from '../models/pago';
 
 class PagoService {
   async list() {
@@ -25,14 +26,12 @@ class PagoService {
     return await PagoRepository.findById(id);
   }
 
-  async create(data: any) {
-    const res: any = await PagoRepository.create(data);
-    const id = res?.id;
-    if (id) return id;
-    return null
+  async create(data: CreatePagoDto) {
+    const { id } = await PagoRepository.create(data);
+    return id ?? null;
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: CreatePagoDto) {
     await PagoRepository.update(id, data);
     return await PagoRepository.findById(id);
   }

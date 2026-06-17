@@ -18,19 +18,19 @@ class DireccionGradoController {
 
   async create(req: Request, res: Response) {
     const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
-    if (!idGradoEducacion || !idUsuario || !idAnioElectivo) {
-      return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
+    if (!idUsuario || !idAnioElectivo) {
+      return res.status(400).json({ success: false, message: 'Profesor y año electivo son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await DireccionGradoService.create({ idGradoEducacion, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
+    const data = await DireccionGradoService.create({ idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
     res.status(201).json({ success: true, message: 'Dirección de grado creada', data, error: null });
   }
 
   async update(req: Request, res: Response) {
     const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
-    if (!idGradoEducacion || !idUsuario || !idAnioElectivo) {
-      return res.status(400).json({ success: false, message: 'Todos los campos son requeridos', data: null, error: 'Datos faltantes' });
+    if (!idUsuario || !idAnioElectivo) {
+      return res.status(400).json({ success: false, message: 'Profesor y año electivo son requeridos', data: null, error: 'Datos faltantes' });
     }
-    const data = await DireccionGradoService.update(req.params.id as string, { idGradoEducacion, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
+    const data = await DireccionGradoService.update(req.params.id as string, { idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
     res.json({ success: true, message: 'Dirección de grado actualizada', data, error: null });
   }
 

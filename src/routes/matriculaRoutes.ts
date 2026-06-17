@@ -66,9 +66,6 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
             ? Object.values(reqFiles).flat()
             : [];
         const receivedFileNames = files.map((file: any) => file.fieldname);
-        if (receivedFileNames.length > 0 && !receivedFileNames.includes('file_certificado_grados')) {
-            console.log('Archivos recibidos sin fieldname file_certificado_grados:', receivedFileNames);
-        }
 		for (const file of files as any[]) {
 			if (file && file.fieldname) {
 				body[file.fieldname] = file.originalname || file.filename || 'uploaded_file';
@@ -171,9 +168,6 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 		const zErr = err as any;
 		const issues = Array.isArray(zErr?.issues) ? zErr.issues : [];
 		const message = issues.length ? issues.map((e: any) => e.message).join('; ') : 'Datos inválidos';
-        console.log('Validación fallida:', message);
-        console.log('Campos con error:', issues.map((e: any) => ({ path: e.path, message: e.message })));
-        
         return res.status(400).json({
 			success: false,
 			message: 'Validación de datos fallida',

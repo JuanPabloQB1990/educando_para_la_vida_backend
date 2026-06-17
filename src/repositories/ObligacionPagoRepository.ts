@@ -159,6 +159,16 @@ class ObligacionPagoRepository {
       throw error;
     }
   }
+  async hasVencidoByEstudiante(idEstudiante: string): Promise<boolean> {
+    const [rows] = await pool.query(
+      `SELECT 1 FROM obligacion_pago op
+       JOIN estudiante_matricula em ON op.id_estudiante_matricula = em.id
+       WHERE em.id_estudiante = ? AND op.estado = 'vencido'
+       LIMIT 1`,
+      [idEstudiante]
+    );
+    return (rows as any[]).length > 0;
+  }
 }
 
 export default new ObligacionPagoRepository();

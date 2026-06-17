@@ -4,7 +4,7 @@ import { asyncHandler } from '../middleware/errorHandler';
 import { verifyToken } from '../middleware/auth';
 import { requireRoles } from '../middleware/roles';
 
-const upload = multer({ limits: { fileSize: 10 * 1024 * 1024 } });
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 import CargaAcademicaController from '../controllers/CargaAcademicaController';
 import DireccionGradoController from '../controllers/DireccionGradoController';
 import ActividadController from '../controllers/ActividadController';
