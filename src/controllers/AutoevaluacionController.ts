@@ -5,9 +5,6 @@ class AutoevaluacionController {
   async upsert(req: Request, res: Response, next: NextFunction) {
     try {
       const { idEstudiante, idPeriodo, idGradoEducacion, nota, observacion } = req.body;
-      if (!idEstudiante || !idPeriodo || !idGradoEducacion || nota === undefined) {
-        return res.status(400).json({ success: false, message: 'Campos requeridos faltantes', data: null, error: 'Datos faltantes' });
-      }
       const data = await AutoevaluacionService.upsert({
         idEstudiante,
         idPeriodo,
@@ -23,7 +20,7 @@ class AutoevaluacionController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      await AutoevaluacionService.delete(req.params.id);
+      await AutoevaluacionService.delete(req.validated!.params.id);
       res.json({ success: true, message: 'Autoevaluación eliminada', data: null, error: null });
     } catch (error) {
       next(error);

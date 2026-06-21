@@ -32,8 +32,8 @@ async function bootstrap() {
   // Rutas públicas de catálogos (usadas por el formulario de matrícula)
   app.use('/api/academico', routerAcademico);
   app.use('/api/catalogo', routerCatalogo);
-  // Rutas académicas (docentes, c
-  // alificaciones, asistencias, classroom)
+  // Rutas académicas (docentes,
+  // Calificaciones, asistencias, classroom)
   app.use('/api/docente', routerDocente);
   // Rutas protegidas — solo admin
   app.use('/api/usuario', routerUsuario);

@@ -2,6 +2,7 @@ import EstudianteRepository, { type EstudianteAdminFilters } from "../repositori
 import EstudianteMatriculaRepository from "../repositories/EstudianteMatriculaRepository";
 import GradosPorMatriculaRepository from "../repositories/GradosPorMatriculaRepository";
 import UsuarioRepository from "../repositories/UsuarioRepository";
+import { AppError } from '../error/AppError';
 
 class EstudianteService {
   async list() {
@@ -9,7 +10,9 @@ class EstudianteService {
   }
 
   async get(id: string) {
-    return await EstudianteRepository.findById(id);
+    const data = await EstudianteRepository.findById(id);
+    if (!data) throw new AppError(404, 'Estudiante no encontrado');
+    return data;
   }
 
   async create(data: any) {
@@ -25,7 +28,7 @@ class EstudianteService {
 
     // fetch existing to get id_usuario
     const existing: any = await EstudianteRepository.findById(id);
-    if (!existing) return null;
+    if (!existing) throw new AppError(404, 'Estudiante no encontrado');
     const idUsuario = existing.idUsuario ?? existing.usuarioIdUsuario ?? null;
 
     // update usuario if data provided
@@ -89,7 +92,7 @@ class EstudianteService {
   async delete(id: string) {
     // remove estudiante and its usuario
     const existing: any = await EstudianteRepository.findById(id);
-    if (!existing) return null;
+    if (!existing) throw new AppError(404, 'Estudiante no encontrado');
     const idUsuario = existing.idUsuario ?? existing.usuarioIdUsuario ?? null;
     const res = await EstudianteRepository.remove(id);
     if (idUsuario) await UsuarioRepository.remove(idUsuario);

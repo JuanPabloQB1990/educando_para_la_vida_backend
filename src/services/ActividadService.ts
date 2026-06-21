@@ -1,3 +1,4 @@
+import { AppError } from '../error/AppError';
 import ActividadRepository from '../repositories/ActividadRepository';
 
 class ActividadService {
@@ -6,7 +7,16 @@ class ActividadService {
   }
 
   async get(id: string) {
-    return ActividadRepository.findById(id);
+    const actividad = await ActividadRepository.findById(id);
+
+    if (!actividad) {
+      throw new AppError(
+        404,
+        'Actividad no encontrada'
+      );
+    }
+
+    return actividad;
   }
 
   async create(data: { idPeriodo: string; idGradoEducacion: string; nombreActividad: string }) {

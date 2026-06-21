@@ -1,55 +1,49 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import ObligacionPagoService from '../services/ObligacionPagoService';
 
 class ObligacionPagoController {
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await ObligacionPagoService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Obligaciones de pago obtenidas', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing obligacion_pago' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await ObligacionPagoService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await ObligacionPagoService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Obligación de pago obtenida', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching obligacion_pago' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await ObligacionPagoService.create(req.body);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Obligación de pago creada', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating obligacion_pago' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const result = await ObligacionPagoService.update(id, req.body);
-      if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data: result, error: null });
+      const result = await ObligacionPagoService.update(req.validated!.params.id, req.body);
+      res.json({ success: true, message: 'Obligación de pago actualizada', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating obligacion_pago' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const result = await ObligacionPagoService.delete(id);
-      if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data: null, error: null });
+      await ObligacionPagoService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Obligación de pago eliminada', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting obligacion_pago' } });
+      next(error);
     }
   }
 }

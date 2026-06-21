@@ -14,7 +14,9 @@ class DireccionGradoService {
   }
 
   async get(id: string) {
-    return DireccionGradoRepository.findById(id);
+    const data = await DireccionGradoRepository.findById(id);
+    if (!data) throw new AppError(404, 'Dirección de grado no encontrada');
+    return data;
   }
 
   async create(data: { idGradoEducacion: string | null; idUsuario: string; idAnioElectivo: string; idBloque?: string | null }) {

@@ -1,4 +1,5 @@
 import GradosPorMatriculaRepository from '../repositories/GradosPorMatriculaRepository';
+import { AppError } from '../error/AppError';
 
 class GradosPorMatriculaService {
   async list() {
@@ -6,7 +7,9 @@ class GradosPorMatriculaService {
   }
 
   async get(id_estudiante_matricula: string, id_grado_educacion: string) {
-    return await GradosPorMatriculaRepository.findByPK(id_estudiante_matricula, id_grado_educacion);
+    const data = await GradosPorMatriculaRepository.findByPK(id_estudiante_matricula, id_grado_educacion);
+    if (!data) throw new AppError(404, 'Registro no encontrado');
+    return data;
   }
 
   async create(data: { id_estudiante_matricula: string; id_grado_educacion: string; estado: string }) {

@@ -177,6 +177,6 @@ function validateMatricula(req: express.Request, res: express.Response, next: ex
 	}
 }
 
-router.post('/', upload.fields(expectedFileFields), requireMinFiles(8), validateMatricula, asyncHandler((req: express.Request, res: express.Response) => MatriculaController.create(req, res)));
+router.post('/', upload.fields(expectedFileFields), requireMinFiles(8), validateMatricula, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => MatriculaController.create(req, res, next)));
 
 export default router;

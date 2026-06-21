@@ -1,4 +1,5 @@
 import GradoEducacionRepository from '../repositories/GradoEducacionRepository';
+import { AppError } from '../error/AppError';
 
 class GradoEducacionService {
   async list() {
@@ -6,7 +7,9 @@ class GradoEducacionService {
   }
 
   async get(id: string) {
-    return await GradoEducacionRepository.findById(id);
+    const data = await GradoEducacionRepository.findById(id);
+    if (!data) throw new AppError(404, 'Grado no encontrado');
+    return data;
   }
 
   async create(nombre: string) {

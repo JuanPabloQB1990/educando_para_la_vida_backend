@@ -3,6 +3,11 @@ import { z } from 'zod';
 import EstudianteMatriculaService from '../services/EstudianteMatriculaService';
 import { AppError } from '../error/AppError';
 
+const patchEstudioSchema = z.object({
+  idTipoEstudio: z.string().min(1, 'Tipo de estudio requerido'),
+  idTiempoValidacion: z.string().nullable().optional(),
+});
+
 const matricularAnioSchema = z.object({
   idAnioElectivo: z.string().min(1, 'Año electivo requerido'),
   idRubro: z.string().min(1, 'Rubro requerido'),
@@ -10,59 +15,54 @@ const matricularAnioSchema = z.object({
 });
 
 class EstudianteMatriculaController {
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await EstudianteMatriculaService.list();
       res.json({ success: true, message: 'Matrículas obtenidas', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing estudiante_matricula' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await EstudianteMatriculaService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await EstudianteMatriculaService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Matrícula obtenida', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching estudiante_matricula' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await EstudianteMatriculaService.create(req.body);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Matrícula creada', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating estudiante_matricula' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      await EstudianteMatriculaService.update(id, req.body);
-      res.json({ success: true, data: null, error: null });
+      await EstudianteMatriculaService.update(req.validated!.params.id, req.body);
+      res.json({ success: true, message: 'Matrícula actualizada', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating estudiante_matricula' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      await EstudianteMatriculaService.delete(id);
-      res.json({ success: true, data: null, error: null });
+      await EstudianteMatriculaService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Matrícula eliminada', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting estudiante_matricula' } });
+      next(error);
     }
   }
 
   async getGrados(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await EstudianteMatriculaService.getGrados(id);
+      const data = await EstudianteMatriculaService.getGrados(req.validated!.params.id);
       res.json({ success: true, data, error: null });
     } catch (error) {
       next(error);
@@ -71,9 +71,21 @@ class EstudianteMatriculaController {
 
   async getObligaciones(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await EstudianteMatriculaService.getObligaciones(id);
+      const data = await EstudianteMatriculaService.getObligaciones(req.validated!.params.id);
       res.json({ success: true, data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async patchEstudio(req: Request, res: Response, next: NextFunction) {
+    try {
+      const parsed = patchEstudioSchema.safeParse(req.body);
+      if (!parsed.success) {
+        throw new AppError(400, parsed.error.errors[0]?.message ?? 'Datos inválidos');
+      }
+      await EstudianteMatriculaService.updateEstudio(req.validated!.params.id, parsed.data.idTipoEstudio, parsed.data.idTiempoValidacion ?? null);
+      res.json({ success: true, message: 'Matrícula actualizada', data: null, error: null });
     } catch (error) {
       next(error);
     }
@@ -81,12 +93,11 @@ class EstudianteMatriculaController {
 
   async matricularAnio(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
       const parsed = matricularAnioSchema.safeParse(req.body);
       if (!parsed.success) {
         throw new AppError(400, parsed.error.errors[0]?.message ?? 'Datos inválidos');
       }
-      await EstudianteMatriculaService.matricularAnio(id, parsed.data);
+      await EstudianteMatriculaService.matricularAnio(req.validated!.params.id, parsed.data);
       res.status(201).json({ success: true, data: null, error: null });
     } catch (error) {
       next(error);

@@ -2,48 +2,50 @@ import express from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import { verifyToken } from '../middleware/auth';
 import { requireRoles } from '../middleware/roles';
+import { validate } from '../middleware/validate';
 import gradoController from '../controllers/GradoEducacionController';
 import tipoEstudioController from '../controllers/TipoEstudioController';
 import tiempoController from '../controllers/TiempoValidacionController';
 import bloqueController from '../controllers/BloqueController';
 import bloqueGradoController from '../controllers/BloqueGradoController';
+import { idParamsSchema, bloqueParamsSchema, bloqueGradoParamsSchema } from '../validators/params';
 
 const router = express.Router();
 
 const adminSecretaria = [verifyToken, requireRoles('admin', 'secretari@')];
 
 // Grado Educacion — GET público (formulario matrícula), mutaciones protegidas
-router.get('/grado_educacion', asyncHandler((req: express.Request, res: express.Response) => gradoController.list(req, res)));
-router.get('/grado_educacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => gradoController.get(req, res)));
-router.post('/grado_educacion', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => gradoController.create(req, res)));
-router.put('/grado_educacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => gradoController.update(req, res)));
-router.delete('/grado_educacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => gradoController.delete(req, res)));
+router.get('/grado_educacion', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => gradoController.list(req, res, next)));
+router.get('/grado_educacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => gradoController.get(req, res, next)));
+router.post('/grado_educacion', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => gradoController.create(req, res, next)));
+router.put('/grado_educacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => gradoController.update(req, res, next)));
+router.delete('/grado_educacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => gradoController.delete(req, res, next)));
 
 // Tipo Estudio — GET público, mutaciones solo admin
-router.get('/tipo_estudio', asyncHandler((req: express.Request, res: express.Response) => tipoEstudioController.list(req, res)));
-router.get('/tipo_estudio/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tipoEstudioController.get(req, res)));
-router.post('/tipo_estudio', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tipoEstudioController.create(req, res)));
-router.put('/tipo_estudio/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tipoEstudioController.update(req, res)));
-router.delete('/tipo_estudio/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tipoEstudioController.delete(req, res)));
+router.get('/tipo_estudio', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tipoEstudioController.list(req, res, next)));
+router.get('/tipo_estudio/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tipoEstudioController.get(req, res, next)));
+router.post('/tipo_estudio', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tipoEstudioController.create(req, res, next)));
+router.put('/tipo_estudio/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tipoEstudioController.update(req, res, next)));
+router.delete('/tipo_estudio/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tipoEstudioController.delete(req, res, next)));
 
 // Tiempo Validacion — GET público, mutaciones solo admin
-router.get('/tiempo_validacion', asyncHandler((req: express.Request, res: express.Response) => tiempoController.list(req, res)));
-router.get('/tiempo_validacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tiempoController.get(req, res)));
-router.post('/tiempo_validacion', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tiempoController.create(req, res)));
-router.put('/tiempo_validacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tiempoController.update(req, res)));
-router.delete('/tiempo_validacion/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => tiempoController.delete(req, res)));
+router.get('/tiempo_validacion', asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tiempoController.list(req, res, next)));
+router.get('/tiempo_validacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tiempoController.get(req, res, next)));
+router.post('/tiempo_validacion', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tiempoController.create(req, res, next)));
+router.put('/tiempo_validacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tiempoController.update(req, res, next)));
+router.delete('/tiempo_validacion/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => tiempoController.delete(req, res, next)));
 
 // Bloque
-router.get('/bloque', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueController.list(req, res)));
-router.get('/bloque/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueController.get(req, res)));
-router.post('/bloque', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueController.create(req, res)));
-router.put('/bloque/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueController.update(req, res)));
-router.delete('/bloque/:id', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueController.delete(req, res)));
+router.get('/bloque', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueController.list(req, res, next)));
+router.get('/bloque/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueController.get(req, res, next)));
+router.post('/bloque', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueController.create(req, res, next)));
+router.put('/bloque/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueController.update(req, res, next)));
+router.delete('/bloque/:id', ...adminSecretaria, validate(idParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueController.delete(req, res, next)));
 
 // Bloque Grado
-router.get('/bloque_grado', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueGradoController.list(req, res)));
-router.get('/bloque_grado/:idBloque', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueGradoController.listByBloque(req, res)));
-router.post('/bloque_grado', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueGradoController.assign(req, res)));
-router.delete('/bloque_grado/:idBloque/:idGradoEducacion', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response) => bloqueGradoController.remove(req, res)));
+router.get('/bloque_grado', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueGradoController.list(req, res, next)));
+router.get('/bloque_grado/:idBloque', ...adminSecretaria, validate(bloqueParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueGradoController.listByBloque(req, res, next)));
+router.post('/bloque_grado', ...adminSecretaria, asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueGradoController.assign(req, res, next)));
+router.delete('/bloque_grado/:idBloque/:idGradoEducacion', ...adminSecretaria, validate(bloqueGradoParamsSchema, 'params'), asyncHandler((req: express.Request, res: express.Response, next: express.NextFunction) => bloqueGradoController.remove(req, res, next)));
 
 export default router;

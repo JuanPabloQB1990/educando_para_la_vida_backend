@@ -1,53 +1,51 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import AnioElectivoService from '../services/AnioElectivoService';
 
 class AnioElectivoController {
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await AnioElectivoService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Años electivos obtenidos', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing anios' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = String(req.params.id);
-      const data = await AnioElectivoService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await AnioElectivoService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Año electivo obtenido', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching anio' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const result = await AnioElectivoService.create(req.body);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Año electivo creado', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating anio' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = String(req.params.id);
+      const id = req.validated!.params.id;
       await AnioElectivoService.update(id, req.body);
-      res.json({ success: true, data: null, error: null });
+      res.json({ success: true, message: 'Año electivo actualizado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating anio' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = String(req.params.id);
+      const id = req.validated!.params.id;
       await AnioElectivoService.delete(id);
-      res.json({ success: true, data: null, error: null });
+      res.json({ success: true, message: 'Año electivo eliminado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting anio' } });
+      next(error);
     }
   }
 }

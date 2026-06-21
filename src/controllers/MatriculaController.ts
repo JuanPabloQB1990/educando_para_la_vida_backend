@@ -1,11 +1,10 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import MatriculaService from "../services/MatriculaService";
 
 class MatriculaController {
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const form = req.body || {};
-
       const files = req.files as Record<string, Express.Multer.File[]>;
 
       const normalizedFiles = {
@@ -20,35 +19,16 @@ class MatriculaController {
         file_comprobante_pago: files?.file_comprobante_pago?.[0],
       };
 
-      const payload = {
-        ...form,
-        ...normalizedFiles,
-      };
+      await MatriculaService.create({ ...form, ...normalizedFiles });
 
-      const result = await MatriculaService.create(payload);
-
-      if (result.exists) {
-        return res.status(409).json({
-          success: false,
-          message: "El alumno ya se encuentra inscrito en la institución",
-          data: null,
-          error: null,
-        });
-      }
-      // For now, return success that the check passed and enrollment may continue
-      return res.status(200).json({
+      res.status(201).json({
         success: true,
         message: "Estudiante matriculado exitosamente",
         data: null,
         error: null,
       });
     } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error procesando matrícula",
-        data: null,
-        error: { message: "Error procesando matrícula" },
-      });
+      next(error);
     }
   }
 }

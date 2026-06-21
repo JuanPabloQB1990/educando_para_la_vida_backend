@@ -90,7 +90,8 @@ class PagoRepository {
         e.observaciones AS observaciones_estudiante,
         u.nombres, u.apellido1, u.apellido2, u.no_documento, u.email,
         u.contacto1, u.contacto2, u.estado AS estado_usuario, u.fecha_expedicion_documento,
-        td.nombre AS nombre_tipo_documento
+        td.nombre AS nombre_tipo_documento,
+        ap.nombres AS verificado_por_nombres, ap.apellido1 AS verificado_por_apellido1, ap.apellido2 AS verificado_por_apellido2
       FROM pago p
       INNER JOIN obligacion_pago op ON p.id_obligacion_pago = op.id
       INNER JOIN rubro r ON op.id_rubro = r.id
@@ -100,6 +101,7 @@ class PagoRepository {
       LEFT JOIN tipo_documento td ON u.id_tipo_documento = td.id
       LEFT JOIN tipo_estudio te ON ep.id_tipo_estudio = te.id
       LEFT JOIN tiempo_validacion tv ON ep.id_tiempo_validacion = tv.id
+      LEFT JOIN auditoria_pago ap ON ap.id_pago = p.id
       ${where}
       ORDER BY p.fecha_pago_real DESC
     `;

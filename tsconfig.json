@@ -1,13 +1,19 @@
+
 {
-    "compilerOptions": {
+  "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
     "rootDir": "src",
     "outDir": "dist",
     "moduleResolution": "node",
     "ignoreDeprecations": "6.0",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
-    "include": ["src/**/*.ts"],
-    "exclude": ["src/**/*.test.ts"]
+  "include": ["src/**/*.ts", "src/types/**/*.d.ts"],
+  "exclude": ["src/**/*.test.ts"]
 }

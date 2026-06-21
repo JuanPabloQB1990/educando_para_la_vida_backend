@@ -1,5 +1,6 @@
 import AnioElectivoRepository from '../repositories/AnioElectivoRepository';
 import PeriodoRepository from '../repositories/PeriodoRepository';
+import { AppError } from '../error/AppError';
 
 class AnioElectivoService {
   async list() {
@@ -7,7 +8,9 @@ class AnioElectivoService {
   }
 
   async get(id: string) {
-    return await AnioElectivoRepository.findById(id);
+    const data = await AnioElectivoRepository.findById(id);
+    if (!data) throw new AppError(404, 'Año electivo no encontrado');
+    return data;
   }
 
   async create(data: any) {

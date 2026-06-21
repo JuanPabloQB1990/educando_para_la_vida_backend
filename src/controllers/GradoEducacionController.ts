@@ -1,55 +1,51 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import gradoService from '../services/GradoEducacionService';
 
 class GradoEducacionController {
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await gradoService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Grados obtenidos', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing grado_educacion' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const data = await gradoService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await gradoService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Grado obtenido', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching grado_educacion' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const { nombre } = req.body;
       const result = await gradoService.create(nombre);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Grado creado', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating grado_educacion' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
       const { nombre } = req.body;
-      await gradoService.update(id, nombre);
-      res.json({ success: true, data: null, error: null });
+      await gradoService.update(req.validated!.params.id, nombre);
+      res.json({ success: true, message: 'Grado actualizado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating grado_educacion' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      await gradoService.delete(id);
-      res.json({ success: true, data: null, error: null });
+      await gradoService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Grado eliminado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting grado_educacion' } });
+      next(error);
     }
   }
 }

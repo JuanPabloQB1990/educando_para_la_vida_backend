@@ -1,55 +1,51 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import tipoEstudioService from '../services/TipoEstudioService';
 
 class TipoEstudioController {
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await tipoEstudioService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Tipos de estudio obtenidos', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing tipo_estudio' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
-      const data = await tipoEstudioService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await tipoEstudioService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Tipo de estudio obtenido', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching tipo_estudio' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const { nombre } = req.body;
       const result = await tipoEstudioService.create(nombre);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Tipo de estudio creado', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating tipo_estudio' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
       const { nombre } = req.body;
-      await tipoEstudioService.update(id, nombre);
-      res.json({ success: true, data: null, error: null });
+      await tipoEstudioService.update(req.validated!.params.id, nombre);
+      res.json({ success: true, message: 'Tipo de estudio actualizado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating tipo_estudio' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
-      await tipoEstudioService.delete(id);
-      res.json({ success: true, data: null, error: null });
+      await tipoEstudioService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Tipo de estudio eliminado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting tipo_estudio' } });
+      next(error);
     }
   }
 }

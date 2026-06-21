@@ -1,4 +1,5 @@
 import TipoEstudioRepository from "../repositories/TipoEstudioRepository";
+import { AppError } from '../error/AppError';
 
 class TipoEstudioService {
   async list() {
@@ -6,7 +7,9 @@ class TipoEstudioService {
   }
 
   async get(id: string) {
-    return await TipoEstudioRepository.findById(id);
+    const data = await TipoEstudioRepository.findById(id);
+    if (!data) throw new AppError(404, 'Tipo de estudio no encontrado');
+    return data;
   }
 
   async create(nombre: string) {

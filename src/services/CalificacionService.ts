@@ -13,7 +13,9 @@ class CalificacionService {
   }
 
   async get(id: string) {
-    return CalificacionRepository.findById(id);
+    const data = await CalificacionRepository.findById(id);
+    if (!data) throw new AppError(404, 'Calificación no encontrada');
+    return data;
   }
 
   async create(data: { idEstudiante: string; idActividadMateria: string; nota: number; observacion?: string }, solicitante?: Solicitante) {

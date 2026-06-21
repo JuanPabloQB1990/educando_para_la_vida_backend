@@ -83,6 +83,13 @@ class EstudianteMatriculaRepository {
     }
   }
 
+  async updateEstudio(id: string, idTipoEstudio: string, idTiempoValidacion: string | null) {
+    await pool.execute(
+      'UPDATE estudiante_matricula SET id_tipo_estudio = ?, id_tiempo_validacion = ? WHERE id = ?',
+      [idTipoEstudio, idTiempoValidacion, id]
+    );
+  }
+
   async matricularAnio(
     idEstudianteMatricula: string,
     idAnioElectivo: string,

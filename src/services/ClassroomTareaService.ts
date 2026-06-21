@@ -20,7 +20,9 @@ class ClassroomTareaService {
   }
 
   async get(id: string) {
-    return ClassroomTareaRepository.findById(id);
+    const data = await ClassroomTareaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Tarea no encontrada');
+    return data;
   }
 
   async create(data: { idCargaAcademica: string; idPeriodo: string | null; titulo: string; instrucciones: string; fechaLimite: string }) {

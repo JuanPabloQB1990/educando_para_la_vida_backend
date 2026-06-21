@@ -15,6 +15,7 @@ import PagoService from "./PagoService";
 import RolService from "./RolService";
 import RubroService from "./RubroService";
 import UsuarioService from "./UsuarioService";
+import { AppError } from "../error/AppError";
 
 
 
@@ -29,7 +30,7 @@ class MatriculaService {
 
     const user = await UsuarioRepository.findByDocumento(no_documento, id_rol);
   
-    if (user) return { exists: true };
+    if (user) throw new AppError(409, 'El alumno ya se encuentra inscrito en la institución');
 
     // No existe: proceder a crear usuario y estudiante.
     // Aseguramos que el payload tenga el rol de estudiante
@@ -151,7 +152,6 @@ class MatriculaService {
       matriculaExitosa(userResult.plainPassword)
     );
 
-    return { exists: false };
   }
 }
 

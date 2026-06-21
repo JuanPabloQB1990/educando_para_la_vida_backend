@@ -23,7 +23,9 @@ class ClassroomEntregaService {
   }
 
   async get(id: string) {
-    return ClassroomEntregaRepository.findById(id);
+    const data = await ClassroomEntregaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Entrega no encontrada');
+    return data;
   }
 
   async create(data: { idClassroomTarea: string; idEstudiante: string }) {

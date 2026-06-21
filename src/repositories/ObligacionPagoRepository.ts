@@ -40,20 +40,21 @@ class ObligacionPagoRepository {
   }
 
   async findByEstudianteMatricula(idEstudianteMatricula: string) {
-    try {
-      const sql = `
-        SELECT op.id AS id_obligacion_pago, op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado,
-               r.nombre AS nombre_rubro
-        FROM obligacion_pago op
-        INNER JOIN rubro r ON op.id_rubro = r.id
-        WHERE op.id_estudiante_matricula = ?
-        ORDER BY op.fecha_vencimiento ASC
-      `;
-      const [rows] = await pool.query(sql, [idEstudianteMatricula]);
-      return mapRowsToEntities<any>(rows as any[]);
-    } catch (error) {
-      throw error;
-    }
+    const sql = `
+      SELECT op.id AS id_obligacion_pago, op.id_rubro, op.monto_cuota, op.fecha_vencimiento, op.estado,
+             r.nombre AS nombre_rubro,
+             ap.nombres AS verificado_por_nombres,
+             ap.apellido1 AS verificado_por_apellido1,
+             ap.apellido2 AS verificado_por_apellido2
+      FROM obligacion_pago op
+      INNER JOIN rubro r ON op.id_rubro = r.id
+      LEFT JOIN pago p ON p.id_obligacion_pago = op.id
+      LEFT JOIN auditoria_pago ap ON ap.id_pago = p.id
+      WHERE op.id_estudiante_matricula = ?
+      ORDER BY op.fecha_vencimiento ASC
+    `;
+    const [rows] = await pool.query(sql, [idEstudianteMatricula]);
+    return mapRowsToEntities<any>(rows as any[]);
   }
 
   async findByIdAndEstudiante(idObligacionPago: string, idEstudiante: string) {

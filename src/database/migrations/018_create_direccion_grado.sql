@@ -1,7 +1,7 @@
 -- Migration: 018_create_direccion_grado.sql
 CREATE TABLE IF NOT EXISTS direccion_grado (
   id VARCHAR(100) PRIMARY KEY DEFAULT (UUID()),
-  id_grado_educacion VARCHAR(100) NOT NULL,
+  id_grado_educacion VARCHAR(100) NULL,
   id_usuario VARCHAR(100) NOT NULL,
   id_anio_electivo VARCHAR(100) NOT NULL,
   id_bloque VARCHAR(100) NULL,

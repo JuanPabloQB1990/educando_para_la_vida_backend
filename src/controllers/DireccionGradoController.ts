@@ -2,50 +2,64 @@ import type { Request, Response, NextFunction } from 'express';
 import DireccionGradoService from '../services/DireccionGradoService';
 
 class DireccionGradoController {
-  async list(req: Request, res: Response) {
-    const { idUsuario, idAnioElectivo } = req.query;
-    const data = idUsuario
-      ? await DireccionGradoService.listByProfesor(idUsuario as string, idAnioElectivo as string | undefined)
-      : await DireccionGradoService.list();
-    res.json({ success: true, message: 'Direcciones de grado obtenidas', data, error: null });
-  }
-
-  async get(req: Request, res: Response) {
-    const data = await DireccionGradoService.get(req.params.id as string);
-    if (!data) return res.status(404).json({ success: false, message: 'No encontrado', data: null, error: 'Not found' });
-    res.json({ success: true, message: 'Dirección de grado obtenida', data, error: null });
-  }
-
-  async create(req: Request, res: Response) {
-    const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
-    if (!idUsuario || !idAnioElectivo) {
-      return res.status(400).json({ success: false, message: 'Profesor y año electivo son requeridos', data: null, error: 'Datos faltantes' });
+  async list(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { idUsuario, idAnioElectivo } = req.query;
+      const data = idUsuario
+        ? await DireccionGradoService.listByProfesor(idUsuario as string, idAnioElectivo as string | undefined)
+        : await DireccionGradoService.list();
+      res.json({ success: true, message: 'Direcciones de grado obtenidas', data, error: null });
+    } catch (error) {
+      next(error);
     }
-    const data = await DireccionGradoService.create({ idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
-    res.status(201).json({ success: true, message: 'Dirección de grado creada', data, error: null });
   }
 
-  async update(req: Request, res: Response) {
-    const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
-    if (!idUsuario || !idAnioElectivo) {
-      return res.status(400).json({ success: false, message: 'Profesor y año electivo son requeridos', data: null, error: 'Datos faltantes' });
+  async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data = await DireccionGradoService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Dirección de grado obtenida', data, error: null });
+    } catch (error) {
+      next(error);
     }
-    const data = await DireccionGradoService.update(req.params.id as string, { idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
-    res.json({ success: true, message: 'Dirección de grado actualizada', data, error: null });
   }
 
-  async updateLink(req: Request, res: Response) {
-    const { linkClaseVirtual } = req.body;
-    if (!linkClaseVirtual) {
-      return res.status(400).json({ success: false, message: 'linkClaseVirtual es requerido', data: null, error: 'Dato faltante' });
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
+      const data = await DireccionGradoService.create({ idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
+      res.status(201).json({ success: true, message: 'Dirección de grado creada', data, error: null });
+    } catch (error) {
+      next(error);
     }
-    const data = await DireccionGradoService.updateLink(req.params.id as string, linkClaseVirtual);
-    res.json({ success: true, message: 'Link de clase virtual actualizado', data, error: null });
   }
 
-  async delete(req: Request, res: Response) {
-    await DireccionGradoService.delete(req.params.id as string);
-    res.json({ success: true, message: 'Dirección de grado eliminada', data: null, error: null });
+  async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { idGradoEducacion, idUsuario, idAnioElectivo, idBloque } = req.body;
+      const data = await DireccionGradoService.update(req.validated!.params.id, { idGradoEducacion: idGradoEducacion ?? null, idUsuario, idAnioElectivo, idBloque: idBloque ?? null });
+      res.json({ success: true, message: 'Dirección de grado actualizada', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateLink(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { linkClaseVirtual } = req.body;
+      const data = await DireccionGradoService.updateLink(req.validated!.params.id, linkClaseVirtual);
+      res.json({ success: true, message: 'Link de clase virtual actualizado', data, error: null });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      await DireccionGradoService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Dirección de grado eliminada', data: null, error: null });
+    } catch (error) {
+      next(error);
+    }
   }
 
   async getForEstudiante(req: Request, res: Response, next: NextFunction) {

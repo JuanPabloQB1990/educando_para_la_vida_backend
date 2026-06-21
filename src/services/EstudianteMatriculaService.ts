@@ -18,7 +18,9 @@ class EstudianteMatriculaService {
   }
 
   async get(id: string) {
-    return await EstudianteMatriculaRepository.findById(id);
+    const data = await EstudianteMatriculaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Matrícula no encontrada');
+    return data;
   }
 
   async create(data: any) {
@@ -60,6 +62,12 @@ class EstudianteMatriculaService {
       dto.meses,
       actualizarAnioElectivo
     );
+  }
+
+  async updateEstudio(id: string, idTipoEstudio: string, idTiempoValidacion: string | null): Promise<void> {
+    const em = await EstudianteMatriculaRepository.findById(id);
+    if (!em) throw new AppError(404, 'Matrícula no encontrada');
+    await EstudianteMatriculaRepository.updateEstudio(id, idTipoEstudio, idTiempoValidacion);
   }
 
   async getGrados(idEstudianteMatricula: string) {

@@ -9,6 +9,7 @@ export interface EstudianteAdminFilters {
   padreCedula?: string;
   madreCedula?: string;
   acudienteCedula?: string;
+  conObligacionVencida?: boolean;
 }
 
 /** Campos de identificación del documento; viven en `usuario`, no en `estudiante`. */
@@ -180,6 +181,15 @@ class EstudianteRepository {
     if (filters.acudienteCedula) {
       conditions.push('e.acudiente_cedula LIKE ?');
       params.push(`%${filters.acudienteCedula}%`);
+    }
+    if (filters.conObligacionVencida) {
+      conditions.push(
+        `EXISTS (
+          SELECT 1 FROM estudiante_matricula em
+          INNER JOIN obligacion_pago op ON op.id_estudiante_matricula = em.id
+          WHERE em.id_estudiante = e.id AND op.estado = 'vencido'
+        )`
+      );
     }
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';

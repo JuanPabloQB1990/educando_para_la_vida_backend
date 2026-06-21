@@ -12,7 +12,9 @@ class PeriodoService {
   }
 
   async get(id: string) {
-    return PeriodoRepository.findById(id);
+    const data = await PeriodoRepository.findById(id);
+    if (!data) throw new AppError(404, 'Periodo no encontrado');
+    return data;
   }
 
   async updateEstado(id: string, estado: PeriodoEstado) {

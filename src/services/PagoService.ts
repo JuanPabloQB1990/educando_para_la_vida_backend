@@ -1,5 +1,6 @@
 import PagoRepository, { type PagoAdminFilters } from '../repositories/PagoRepository';
 import type { CreatePagoDto } from '../models/pago';
+import { AppError } from '../error/AppError';
 
 class PagoService {
   async list() {
@@ -18,27 +19,32 @@ class PagoService {
     montoPagado?: string
   ) {
     const existing = await PagoRepository.findById(idPago);
-    if (!existing) return null;
+    if (!existing) throw new AppError(404, 'Pago no encontrado');
     return await PagoRepository.aprobarRechazar(idPago, accion, observaciones, idObligacionPago, montoPagado);
   }
 
   async get(id: string) {
-    return await PagoRepository.findById(id);
+    const data = await PagoRepository.findById(id);
+    if (!data) throw new AppError(404, 'Pago no encontrado');
+    return data;
   }
 
   async create(data: CreatePagoDto) {
     const { id } = await PagoRepository.create(data);
-    return id ?? null;
+    if (!id) throw new AppError(500, 'Error al crear pago');
+    return id;
   }
 
   async update(id: string, data: CreatePagoDto) {
+    const existing = await PagoRepository.findById(id);
+    if (!existing) throw new AppError(404, 'Pago no encontrado');
     await PagoRepository.update(id, data);
     return await PagoRepository.findById(id);
   }
 
   async delete(id: string) {
     const existing = await PagoRepository.findById(id);
-    if (!existing) return null;
+    if (!existing) throw new AppError(404, 'Pago no encontrado');
     return await PagoRepository.remove(id);
   }
 }

@@ -1,4 +1,5 @@
 import PlanEstudioRepository from '../repositories/PlanEstudioRepository';
+import { AppError } from '../error/AppError';
 
 class PlanEstudioService {
   async list() {
@@ -10,7 +11,9 @@ class PlanEstudioService {
   }
 
   async get(id: string) {
-    return PlanEstudioRepository.findById(id);
+    const data = await PlanEstudioRepository.findById(id);
+    if (!data) throw new AppError(404, 'Plan de estudio no encontrado');
+    return data;
   }
 
   async create(idGradoEducacion: string, idMateria: string) {

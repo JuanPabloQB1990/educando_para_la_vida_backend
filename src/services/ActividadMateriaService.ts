@@ -1,4 +1,5 @@
 import ActividadMateriaRepository from '../repositories/ActividadMateriaRepository';
+import { AppError } from '../error/AppError';
 
 class ActividadMateriaService {
   async listByActividad(idActividad: string) {
@@ -6,7 +7,9 @@ class ActividadMateriaService {
   }
 
   async get(id: string) {
-    return ActividadMateriaRepository.findById(id);
+    const data = await ActividadMateriaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Actividad-materia no encontrada');
+    return data;
   }
 
   async create(data: { idActividad: string; idMateria: string; idCargaAcademica: string }) {

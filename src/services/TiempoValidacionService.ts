@@ -1,4 +1,5 @@
 import TiempoValidacionRepository from '../repositories/TiempoValidacionRepository';
+import { AppError } from '../error/AppError';
 
 class TiempoValidacionService {
   async list() {
@@ -6,7 +7,9 @@ class TiempoValidacionService {
   }
 
   async get(id: string) {
-    return await TiempoValidacionRepository.findById(id);
+    const data = await TiempoValidacionRepository.findById(id);
+    if (!data) throw new AppError(404, 'Tiempo de validación no encontrado');
+    return data;
   }
 
   async create(tiempo: string) {

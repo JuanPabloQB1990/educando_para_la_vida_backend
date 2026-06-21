@@ -1,4 +1,5 @@
 import CargaAcademicaRepository from '../repositories/CargaAcademicaRepository';
+import { AppError } from '../error/AppError';
 
 class CargaAcademicaService {
   async list() {
@@ -10,7 +11,9 @@ class CargaAcademicaService {
   }
 
   async get(id: string) {
-    return CargaAcademicaRepository.findById(id);
+    const data = await CargaAcademicaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Carga académica no encontrada');
+    return data;
   }
 
   async create(data: { idUsuario: string; idMateria: string; idGradoEducacion: string; idAnioElectivo: string; idBloque?: string | null }) {

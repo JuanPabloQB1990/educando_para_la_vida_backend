@@ -5,11 +5,14 @@ import path from 'path';
 import { verifyToken } from '../middleware/auth';
 import { requireRoles } from '../middleware/roles';
 import { asyncHandler } from '../middleware/errorHandler';
+import { validate } from '../middleware/validate';
 import EstudiantePerfilController from '../controllers/EstudiantePerfilController';
 import EstudiantePagosController from '../controllers/EstudiantePagosController';
 import ClassroomTareaController from '../controllers/ClassroomTareaController';
 import ClassroomEntregaController from '../controllers/ClassroomEntregaController';
 import DireccionGradoController from '../controllers/DireccionGradoController';
+import { classroomEntregaCreateForEstudianteSchema } from '../validators/classroomEntrega';
+import { idParamsSchema, adjuntoParamsSchema } from '../validators/params';
 
 const router = express.Router();
 
@@ -37,9 +40,9 @@ router.post('/pagos/comprobante', upload.single('comprobante'), asyncHandler((re
 router.get('/classroom/tareas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomTareaController.listForEstudiante(req, res, next)));
 
 router.get('/classroom/entregas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.listForEstudiante(req, res, next)));
-router.post('/classroom/entregas', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.createForEstudiante(req, res, next)));
-router.post('/classroom/entregas/:id/adjuntos', upload.array('files', 5), asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.uploadAdjuntosForEstudiante(req, res, next)));
-router.delete('/classroom/entregas/:id/adjuntos/:adjuntoId', asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.deleteAdjuntoForEstudiante(req, res, next)));
+router.post('/classroom/entregas', validate(classroomEntregaCreateForEstudianteSchema), asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.createForEstudiante(req, res, next)));
+router.post('/classroom/entregas/:id/adjuntos', validate(idParamsSchema, 'params'), upload.array('files', 5), asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.uploadAdjuntosForEstudiante(req, res, next)));
+router.delete('/classroom/entregas/:id/adjuntos/:adjuntoId', validate(adjuntoParamsSchema, 'params'), asyncHandler((req: Request, res: Response, next: NextFunction) => ClassroomEntregaController.deleteAdjuntoForEstudiante(req, res, next)));
 
 router.get('/clase-virtual', asyncHandler((req: Request, res: Response, next: NextFunction) => DireccionGradoController.getForEstudiante(req, res, next)));
 

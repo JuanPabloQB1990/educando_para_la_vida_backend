@@ -4,8 +4,14 @@ import EstudianteService from '../services/EstudianteService';
 class EstudianteController {
   async listAdmin(req: Request, res: Response, next: NextFunction) {
     try {
-      const { noDocumento, padreCedula, madreCedula, acudienteCedula } = req.query as Record<string, string | undefined>;
-      const data = await EstudianteService.listAdmin({ noDocumento, padreCedula, madreCedula, acudienteCedula });
+      const { noDocumento, padreCedula, madreCedula, acudienteCedula, conObligacionVencida } = req.query as Record<string, string | undefined>;
+      const data = await EstudianteService.listAdmin({
+        noDocumento,
+        padreCedula,
+        madreCedula,
+        acudienteCedula,
+        conObligacionVencida: conObligacionVencida === 'true',
+      });
       res.json({ success: true, message: 'Estudiantes matriculados obtenidos', data, error: null });
     } catch (error) {
       next(error);
@@ -14,65 +20,57 @@ class EstudianteController {
 
   async getHistorial(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await EstudianteService.getHistorial(id);
+      const data = await EstudianteService.getHistorial(req.validated!.params.id);
       res.json({ success: true, message: 'Historial de matrículas obtenido', data, error: null });
     } catch (error) {
       next(error);
     }
   }
 
-  async list(req: Request, res: Response) {
+  async list(_req: Request, res: Response, next: NextFunction) {
     try {
       const data = await EstudianteService.list();
-      res.json({ success: true, data, error: null });
+      res.json({ success: true, message: 'Estudiantes obtenidos', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error listing estudiantes' } });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const data = await EstudianteService.get(id);
-      if (!data) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data, error: null });
+      const data = await EstudianteService.get(req.validated!.params.id);
+      res.json({ success: true, message: 'Estudiante obtenido', data, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error fetching estudiante' } });
+      next(error);
     }
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
-      // accept nested payloads like { usuario: {...}, estudiante: {...} } or flat body
       const payload = { ...(req.body.usuario ?? {}), ...(req.body.estudiante ?? {}), ...req.body };
       const result = await EstudianteService.create(payload);
-      res.status(201).json({ success: true, data: result, error: null });
+      res.status(201).json({ success: true, message: 'Estudiante creado', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error creating estudiante' } });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
       const payload = { ...(req.body.usuario ?? {}), ...(req.body.estudiante ?? {}), ...req.body };
-      const result = await EstudianteService.update(id, payload);
-      if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data: result, error: null });
+      const result = await EstudianteService.update(req.validated!.params.id, payload);
+      res.json({ success: true, message: 'Estudiante actualizado', data: result, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error updating estudiante' } });
+      next(error);
     }
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] ?? '' : (req.params.id ?? '');
-      const result = await EstudianteService.delete(id);
-      if (!result) return res.status(404).json({ success: false, data: null, error: { message: 'Not found' } });
-      res.json({ success: true, data: null, error: null });
+      await EstudianteService.delete(req.validated!.params.id);
+      res.json({ success: true, message: 'Estudiante eliminado', data: null, error: null });
     } catch (error) {
-      res.status(500).json({ success: false, data: null, error: { message: 'Error deleting estudiante' } });
+      next(error);
     }
   }
 }

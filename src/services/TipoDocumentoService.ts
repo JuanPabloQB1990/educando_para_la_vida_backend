@@ -1,4 +1,5 @@
 import TipoDocumentoRepository from '../repositories/TipoDocumentoRepository';
+import { AppError } from '../error/AppError';
 
 class TipoDocumentoService {
   async list() {
@@ -6,7 +7,9 @@ class TipoDocumentoService {
   }
 
   async get(id: string) {
-    return await TipoDocumentoRepository.findById(id);
+    const data = await TipoDocumentoRepository.findById(id);
+    if (!data) throw new AppError(404, 'Tipo de documento no encontrado');
+    return data;
   }
 
   async create(nombre: string) {

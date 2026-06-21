@@ -1,4 +1,5 @@
 import AsistenciaRepository from '../repositories/AsistenciaRepository';
+import { AppError } from '../error/AppError';
 
 class AsistenciaService {
   async listByGradoPeriodo(idGradoEducacion: string, idPeriodo: string) {
@@ -10,7 +11,9 @@ class AsistenciaService {
   }
 
   async get(id: string) {
-    return AsistenciaRepository.findById(id);
+    const data = await AsistenciaRepository.findById(id);
+    if (!data) throw new AppError(404, 'Asistencia no encontrada');
+    return data;
   }
 
   async create(data: { idEstudiante: string; idActividad: string; fecha: string; estadoAsistencia: string | null; observacion?: string | null }) {
@@ -50,6 +53,7 @@ class AsistenciaService {
   }
 
   async updateFechaSesion(idActividad: string, fechaActual: string, fechaNueva: string) {
+    if (fechaActual === fechaNueva) throw new AppError(400, 'La fecha nueva debe ser distinta a la actual');
     return AsistenciaRepository.updateFechaByActividadFecha(idActividad, fechaActual, fechaNueva);
   }
 

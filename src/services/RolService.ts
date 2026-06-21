@@ -1,4 +1,5 @@
 import RolRepository from '../repositories/RolRepository';
+import { AppError } from '../error/AppError';
 
 class RolService {
   async list() {
@@ -6,11 +7,15 @@ class RolService {
   }
 
   async get(id: string) {
-    return await RolRepository.findById(id);
+    const data = await RolRepository.findById(id);
+    if (!data) throw new AppError(404, 'Rol no encontrado');
+    return data;
   }
 
   async findByName(nombre_rol: string) {
-    return await RolRepository.findByName(nombre_rol);
+    const data = await RolRepository.findByName(nombre_rol);
+    if (!data) throw new AppError(404, 'Rol no encontrado');
+    return data;
   }
 
   async create(nombre_rol: string) {

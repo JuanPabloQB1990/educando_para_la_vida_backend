@@ -13,9 +13,7 @@ class TiempoValidacionController {
 
   async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
-      const data = await tiempoService.get(id);
-      if (!data) return res.status(404).json({ success: false, message: 'No encontrado', data: null, error: null });
+      const data = await tiempoService.get(req.validated!.params.id);
       res.json({ success: true, message: 'Tiempo de validación encontrado', data, error: null });
     } catch (error) {
       next(error);
@@ -34,9 +32,8 @@ class TiempoValidacionController {
 
   async update(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
       const { tiempo } = req.body;
-      const data = await tiempoService.update(id, tiempo);
+      const data = await tiempoService.update(req.validated!.params.id, tiempo);
       res.json({ success: true, message: 'Tiempo de validación actualizado', data, error: null });
     } catch (error) {
       next(error);
@@ -45,8 +42,7 @@ class TiempoValidacionController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
-      const id = req.params.id as string;
-      await tiempoService.delete(id);
+      await tiempoService.delete(req.validated!.params.id);
       res.json({ success: true, message: 'Tiempo de validación eliminado', data: null, error: null });
     } catch (error) {
       next(error);

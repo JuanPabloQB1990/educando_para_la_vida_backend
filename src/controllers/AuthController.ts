@@ -41,63 +41,78 @@ class AuthController {
     }
   }
 
-  async refresh(req: Request, res: Response): Promise<void> {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      res.status(400).json({ success: false, message: 'Refresh token requerido', data: null, error: 'Refresh token requerido' });
-      return;
+  async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        res.status(400).json({ success: false, message: 'Refresh token requerido', data: null, error: null });
+        return;
+      }
+      const result = await AuthService.refresh(refreshToken);
+      res.status(200).json({ success: true, message: 'Token renovado', data: result, error: null });
+    } catch (error) {
+      next(error);
     }
-
-    const result = await AuthService.refresh(refreshToken);
-    res.status(200).json({ success: true, message: 'Token renovado', data: result, error: null });
   }
 
-  async logout(req: Request, res: Response): Promise<void> {
-    await AuthService.logout(req.user!.id);
-    res.status(200).json({ success: true, message: 'Sesión cerrada', data: null, error: null });
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await AuthService.logout(req.user!.id);
+      res.status(200).json({ success: true, message: 'Sesión cerrada', data: null, error: null });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async solicitarRecuperacion(req: Request, res: Response): Promise<void> {
-    const parsed = recuperarSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, message: 'Email inválido', data: null, error: 'Email inválido' });
-      return;
+  async solicitarRecuperacion(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = recuperarSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, message: 'Email inválido', data: null, error: null });
+        return;
+      }
+      await AuthService.solicitarRecuperacion(parsed.data.email);
+      res.status(200).json({
+        success: true,
+        message: 'Si el correo existe, recibirás un código de recuperación.',
+        data: null,
+        error: null,
+      });
+    } catch (error) {
+      next(error);
     }
-
-    await AuthService.solicitarRecuperacion(parsed.data.email);
-    res.status(200).json({
-      success: true,
-      message: 'Si el correo existe, recibirás un código de recuperación.',
-      data: null,
-      error: null,
-    });
   }
 
-  async verificarCodigo(req: Request, res: Response): Promise<void> {
-    const parsed = verificarCodigoSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: parsed.error.errors[0].message });
-      return;
+  async verificarCodigo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = verificarCodigoSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: null });
+        return;
+      }
+      const valido = await AuthService.verificarCodigo(parsed.data.email, parsed.data.code);
+      if (!valido) {
+        res.status(400).json({ success: false, message: 'Código inválido o expirado', data: null, error: null });
+        return;
+      }
+      res.status(200).json({ success: true, message: 'Código válido', data: null, error: null });
+    } catch (error) {
+      next(error);
     }
-
-    const valido = await AuthService.verificarCodigo(parsed.data.email, parsed.data.code);
-    if (!valido) {
-      res.status(400).json({ success: false, message: 'Código inválido o expirado cambiado', data: null, error: 'Código inválido o expirado cambiado' });
-      return;
-    }
-
-    res.status(200).json({ success: true, message: 'Código válido', data: null, error: null });
   }
 
-  async nuevaPassword(req: Request, res: Response): Promise<void> {
-    const parsed = nuevaPasswordSchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: parsed.error.errors[0].message });
-      return;
+  async nuevaPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = nuevaPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({ success: false, message: parsed.error.errors[0].message, data: null, error: null });
+        return;
+      }
+      await AuthService.nuevaPassword(parsed.data.email, parsed.data.code, parsed.data.newPassword);
+      res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente', data: null, error: null });
+    } catch (error) {
+      next(error);
     }
-
-    await AuthService.nuevaPassword(parsed.data.email, parsed.data.code, parsed.data.newPassword);
-    res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente', data: null, error: null });
   }
 }
 
